@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ESNext", // Target modern JavaScript
+    "lib": ["DOM", "DOM.Iterable", "ESNext"], // Include DOM and modern JS features
+    "allowJs": true, // Allow JavaScript files
+    "skipLibCheck": true, // Skip checking library declaration files
+    "esModuleInterop": true, // Enable ES module compatibility
+    "strict": true, // Enable all strict type-checking options
+    "forceConsistentCasingInFileNames": true, // Disallow inconsistent casing
+    "module": "ESNext", // Use ESNext for module code generation
+    "moduleResolution": "Node", // Use Node.js resolution for modules
+    "resolveJsonModule": true, // Enable importing .json files
+    "isolatedModules": true, // Ensure each file can be safely transpiled
+    "noEmit": true, // Do not emit outputs
+    "jsx": "react-jsx" // Use the new JSX transform
+  },
+  "include": ["src"], // Include all files in the src folder
+  "exclude": ["node_modules"] // Exclude node_modules folder
+}
