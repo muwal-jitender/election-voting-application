@@ -141,7 +141,6 @@ body {
 /* ---------- ERROR PAGE ----------- */
 .errorPage {
   display: grid;
-
   place-items: center;
   height: 100vh;
   background: var(--color-gray-0);
