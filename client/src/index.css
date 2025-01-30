@@ -130,6 +130,19 @@ button {
   background: var(--color-grey-900);
   color: var(--color-gray-0);
 }
+.dark {
+  --color-gray-0: #0e0d14;
+  --color-gray-100: #2f2b42;
+  --color-gray-200: #45405e;
+  --color-gray-300: #7b7b7b;
+  --color-gray-400: #919191;
+  --color-gray-500: #a1a1a1;
+  --color-gray-600: #c0c0c0;
+  --color-gray-700: #e6e5e5;
+  --color-gray-800: #fafafa;
+  --color-gray-900: #fff;
+}
+
 body {
   font-family: "Montserrat", sans-serif;
   font-size: 0.9rem;
@@ -157,4 +170,15 @@ body {
 }
 .errorPage__container h1 {
   font-size: 4rem;
+}
+
+/* ---------- MEDIA QUERIES (Mobile) ---------- */
+@media screen and (max-width: 600px) {
+  .container {
+    width: var(--container-w-sm);
+  }
+
+  .errorPage__container {
+    padding: 0 2rem;
+  }
 }
