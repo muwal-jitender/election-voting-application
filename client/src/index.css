@@ -137,3 +137,25 @@ body {
   color: var(--color-gray-700);
   line-height: 1.6;
 }
+
+/* ---------- ERROR PAGE ----------- */
+.errorPage {
+  display: grid;
+
+  place-items: center;
+  height: 100vh;
+  background: var(--color-gray-0);
+}
+.errorPage__container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.errorPage__container img {
+  width: 80%;
+}
+.errorPage__container h1 {
+  font-size: 4rem;
+}
