@@ -13,9 +13,17 @@ const Navbar: React.FC = () => {
   const [darkTheme, setDarkTheme] = useState(
     localStorage.getItem(VOTING_APP_THEME)
   );
+  // Show or hide nav on page load and window resize
+  useEffect(() => {
+    showHideNav();
+    window.addEventListener("resize", showHideNav);
 
-  // Function to close nav on small screens when a link is clicked
-  const closeNavMenuHandler = () => {
+    return () => {
+      window.removeEventListener("resize", showHideNav);
+    };
+  }, []);
+
+  const showHideNav = () => {
     if (window.innerWidth < 600) {
       setShowNav(false);
     } else {
@@ -23,17 +31,21 @@ const Navbar: React.FC = () => {
     }
   };
 
+  // Function to toggle theme
+  const toggleTheme = () => {
+    showHideNav();
+  };
+
   useEffect(() => {
     document.body.className = localStorage.getItem(VOTING_APP_THEME) ?? "";
   }, [darkTheme]);
+
   // Function to toggle dark theme
   const changeThemeHandler = () => {
-    if (localStorage.getItem(VOTING_APP_THEME) === "dark") {
-      localStorage.setItem(VOTING_APP_THEME, "");
-    } else {
-      localStorage.setItem(VOTING_APP_THEME, "dark");
-    }
-    setDarkTheme(localStorage.getItem(VOTING_APP_THEME));
+    const currentTheme = localStorage.getItem(VOTING_APP_THEME);
+    const newTheme = currentTheme === "dark" ? "" : "dark";
+    localStorage.setItem(VOTING_APP_THEME, newTheme);
+    setDarkTheme(newTheme);
   };
   return (
     <nav className="nav">
@@ -45,13 +57,13 @@ const Navbar: React.FC = () => {
         <div>
           {showNav && (
             <menu>
-              <NavLink to="/elections" onClick={closeNavMenuHandler}>
+              <NavLink to="/elections" onClick={toggleTheme}>
                 Elections
               </NavLink>
-              <NavLink to="/results" onClick={closeNavMenuHandler}>
+              <NavLink to="/results" onClick={toggleTheme}>
                 Results
               </NavLink>
-              <NavLink to="/logout" onClick={closeNavMenuHandler}>
+              <NavLink to="/logout" onClick={toggleTheme}>
                 Logout
               </NavLink>
             </menu>
