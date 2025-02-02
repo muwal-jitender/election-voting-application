@@ -33,7 +33,7 @@ const Register = () => {
   return (
     <section className="register">
       <div className="container register__container">
-        <h2>Sign Up</h2>
+        <h2>Register</h2>
         <form className="form" onSubmit={handleSubmit}>
           <p className="form__error-message">Any error from the backend</p>
           <input
@@ -77,7 +77,7 @@ const Register = () => {
             Already have an account? <Link to="/">Sign In</Link>
           </p>
           <button type="submit" className="btn primary">
-            Sign Up
+            Register
           </button>
         </form>
       </div>
