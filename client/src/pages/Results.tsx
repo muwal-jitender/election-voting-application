@@ -1,9 +1,10 @@
+import { Election } from "../types";
 import React from "react";
 import ResultElection from "../components/ResultElection";
 import { elections as dummyElections } from "../data/data";
 
 const Results = () => {
-  const [elections, setElections] = React.useState(dummyElections);
+  const [elections, setElections] = React.useState<Election[]>(dummyElections);
   return (
     <section className="results">
       <div className="container results__container">
