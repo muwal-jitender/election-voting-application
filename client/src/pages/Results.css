@@ -1,0 +1,9 @@
+.results {
+  margin: 5rem 0;
+  width: 58rem;
+  margin-inline: auto;
+}
+.results__container {
+  display: flex;
+  flex-direction: column;
+}

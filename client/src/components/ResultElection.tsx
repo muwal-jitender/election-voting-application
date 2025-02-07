@@ -1,7 +1,10 @@
-import CandidateRating from "./CandidateRating";
-import { Election } from "../types";
-import { candidates } from "../data/data";
+import "./ResultElection.css";
+
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { candidates } from "../data/data";
+import { Election } from "../types";
+import CandidateRating from "./CandidateRating";
 
 const ResultElection = ({ id, thumbnail, title }: Election) => {
   const [totalVotes, setTotalVotes] = useState(258);
@@ -16,16 +19,19 @@ const ResultElection = ({ id, thumbnail, title }: Election) => {
         <div className="result_header-image">
           <img src={thumbnail} alt={title} />
         </div>
-        <ul className="result__list">
-          {electionCandidates.map((candidate) => (
-            <CandidateRating
-              key={candidate.id}
-              {...candidate}
-              totalVotes={totalVotes}
-            />
-          ))}
-        </ul>
       </header>
+      <ul className="result__list">
+        {electionCandidates.map((candidate) => (
+          <CandidateRating
+            key={candidate.id}
+            {...candidate}
+            totalVotes={totalVotes}
+          />
+        ))}
+      </ul>
+      <Link to={`/election/${id}/candidates`} className="btn primary full">
+        Enter Election
+      </Link>
     </article>
   );
 };

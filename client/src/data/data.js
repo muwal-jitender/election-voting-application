@@ -5,10 +5,8 @@ import Candidate4 from "../assets/candidate-4.jpeg";
 import Candidate5 from "../assets/candidate-5.jpeg";
 import Candidate6 from "../assets/candidate-6.jpeg";
 import Candidate7 from "../assets/candidate-7.jpeg";
-import Thumbnail1 from "../assets/american-flag.png";
 import Thumbnail2 from "../assets/flag_of_alabama.png";
 import Thumbnail3 from "../assets/flag_of_alaska.png";
-import Thumbnail4 from "../assets/flag_of_the_state_of_georgia.png";
 
 export const elections = [
   {
@@ -98,7 +96,7 @@ export const candidates = [
   {
     id: "c7",
     fullName: "Chaminda Vas",
-    image: Candidate6,
+    image: Candidate7,
     motto:
       "Sed quibusdam recusandae alias error harum maxime adipisci amet laborum.",
     voteCount: 145,
