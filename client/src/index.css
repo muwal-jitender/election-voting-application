@@ -1,6 +1,7 @@
 @font-face {
   font-family: "Montserrat";
-  src: url("./assets/fonts/Montserrat-ThinItalic.woff2") format("woff2"),
+  src:
+    url("./assets/fonts/Montserrat-ThinItalic.woff2") format("woff2"),
     url("./assets/fonts/Montserrat-ThinItalic.woff") format("woff");
   font-weight: 100;
   font-style: italic;
@@ -9,7 +10,8 @@
 
 @font-face {
   font-family: "Montserrat";
-  src: url("./assets/fonts/Montserrat-Thin.woff2") format("woff2"),
+  src:
+    url("./assets/fonts/Montserrat-Thin.woff2") format("woff2"),
     url("./assets/fonts/Montserrat-Thin.woff") format("woff");
   font-weight: 100;
   font-style: normal;
@@ -112,6 +114,10 @@ button {
   border-radius: var(--radius-1);
   transition: var(--transform);
 }
+.btn:hover {
+  background: var(--color-grey-900);
+  color: var(--color-gray-0);
+}
 .btn.primary {
   background: var(--color-primary);
   color: var(--color-gray-0);
@@ -126,10 +132,7 @@ button {
 .btn.full {
   width: 100%;
 }
-.btn:hover {
-  background: var(--color-grey-900);
-  color: var(--color-gray-0);
-}
+
 .dark {
   --color-gray-0: #0e0d14;
   --color-gray-100: #2f2b42;
