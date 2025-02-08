@@ -1,3 +1,4 @@
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import {
   Candidates,
   Congrats,
@@ -10,7 +11,6 @@ import {
   Results,
   RootLayout,
 } from "./pages/index";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 import React from "react";
 

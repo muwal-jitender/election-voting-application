@@ -1,0 +1,24 @@
+.candidates {
+  margin: 5rem 0;
+}
+
+.candidates__header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 60%;
+  margin-inline: auto;
+}
+
+.candidates__header p {
+  margin: 1rem 0 3rem;
+}
+.candidates__header p .btn.primary {
+  justify-content: center;
+}
+.candidates__container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 3rem;
+}

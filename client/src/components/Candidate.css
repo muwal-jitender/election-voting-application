@@ -1,0 +1,27 @@
+.candidate {
+  background: var(--color-gray-0);
+  text-align: center;
+  border-radius: var(--radius-3);
+  padding-bottom: 1.2rem;
+  overflow: hidden;
+  box-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.1);
+  border: 0.5rem solid var(--color-gray-0);
+  transition: var(--transform);
+  max-width: 17rem;
+}
+.candidate:hover {
+  box-shadow: none;
+  border-color: var(--color-gray-100);
+}
+.candidate__image {
+  width: 100%;
+  aspect-ratio: 1/1;
+  overflow: hidden;
+  margin-inline: auto;
+  margin-bottom: 1.5rem;
+}
+
+.candidate small {
+  display: block;
+  margin: 0.5rem 0 1rem;
+}

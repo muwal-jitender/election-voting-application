@@ -1,4 +1,4 @@
-export interface Election {
+export interface ElectionModel {
   id: string;
   title: string;
   description: string;

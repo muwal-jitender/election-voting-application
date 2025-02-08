@@ -3,10 +3,10 @@ import "./ResultElection.css";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { candidates } from "../data/data";
-import { Election } from "../types";
+import { ElectionModel } from "../types";
 import CandidateRating from "./CandidateRating";
 
-const ResultElection = ({ id, thumbnail, title }: Election) => {
+const ResultElection = ({ id, thumbnail, title }: ElectionModel) => {
   const [totalVotes, setTotalVotes] = useState(258);
   const electionCandidates = candidates.filter(
     (candidate) => candidate.electionId === id,
@@ -29,7 +29,7 @@ const ResultElection = ({ id, thumbnail, title }: Election) => {
           />
         ))}
       </ul>
-      <Link to={`/election/${id}/candidates`} className="btn primary full">
+      <Link to={`/elections/${id}/candidates`} className="btn primary full">
         Enter Election
       </Link>
     </article>
