@@ -106,21 +106,22 @@ button {
 }
 .btn {
   width: fit-content;
-  background: var(--color-grey-100);
-  color: var(--color-grey-900);
+  background: var(--color-gray-100);
+  color: var(--color-gray-900);
   font-weight: 600;
   padding: 1rem 2rem;
   text-align: center;
   border-radius: var(--radius-1);
   transition: var(--transform);
 }
-.btn:hover {
-  background: var(--color-grey-900);
-  color: var(--color-gray-0);
-}
+
 .btn.primary {
   background: var(--color-primary);
   color: var(--color-gray-0);
+}
+.btn.primary:hover {
+  background: var(--color-gray-900);
+  color: var(--color-gray-100);
 }
 .btn.danger {
   background: var(--color-danger);
