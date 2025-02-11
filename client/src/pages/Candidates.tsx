@@ -1,13 +1,18 @@
 import "./Candidates.css";
 
+import { CandidateModel, RootState } from "../types";
+
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import Candidate from "../components/Candidate";
 import ConfirmVote from "../components/ConfirmVote";
 import { candidates as dummyCandidates } from "../data/data";
-import { CandidateModel } from "../types";
 
 const Candidates = () => {
   const { id } = useParams<{ id: string }>();
+  const voteCandidateModalShowing = useSelector(
+    (state: RootState) => state.ui.voteCandidateModalShowing,
+  );
   // Get Candidates that belongs to this election
   const electionCandidates: CandidateModel[] = dummyCandidates.filter(
     (candidate) => candidate.electionId === id,
@@ -30,7 +35,7 @@ const Candidates = () => {
           ))}
         </div>
       </section>
-      <ConfirmVote />
+      {voteCandidateModalShowing && <ConfirmVote />}
     </>
   );
 };

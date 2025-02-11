@@ -2,13 +2,21 @@ import "./ConfirmVote.css";
 
 import { useEffect, useState } from "react";
 
+import { useDispatch } from "react-redux";
 import { candidates } from "../data/data";
+import { UiActions } from "../store/ui-slice";
 import { CandidateModel } from "../types";
 
 const ConfirmVote = () => {
   const [modalCandidate, setModalCandidate] = useState<CandidateModel | null>(
     null,
   );
+  const dispatch = useDispatch();
+
+  // Close the confirm vote modal
+  const closeCandidateModal = () => {
+    dispatch(UiActions.closeVoteCandidateModal());
+  };
 
   const fetchCandidate = () => {
     const candidate = candidates.find((candidate) => candidate.id === "c1");
@@ -38,7 +46,9 @@ const ConfirmVote = () => {
           </>
         )}
         <div className="confirm__vote-cta">
-          <button className="btn danger">Cancel</button>
+          <button className="btn danger" onClick={closeCandidateModal}>
+            Cancel
+          </button>
           <button className="btn primary">Confirm</button>
         </div>
       </div>

@@ -1,12 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { UIState } from "../types";
 
-const initialState = {
+const initialState: UIState = {
   addCandidateModalShowing: false,
   voteCandidateModalShowing: false,
   electionModalShowing: false,
   updateElectionModalShowing: false,
 };
-const uiSlice = createSlice({
+const UiSlice = createSlice({
   name: "ui",
   initialState,
   reducers: {
@@ -37,5 +38,5 @@ const uiSlice = createSlice({
   },
 });
 
-export const uiActions = uiSlice.actions;
-export default uiSlice;
+export const UiActions = UiSlice.actions;
+export default UiSlice;
