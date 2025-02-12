@@ -1,0 +1,8 @@
+.congrats {
+  padding: 8rem 0;
+  height: 100vh;
+  text-align: center;
+}
+.congrats__container p {
+  margin: 0.5rem 0 1.2rem;
+}
