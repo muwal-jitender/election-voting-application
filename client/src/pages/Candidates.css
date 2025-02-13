@@ -22,3 +22,9 @@
   grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
   gap: 3rem;
 }
+
+@media screen and (max-width: 600px) {
+  .candidates__header {
+    width: var(--container-w-sm);
+  }
+}

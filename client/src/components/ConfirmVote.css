@@ -33,3 +33,9 @@
 .dark .confirm__vote-cta {
   color: var(--color-gray-0);
 }
+
+@media screen and (max-width: 600px) {
+  .modal__content {
+    width: none;
+  }
+}

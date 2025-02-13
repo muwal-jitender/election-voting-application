@@ -1,4 +1,4 @@
-export interface Voter {
+export interface VoterModel {
   id: string;
   fullName: string;
   email: string;

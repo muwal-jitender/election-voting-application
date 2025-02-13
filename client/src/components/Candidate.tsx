@@ -2,6 +2,7 @@ import "./Candidate.css";
 
 import { useDispatch } from "react-redux";
 import { UiActions } from "../store/ui-slice";
+import { voteActions } from "../store/vote-slice";
 import { CandidateModel } from "../types";
 
 const Candidate = ({ image, id, fullName, motto }: CandidateModel) => {
@@ -10,6 +11,7 @@ const Candidate = ({ image, id, fullName, motto }: CandidateModel) => {
   // Open the confirm vote modal
   const openCandidateModal = () => {
     dispatch(UiActions.openVoteCandidateModal());
+    dispatch(voteActions.changeSelectedVoteCandidate(id));
   };
 
   return (

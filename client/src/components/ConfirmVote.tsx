@@ -1,11 +1,11 @@
 import "./ConfirmVote.css";
 
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { CandidateModel, RootState } from "../types";
 
-import { useDispatch } from "react-redux";
 import { candidates } from "../data/data";
 import { UiActions } from "../store/ui-slice";
-import { CandidateModel } from "../types";
 
 const ConfirmVote = () => {
   const [modalCandidate, setModalCandidate] = useState<CandidateModel | null>(
@@ -18,8 +18,15 @@ const ConfirmVote = () => {
     dispatch(UiActions.closeVoteCandidateModal());
   };
 
+  // Get selected candidate id from redux store
+  const selectedVoteCandidate = useSelector(
+    (state: RootState) => state.vote.selectedVoteCandidate,
+  );
+
   const fetchCandidate = () => {
-    const candidate = candidates.find((candidate) => candidate.id === "c1");
+    const candidate = candidates.find(
+      (candidate) => candidate.id === selectedVoteCandidate,
+    );
     if (candidate) {
       setModalCandidate(candidate);
     }

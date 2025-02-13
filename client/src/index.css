@@ -207,7 +207,6 @@ body {
 }
 .modal__content {
   background: var(--color-gray-0);
-  width: 30rem;
   border-radius: var(--radius-5);
   overflow: hidden;
 }
