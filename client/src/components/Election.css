@@ -1,0 +1,38 @@
+.election {
+  display: grid;
+  grid-template-columns: 17rem auto;
+  align-items: center;
+  background: var(--color-gray-0);
+  border-radius: var(--radius-3);
+  overflow: hidden;
+  border: 0.5rem solid var(--color-gray-0);
+  transition: var(--transform);
+}
+.election__image {
+  height: 10rem;
+}
+.election:hover {
+  box-shadow: 0 0.8rem 0.8rem rgba(0, 0, 0, 0.1);
+}
+.election__info {
+  padding: 1rem 2rem;
+}
+.election__info h4 {
+  margin-bottom: 0.7rem;
+  color: var(--color-primary);
+}
+.election__cta {
+  display: flex;
+  gap: 1.2rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+@media screen and (max-width: 600px) {
+  .election {
+    grid-template-columns: 1fr;
+  }
+  .election__info {
+    padding: 2rem 1rem;
+  }
+}

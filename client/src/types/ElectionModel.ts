@@ -6,3 +6,8 @@ export interface ElectionModel {
   candidates: string[];
   voters: string[];
 }
+export interface AddElectionModel {
+  title: string;
+  description: string;
+  thumbnail: string;
+}

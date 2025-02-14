@@ -6,7 +6,7 @@ import { voteActions } from "../store/vote-slice";
 import { CandidateModel } from "../types";
 
 const Candidate = ({ image, id, fullName, motto }: CandidateModel) => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch(); // Hook to send actions to Redux
 
   // Open the confirm vote modal
   const openCandidateModal = () => {

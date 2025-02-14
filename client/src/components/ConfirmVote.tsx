@@ -18,7 +18,7 @@ const ConfirmVote = () => {
     dispatch(UiActions.closeVoteCandidateModal());
   };
 
-  // Get selected candidate id from redux store
+  // Get selected candidate id (state) from redux store
   const selectedVoteCandidate = useSelector(
     (state: RootState) => state.vote.selectedVoteCandidate,
   );

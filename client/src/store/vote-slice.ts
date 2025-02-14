@@ -29,5 +29,7 @@ const VoteSlice = createSlice({
   },
 });
 
+// Exporting actions so we can use them with `dispatch`
 export const voteActions = VoteSlice.actions;
+// Exporting reducer so it can be used in the Redux store
 export default VoteSlice;
