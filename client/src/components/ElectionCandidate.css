@@ -1,0 +1,34 @@
+.election-candidate {
+  background: var(--color-gray-0);
+  border-radius: var(--radius-4);
+  overflow: hidden;
+  position: relative;
+  text-align: center;
+}
+
+.election-candidate__image {
+  height: 14rem;
+  overflow: hidden;
+}
+.election-candidate h5 {
+  margin: 0.5rem 0 0.3rem;
+}
+.election-candidate > div:nth-child(2) {
+  padding: 1.3rem;
+}
+
+.election-candidate__btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 1rem;
+  background: var(--color-danger);
+  color: var(--color-gray-0);
+  padding: 0.5rem;
+  font-size: 1.1rem;
+  border-radius: var(--radius-1);
+  display: flex;
+}
+.election-candidate__btn:hover {
+  background: var(--color-gray-900);
+}

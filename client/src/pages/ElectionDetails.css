@@ -1,0 +1,64 @@
+.election-details {
+  margin: 5rem 0;
+}
+.election-details__image {
+  height: 15rem;
+  margin: 1.2rem 0 0.8rem;
+}
+
+.election-details__candidates {
+  margin-top: 2.5rem;
+  padding: 2.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 3rem;
+  border-top: 2px solid var(--color-gray-200);
+}
+.add__candidate-btn {
+  background: var(--color-gray-100);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-4);
+  font-size: 5rem;
+  color: var(--color-primary);
+  box-shadow: 0 0.8rem 0.8rem rgba(0, 0, 0, 0.1);
+  transition: var(--transform);
+  display: grid;
+  place-items: center;
+  min-height: 15rem;
+}
+
+.voters {
+  margin: 6rem 0 3rem;
+}
+
+.voters h2 {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.voters__table {
+  width: 100%;
+}
+
+.voters__table thead th {
+  text-align: left;
+  padding: 0.7rem 1.5rem;
+}
+
+.voters__table tbody td {
+  padding: 0.7rem 1.5rem;
+}
+.voters__table tbody tr:nth-child(odd) {
+  background-color: var(--color-gray-0);
+}
+
+@media screen and (max-width: 600px) {
+  .voters__table thead tr {
+    display: flex;
+    flex-direction: column;
+  }
+  .voters__table tbody tr {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+}

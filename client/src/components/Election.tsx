@@ -1,9 +1,16 @@
 import "./Election.css";
 
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { UiActions } from "../store/ui-slice";
 import { ElectionModel } from "../types";
 
 const Election = ({ id, title, description, thumbnail }: ElectionModel) => {
+  const dispatch = useDispatch();
+  const openUpdateElectionModal = () => {
+    dispatch(UiActions.openUpdateElectionModal());
+  };
+
   return (
     <article className="election">
       <div className="election__image">
@@ -22,7 +29,9 @@ const Election = ({ id, title, description, thumbnail }: ElectionModel) => {
           <Link to={`/elections/${id}`} className="btn sm primary">
             View
           </Link>
-          <button className="btn sm primary">Edit</button>
+          <button className="btn sm primary" onClick={openUpdateElectionModal}>
+            Edit
+          </button>
         </div>
       </div>
     </article>
