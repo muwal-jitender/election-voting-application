@@ -7,7 +7,6 @@
   box-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.1);
   border: 0.5rem solid var(--color-gray-0);
   transition: var(--transform);
-  max-width: 17rem;
 }
 .candidate:hover {
   box-shadow: none;
@@ -24,10 +23,4 @@
 .candidate small {
   display: block;
   margin: 0.5rem 0 1rem;
-}
-
-@media screen and (max-width: 600px) {
-  .candidate {
-    max-width: none;
-  }
 }

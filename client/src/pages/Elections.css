@@ -13,3 +13,12 @@
   flex-direction: column;
   gap: 1rem;
 }
+
+@media screen and (max-width: 600px) {
+  .elections__header h1 {
+    font-size: 1.2rem;
+  }
+  .btn {
+    padding: 0.8rem 1.2rem;
+  }
+}
