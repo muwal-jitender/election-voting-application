@@ -1,5 +1,5 @@
 @font-face {
-  font-family: "Montserrat";
+  font-family: "Inter", serif;
   src:
     url("./assets/fonts/Montserrat-ThinItalic.woff2") format("woff2"),
     url("./assets/fonts/Montserrat-ThinItalic.woff") format("woff");
@@ -9,7 +9,7 @@
 }
 
 @font-face {
-  font-family: "Montserrat";
+  font-family: "Inter", serif;
   src:
     url("./assets/fonts/Montserrat-Thin.woff2") format("woff2"),
     url("./assets/fonts/Montserrat-Thin.woff") format("woff");
