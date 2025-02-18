@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 
+import  voterModel  from "../models/voter.model";
+
 // import { User } from "./auth.model"; // Simulated user model
 // import bcrypt from "bcryptjs";
 // import jwt from "jsonwebtoken";
@@ -13,11 +15,11 @@ const JWT_SECRET = "your_secret_key";
 // REGISTER USER
 export const register = async (req: Request, res: Response) => {
   try {
-    const { username, email, password } = req.body;
+    // const { fullName, email, password } = req.body;
 
-    // Check if user already exists
-    // const existingUser = users.find(user => user.email === email);
-    // if (existingUser) {
+    // // Check if user already exists
+    // const existingEmail = await voterModel.findOne({email});
+    // if (existingEmail) {
     //   return res.status(400).json({ message: "User already exists" });
     // }
 
