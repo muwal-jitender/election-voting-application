@@ -1,7 +1,7 @@
 import { Router } from "express";
 import candidateRouter from "./candidate.routes";
 import electionRouter from "./elections.routes";
-import voterRouter from "./voters.routes";
+import voterRouter from "./voter.routes";
 
 const router = Router();
 // Voters

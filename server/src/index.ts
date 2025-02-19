@@ -1,3 +1,5 @@
+import "reflect-metadata"
+
 import * as dotenv from "dotenv";
 
 import {errorHandler, notFound} from './middleware/error.middleware';

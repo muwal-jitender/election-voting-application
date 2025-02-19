@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import  voterModel  from "../models/voter.model";
+//import  voterModel  from "../models/voter.model";
 
 // import { User } from "./auth.model"; // Simulated user model
 // import bcrypt from "bcryptjs";
