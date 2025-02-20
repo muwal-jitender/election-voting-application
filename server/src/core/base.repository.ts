@@ -25,6 +25,10 @@ export class BaseRepository<T extends Document> {
   async findById(id: string): Promise<T | null> {
     return await this.model.findOne({ id }).exec();
   }
+  /** Find one document by column/field name */
+  async findOneByField<K extends keyof T>(field:K, value: unknown): Promise<T | null> {
+    return await this.model.findOne({ [field]: value} as Record<string, unknown>).exec();
+  }
 
   /** Update a document by ID */
   async update(id: string, data: Partial<T>): Promise<T | null> {

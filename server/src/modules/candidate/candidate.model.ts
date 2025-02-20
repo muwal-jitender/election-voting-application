@@ -6,33 +6,28 @@ import { v4 as uuidv4 } from "uuid";
 export interface CandidateDocument extends Document {
   id: string;
   fullName: string;
-  email: string;
-  password: string;
-  votedElectionIds: Types.ObjectId[];
-  isAdmin: boolean;
+  image: string;
+  motto: string;
+  voteCount: number;
+  electionId: string;
 }
 
-const CandidateSchema = new Schema<CandidateDocument>({
+export interface AddCandidateModel {
+  fullName: string;
+  image: string;
+  motto: string;
+}
+
+
+const candidateSchema = new Schema<CandidateDocument>({
   id: { type: String, default: uuidv4, unique: true },
   fullName: { type: String, required: true, trim: true },
-  email: {
-    type: String,
-    required: true,
-    unique: true, // Prevent duplicate emails
-    index: true,  // Improve query performance
-    match: [/^\S+@\S+\.\S+$/, "Please enter a valid email address"], // Validate email
-  },
-  password: { type: String, required: true, minlength: 8 }, // Enforce password length
-  votedElectionIds: [{ type: Types.ObjectId, ref: "Election", required: false }], // Not required initially
-  isAdmin: { type: Boolean, default: false, immutable: true }, // Immutable prevents users from making themselves admin
+  image: { type: String, required: true, trim: true },
+  motto: { type: String, required: true, trim: true },
+  voteCount: { type: Number, },
+  electionId: [{ type: Types.ObjectId, ref: "Election", required: false }], // Not required initially
 }, { timestamps: true });
 
-// **Hash password before saving**
-CandidateSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
 
-export const CandidateModel = model<CandidateDocument>("Voter", CandidateSchema);
+
+export const CandidateModel = model<CandidateDocument>("Candidate", candidateSchema);

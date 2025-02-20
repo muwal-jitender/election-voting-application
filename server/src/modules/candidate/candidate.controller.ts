@@ -8,7 +8,7 @@ import { CandidateDTO } from "./candidate.dto";
 import { CandidateService } from "./candidate.service";
 
 @injectable()
-export class ElectionController {
+export class CandidateController {
   constructor(@inject(CandidateService) private candidateService: CandidateService) {}
 
   async create  (req: Request, res: Response) {

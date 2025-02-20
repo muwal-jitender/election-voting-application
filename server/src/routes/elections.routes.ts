@@ -1,15 +1,16 @@
-import { create, get, getById, getCandidatesByElectionId, getVotersByElectionId, remove, update } from "../controllers/election.controller";
-
+import { ElectionController } from "../modules/election/election.controller";
 import { Router } from "express";
+import { container } from "tsyringe";
 
 const electionRouter = Router();
+const electionController = container.resolve(ElectionController);
 
-electionRouter.post("/", create);
-electionRouter.get("/", get);
-electionRouter.get("/:id", getById);
-electionRouter.delete("/:id", remove);
-electionRouter.patch("/:id", update);
-electionRouter.get("/:id/candidates", getCandidatesByElectionId);
-electionRouter.get("/:id/voters", getVotersByElectionId);
+electionRouter.post("/", electionController.create.bind(electionController));
+electionRouter.get("/", electionController.get.bind(electionController));
+electionRouter.get("/:id", electionController.getById.bind(electionController));
+electionRouter.delete("/:id",electionController.remove.bind(electionController));
+electionRouter.patch("/:id", electionController.update.bind(electionController));
+electionRouter.get("/:id/candidates", electionController.getCandidatesByElectionId.bind(electionController));
+electionRouter.get("/:id/voters", electionController.getVotersByElectionId.bind(electionController));
 
 export default electionRouter;

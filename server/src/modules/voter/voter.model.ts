@@ -14,7 +14,7 @@ export interface VoterDocument extends Document {
 
 const voterSchema = new Schema<VoterDocument>({
   id: { type: String, default: uuidv4, unique: true },
-  fullName: { type: String, required: true, trim: true },
+  fullName: { type: String, required: true, trim: true , lowercase: true},
   email: {
     type: String,
     required: true,
