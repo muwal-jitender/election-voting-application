@@ -2,7 +2,6 @@ import "reflect-metadata";
 
 import * as dotenv from "dotenv";
 
-import { errorHandler, notFound } from "./middleware/error.middleware";
 import express, { Request, Response } from "express";
 
 import { connect } from "mongoose";
@@ -26,8 +25,6 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use(router);
-app.use(notFound);
-app.use(errorHandler);
 
 // Start server
 connect(DB)

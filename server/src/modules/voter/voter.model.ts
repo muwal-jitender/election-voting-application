@@ -17,6 +17,7 @@ const voterSchema = new Schema<VoterDocument>(
     email: {
       type: String,
       required: true,
+      trim: true,
       lowercase: true,
       unique: true, // Prevent duplicate emails
       index: true, // Improve query performance

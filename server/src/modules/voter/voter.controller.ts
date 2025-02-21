@@ -37,7 +37,7 @@ export class VoterController {
           .json({ error: "Email already exists" });
       }
 
-      // Explicitly set isAdmin to false
+      // Explicitly set isAdmin to false, so that no external voter can set itself as Admin
       const voter = await this.voterService.registerVoter({
         ...voterData,
         isAdmin: false,
