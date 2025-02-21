@@ -13,7 +13,6 @@ export class RegisterVoterDTO {
   password!: string;
 }
 export class SignInDTO {
-
   @IsEmail({}, { message: "Invalid email address" })
   @IsNotEmpty({ message: "Email is required" })
   email!: string;

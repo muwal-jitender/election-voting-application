@@ -7,11 +7,11 @@ import { VoterDocument } from "./voter.model";
 // Voter Service
 @singleton()
 export class VoterService {
+  constructor(
+    @inject(VoterRepository) private voterRepository: VoterRepository
+  ) {}
 
-  constructor(@inject(VoterRepository) private voterRepository: VoterRepository) {}
-
-
-  async registerVoter(data: RegisterVoterDTO &{isAdmin:boolean}) {
+  async registerVoter(data: RegisterVoterDTO & { isAdmin: boolean }) {
     return await this.voterRepository.create(data);
   }
 
@@ -19,16 +19,24 @@ export class VoterService {
     return await this.voterRepository.findAll();
   }
   async findByEmail(email: string) {
-    return await this.voterRepository.findOneByField('email', email);
+    return await this.voterRepository.findOneByField("email", email);
   }
 
-   /** Check login credentials */
-   async checkCredentials(email: string, password: string): Promise<VoterDocument | null> {
-    const voter = await this.voterRepository.findOneByFieldWithSelect('email', email, ["password"]);
+  /** Check login credentials */
+  async checkCredentials(
+    email: string,
+    password: string
+  ): Promise<VoterDocument | null> {
+    // const voter = await this.voterRepository.findOneByField("email", email);
+    const voter = await this.voterRepository.findOneByFieldWithSelect(
+      "email",
+      email,
+      ["password"]
+    );
     if (!voter) {
       return null;
     }
- 
+
     const isMatch = await bcrypt.compare(password, voter.password);
     return isMatch ? voter : null;
   }

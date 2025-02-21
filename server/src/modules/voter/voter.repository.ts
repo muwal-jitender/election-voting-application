@@ -1,4 +1,4 @@
-import {VoterDocument, VoterModel} from "./voter.model"
+import { VoterDocument, VoterModel } from "./voter.model";
 
 import { BaseRepository } from "../../core/base.repository";
 import { singleton } from "tsyringe";

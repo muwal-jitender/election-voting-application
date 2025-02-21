@@ -1,0 +1,23 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach by Process ID",
+      "processId": "${command:PickProcess}",
+      "request": "attach",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug API",
+      "program": "${workspaceFolder}/server/src/index.ts",
+      "outFiles": ["${workspaceFolder}/server/dist/**/*.js"],
+      "preLaunchTask": "tsc: build - tsconfig.json",
+      "restart": true,
+      "env": { "NODE_ENV": "development" },
+      "console": "integratedTerminal"
+    }
+  ]
+}
