@@ -30,6 +30,18 @@ export class BaseRepository<T extends Document> {
     return await this.model.findOne({ [field]: value} as Record<string, unknown>).exec();
   }
 
+  /** Find one document by field name and allow selecting specific fields */
+async findOneByFieldWithSelect<K extends keyof T>(
+  field: K,
+  value: unknown,
+  selectedFields: string[] // Fields to include explicitly
+): Promise<T | null> {
+  return await this.model
+    .findOne({ [field]: value } as Record<string, unknown>)
+    .select(selectedFields.join(" ")) // Dynamically select required fields
+    .exec();
+}
+
   /** Update a document by ID */
   async update(id: string, data: Partial<T>): Promise<T | null> {
     return await this.model.findOneAndUpdate({ id }, data, { new: true }).exec();

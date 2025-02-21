@@ -24,10 +24,11 @@ export class VoterService {
 
    /** Check login credentials */
    async checkCredentials(email: string, password: string): Promise<VoterDocument | null> {
-    const voter = await this.voterRepository.findOneByField('email', email);
+    const voter = await this.voterRepository.findOneByFieldWithSelect('email', email, ["password"]);
     if (!voter) {
       return null;
     }
+ 
     const isMatch = await bcrypt.compare(password, voter.password);
     return isMatch ? voter : null;
   }

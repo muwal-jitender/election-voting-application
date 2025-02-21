@@ -35,32 +35,37 @@ export class VoterController {
       const voter = await this.voterService.registerVoter({ ...voterData, isAdmin: false });
 
       // Remove sensitive fields
-      const { password, ...safeVoterData } = voter.toObject();
+      // const { password, ...safeVoterData } = voter.toObject();
 
       return res.status(StatusCodes.CREATED).json({
         message: "Voter registered successfully",
-        data: safeVoterData
+        data: voter
       });
-    } catch (error) {
-      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: "Internal Server Error" });
+    } catch (error : unknown) {
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: (error as Error).stack });
     }
   }
 
 
   async login(req: Request, res: Response) {
     try {
-      const {email, password}: SignInDTO = req.body;
-      const voter = await this.voterService.checkCredentials(email, password);
-     return res.status(201).json(voter);
-    } catch (error) {
-    return  res.status(500).json({ message: "Internal Server Error" });
+      const signInDTO: SignInDTO =plainToClass(SignInDTO,req.body);
+       // Validate Payload
+       const errors = await validate(signInDTO);
+       if (errors.length > 0) {
+         return res.status(StatusCodes.BAD_REQUEST).json({ errors: errors.map(err => err.constraints) });
+       }
+      await this.voterService.checkCredentials(signInDTO.email.toLowerCase(), signInDTO.password);
+     return res.status(StatusCodes.OK).json({message:"You are now logged in",data:null});
+    } catch (error: unknown) {
+    return  res.status(500).json({ message: (error as Error).stack });
     }
   }
 
   async getById(req: Request, res: Response) {
     try {
       const voters = await this.voterService.getAllVoters();
-      res.status(200).json({ message: "Get Voter successful" });
+      res.status(200).json({ message: "Voter found", data: voters });
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error" });
     }
