@@ -23,7 +23,7 @@ export class BaseRepository<T extends Document> {
 
   /** Find one document by ID */
   async findById(id: string): Promise<T | null> {
-    return await this.model.findOne({ id }).exec();
+    return await this.model.findOne({ _id: id }).exec();
   }
   /** Find one document by column/field name */
   async findOneByField<K extends keyof T>(

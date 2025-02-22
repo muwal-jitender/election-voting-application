@@ -71,15 +71,19 @@ export class VoterController {
         signInDTO.email.toLowerCase(),
         signInDTO.password
       );
+
       if (!voter) {
         return res.status(StatusCodes.UNAUTHORIZED).json({
           message: "Invalid username or password",
           data: null,
         });
       }
-      return res
-        .status(StatusCodes.OK)
-        .json({ message: "You are now logged in", data: null });
+      const token = this.voterService.generateToken(voter);
+      const { password, ...response } = voter.toJSON(); // .toJSON() converts `_id` to `id`
+      return res.status(StatusCodes.OK).json({
+        message: "You are now logged in",
+        data: { token, response },
+      });
     } catch (error: unknown) {
       return res.status(500).json({ message: (error as Error).stack });
     }
@@ -87,7 +91,8 @@ export class VoterController {
 
   async getById(req: Request, res: Response) {
     try {
-      const voters = await this.voterService.getAllVoters();
+      const { id } = req.params;
+      const voters = await this.voterService.getVoterById(id);
       res.status(200).json({ message: "Voter found", data: voters });
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error" });

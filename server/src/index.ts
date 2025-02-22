@@ -4,6 +4,7 @@ import * as dotenv from "dotenv";
 
 import express, { Request, Response } from "express";
 
+import { config } from "./utils/config";
 import { connect } from "mongoose";
 import cors from "cors";
 import router from "./routes/index";
@@ -11,7 +12,7 @@ import router from "./routes/index";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = config.PORT || 5000;
 const DB = (process.env.MONGO_URI as string) || "";
 
 // Middleware
