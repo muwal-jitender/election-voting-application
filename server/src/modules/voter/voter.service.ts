@@ -4,7 +4,7 @@ import { RegisterVoterDTO } from "./voter.dto";
 import { VoterRepository } from "./voter.repository";
 import { VoterDocument } from "./voter.model";
 import jwt from "jsonwebtoken";
-import { config } from "../../utils/config";
+import { env } from "../../utils/env.config";
 // Voter Service
 @singleton()
 export class VoterService {
@@ -50,8 +50,8 @@ export class VoterService {
       email: voter.email,
       isAdmin: voter.isAdmin,
     };
-    const options = { expiresIn: parseInt(config.JWT_EXPIRES_IN, 10) }; // Explicitly define type
+    const options = { expiresIn: parseInt(env.JWT_EXPIRES_IN, 10) }; // Explicitly define type
 
-    return jwt.sign(payload, config.JWT_SECRET, options);
+    return jwt.sign(payload, env.JWT_SECRET, options);
   }
 }

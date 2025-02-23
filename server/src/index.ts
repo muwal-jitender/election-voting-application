@@ -4,15 +4,16 @@ import * as dotenv from "dotenv";
 
 import express, { Request, Response } from "express";
 
-import { config } from "./utils/config";
 import { connect } from "mongoose";
 import cors from "cors";
+import { env } from "./utils/env.config";
 import router from "./routes/index";
+import upload from "express-fileupload";
 
 dotenv.config();
 
 const app = express();
-const PORT = config.PORT || 5000;
+const PORT = env.PORT || 5000;
 const DB = (process.env.MONGO_URI as string) || "";
 
 // Middleware
@@ -25,6 +26,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server is running!");
 });
 
+app.use(upload());
 app.use(router);
 
 // Start server

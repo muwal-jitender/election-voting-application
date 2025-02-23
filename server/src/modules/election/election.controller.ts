@@ -6,6 +6,9 @@ import { inject, injectable, singleton } from "tsyringe";
 
 import { ElectionDTO } from "./election.dto";
 import { ElectionService } from "./election.service";
+import { UploadedFile } from "express-fileupload";
+import { uploadToCloudinary } from "../../config/cloudinary.config";
+import { StatusCodes } from "http-status-codes";
 
 @injectable()
 export class ElectionController {
@@ -15,10 +18,27 @@ export class ElectionController {
 
   async create(req: Request, res: Response) {
     try {
-      const voterData: ElectionDTO = req.body;
-      const voter = await this.electionService.create(voterData);
-      res.status(201).json(voter);
-      res.status(200).json({ message: "Get Voter successful" });
+      const { title, description } = req.body;
+
+      if (!req.files || !req.files.thumbnail) {
+        return res.status(400).json({ message: "Thumbnail is required" });
+      }
+
+      const file = req.files.thumbnail as UploadedFile; // ✅ Get file from `req.files`
+
+      // ✅ Upload to Cloudinary
+      const thumbnailUrl = await uploadToCloudinary(file.tempFilePath);
+
+      const newElection = await this.electionService.create({
+        title,
+        description,
+        thumbnail: thumbnailUrl ?? "", // ✅ Store Cloudinary URL
+      });
+
+      return res.status(StatusCodes.CREATED).json({
+        message: "Election created successfully",
+        data: newElection,
+      });
     } catch (error) {
       res.status(500).json({ message: "Internal server error" });
     }
