@@ -9,6 +9,8 @@ import { ElectionService } from "./election.service";
 import { UploadedFile } from "express-fileupload";
 import { uploadToCloudinary } from "../../config/cloudinary.config";
 import { StatusCodes } from "http-status-codes";
+import { validate } from "class-validator";
+import { plainToClass } from "class-transformer";
 
 @injectable()
 export class ElectionController {
@@ -18,10 +20,20 @@ export class ElectionController {
 
   async create(req: Request, res: Response) {
     try {
-      const { title, description } = req.body;
+      const data: ElectionDTO = plainToClass(ElectionDTO, req.body);
 
       if (!req.files || !req.files.thumbnail) {
-        return res.status(400).json({ message: "Thumbnail is required" });
+        return res
+          .status(StatusCodes.BAD_REQUEST)
+          .json({ message: "Thumbnail is required" });
+      }
+
+      // Validate Payload
+      const errors = await validate(data);
+      if (errors.length > 0) {
+        return res
+          .status(StatusCodes.BAD_REQUEST)
+          .json({ errors: errors.map((err) => err.constraints) });
       }
 
       const file = req.files.thumbnail as UploadedFile; // ✅ Get file from `req.files`
@@ -30,8 +42,7 @@ export class ElectionController {
       const thumbnailUrl = await uploadToCloudinary(file.tempFilePath);
 
       const newElection = await this.electionService.create({
-        title,
-        description,
+        ...data,
         thumbnail: thumbnailUrl ?? "", // ✅ Store Cloudinary URL
       });
 
@@ -39,8 +50,8 @@ export class ElectionController {
         message: "Election created successfully",
         data: newElection,
       });
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+    } catch (error: unknown) {
+      res.status(500).json({ message: (error as Error).stack });
     }
   }
 

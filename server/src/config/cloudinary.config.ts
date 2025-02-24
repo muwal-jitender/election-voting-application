@@ -32,8 +32,8 @@ export async function uploadToCloudinary(
     fs.unlinkSync(filePath);
 
     return result.secure_url; // Return Cloudinary URL
-  } catch (error) {
-    console.error("Cloudinary Upload Error:", error);
+  } catch (error: unknown) {
+    console.error("Cloudinary Upload Error:", (error as Error).stack);
     return null;
   }
 }

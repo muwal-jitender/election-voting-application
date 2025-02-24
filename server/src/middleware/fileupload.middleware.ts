@@ -4,10 +4,12 @@ import fileUpload from "express-fileupload";
 export const configureFileUpload = (app: Application) => {
   app.use(
     fileUpload({
-      useTempFiles: true, // ✅ Use temp files for better performance
-      tempFileDir: "/tmp/", // ✅ Store temporary files in `/tmp`
-      limits: { fileSize: 10 * 1024 * 1024 }, // ✅ Limit file size (10MB)
-      abortOnLimit: true,
+      useTempFiles: true, // ✅ Store files in temporary storage
+      tempFileDir: "/tmp/", // ✅ Temp directory for uploads
+      limits: { fileSize: 10 * 1024 * 1024 }, // ✅ 10MB limit
+      abortOnLimit: true, // ✅ Prevents large files from overloading memory
+      safeFileNames: true, // ✅ Sanitizes file names
+      preserveExtension: true, // ✅ Keeps file extension
     })
   );
 };
