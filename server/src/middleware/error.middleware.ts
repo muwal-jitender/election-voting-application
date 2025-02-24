@@ -1,18 +1,23 @@
-// import {NextFunction, Request, Response} from "express";
+import { NextFunction, Request, Response } from "express";
 
-// import { CustomError } from "../models/error.model";
+// ✅ Custom Error Interface
+interface AppError {
+  statusCode: number;
+  message: string;
+  details?: any;
+}
 
-// const notFound = (req:Request, res: Response, next:NextFunction)=>{
-//   const error = new Error(`Not found- ${req.originalUrl}`);
-//   res.status(404);
-//   next(error);
-// }
+// ✅ Error Middleware to Catch All Errors
+export const errorHandler = (
+  err: AppError,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  console.error("🔥 Error: ", err.message);
 
-// const errorHandler = (error:CustomError, req:Request, res: Response, next:NextFunction)=>{
-//   if(res.headersSent){
-//     return next(error);
-//   }
-//   res.status(error.code || 500).json({message:error.message || "An unknown error occurred."})
-// }
-
-// export {notFound, errorHandler}
+  res.status(err.statusCode || 500).json({
+    message: err.message || "Internal Server Error",
+    data: err.details || null,
+  });
+};

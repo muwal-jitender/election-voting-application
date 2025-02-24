@@ -8,6 +8,7 @@ import { configureFileUpload } from "./middleware/fileupload.middleware";
 import { connect } from "mongoose";
 import cors from "cors";
 import { env } from "./utils/env.config";
+import { errorHandler } from "./middleware/error.middleware";
 import router from "./routes/index";
 
 dotenv.config();
@@ -34,6 +35,8 @@ app.get("/", (req: Request, res: Response) => {
 // ✅ Use Routes
 app.use(router);
 
+// ✅ Error handling middleware (MUST be last)
+app.use(errorHandler);
 // Start server
 connect(DB)
   .then(() => {

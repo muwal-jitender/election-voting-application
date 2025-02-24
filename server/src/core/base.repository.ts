@@ -50,12 +50,13 @@ export class BaseRepository<T extends Document> {
   /** Update a document by ID */
   async update(id: string, data: Partial<T>): Promise<T | null> {
     return await this.model
-      .findOneAndUpdate({ id }, data, { new: true })
+      .findOneAndUpdate({ _id: id }, data, { new: true })
       .exec();
   }
 
   /** Delete a document by ID */
+  /** Delete a document by ID */
   async delete(id: string): Promise<T | null> {
-    return await this.model.findOneAndDelete({ id }).exec();
+    return await this.model.findOneAndDelete({ _id: id }).exec();
   }
 }

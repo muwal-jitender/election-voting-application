@@ -19,6 +19,9 @@ export class VoterService {
   async getAllVoters() {
     return await this.voterRepository.findAll();
   }
+  async getAllVotersByElectionId(id: string) {
+    return await this.voterRepository.findAll({ electionId: id });
+  }
   async getVoterById(id: string) {
     return await this.voterRepository.findById(id);
   }

@@ -1,6 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
 import { env } from "../utils/env.config";
-import fs from "fs"; // File system module
 
 // ✅ Configure Cloudinary (Ensure it's set up in `env.config.ts`)
 cloudinary.config({
@@ -28,12 +27,22 @@ export async function uploadToCloudinary(
       resource_type: "image", // Ensures it's an image upload
     });
 
-    // ✅ Delete temp file after successful upload
-    fs.unlinkSync(filePath);
-
     return result.secure_url; // Return Cloudinary URL
   } catch (error: unknown) {
     console.error("Cloudinary Upload Error:", (error as Error).stack);
     return null;
   }
 }
+
+// ✅ Function to delete a file from Cloudinary
+export const deleteFromCloudinary = async (cloudinaryUrl: string) => {
+  try {
+    const publicId = cloudinaryUrl.split("/").pop()?.split(".")[0]; // Extract public ID
+    if (!publicId) return;
+
+    await cloudinary.uploader.destroy(`elections/${publicId}`);
+    console.log(`✅ Deleted from Cloudinary: ${cloudinaryUrl}`);
+  } catch (error) {
+    console.error("❌ Cloudinary Deletion Failed:", error);
+  }
+};

@@ -1,31 +1,40 @@
 // Voter Controller
 import "reflect-metadata";
 
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { inject, injectable, singleton } from "tsyringe";
 
 import { ElectionDTO } from "./election.dto";
 import { ElectionService } from "./election.service";
 import { UploadedFile } from "express-fileupload";
-import { uploadToCloudinary } from "../../config/cloudinary.config";
+import {
+  deleteFromCloudinary,
+  uploadToCloudinary,
+} from "../../config/cloudinary.config";
 import { StatusCodes } from "http-status-codes";
 import { validate } from "class-validator";
 import { plainToClass } from "class-transformer";
+import path from "path";
+import { deleteFromLocal, uploadToLocal } from "../../utils/file.utils";
+import { FILE_SIZE } from "../../utils/config.utils";
+import { BadRequestError } from "../../utils/exceptions.utils";
+import { CandidateService } from "../candidate/candidate.service";
+import { VoterService } from "../voter/voter.service";
 
 @injectable()
 export class ElectionController {
   constructor(
-    @inject(ElectionService) private electionService: ElectionService
+    @inject(ElectionService) private electionService: ElectionService,
+    @inject(CandidateService) private candidateService: CandidateService,
+    @inject(VoterService) private voterService: VoterService
   ) {}
 
-  async create(req: Request, res: Response) {
+  async create(req: Request, res: Response, next: NextFunction) {
     try {
       const data: ElectionDTO = plainToClass(ElectionDTO, req.body);
 
       if (!req.files || !req.files.thumbnail) {
-        return res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ message: "Thumbnail is required" });
+        throw new BadRequestError("Thumbnail is required");
       }
 
       // Validate Payload
@@ -36,10 +45,19 @@ export class ElectionController {
           .json({ errors: errors.map((err) => err.constraints) });
       }
 
-      const file = req.files.thumbnail as UploadedFile; // ✅ Get file from `req.files`
+      const file = req.files.thumbnail as UploadedFile;
 
-      // ✅ Upload to Cloudinary
-      const thumbnailUrl = await uploadToCloudinary(file.tempFilePath);
+      // ✅ Get file size should be less than 10MB
+      if (file.size > FILE_SIZE) {
+        throw new BadRequestError(
+          "File too large. Please upload an image smaller than 10MB."
+        );
+      }
+
+      const cloudinaryUrl = await uploadToLocal(file);
+
+      // ✅ Upload to Cloudinary file.tempFilePath
+      const thumbnailUrl = await uploadToCloudinary(cloudinaryUrl);
 
       const newElection = await this.electionService.create({
         ...data,
@@ -51,39 +69,109 @@ export class ElectionController {
         data: newElection,
       });
     } catch (error: unknown) {
-      res.status(500).json({ message: (error as Error).stack });
+      next(error);
     }
   }
 
-  async get(req: Request, res: Response) {
+  async get(req: Request, res: Response, next: NextFunction) {
     try {
-      res.status(200).json({ message: "Get Voter successful" });
+      const elections = await this.electionService.getAll();
+      return res.status(StatusCodes.OK).json(elections);
     } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+      next(error);
     }
   }
 
-  async getById(req: Request, res: Response) {
+  async getById(req: Request, res: Response, next: NextFunction) {
     try {
-      res.status(200).json({ message: "Get Voter successful" });
+      const { id } = req.params;
+      if (!id) throw new BadRequestError("Election-id is missing");
+      const elections = await this.electionService.getById(id);
+      return res
+        .status(StatusCodes.OK)
+        .json({ message: "Found Election", data: elections });
     } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+      next(error);
     }
   }
 
-  async remove(req: Request, res: Response) {
+  async remove(req: Request, res: Response, next: NextFunction) {
     try {
-      res.status(200).json({ message: "Get Voter successful" });
+      const { id } = req.params;
+      if (!id) throw new BadRequestError("Election-id is missing");
+      const result = await this.electionService.delete(id);
+      if (!result) {
+        return res.status(StatusCodes.NOT_FOUND).json({
+          message: "Election not found",
+        });
+      }
+      return res.status(StatusCodes.OK).json({
+        message: "Election removed successfully",
+        data: null,
+      });
     } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+      next(error);
     }
   }
 
-  async update(req: Request, res: Response) {
+  async update(req: Request, res: Response, next: NextFunction) {
     try {
-      res.status(200).json({ message: "Get Voter successful" });
-    } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+      const { id } = req.params; // ✅ Get election ID from params
+      const existingElection = await this.electionService.getById(id);
+
+      if (!existingElection) {
+        throw new BadRequestError("Election not found");
+      }
+
+      const data: ElectionDTO = plainToClass(ElectionDTO, req.body);
+
+      // ✅ Validate Partial Update Payload
+      const errors = await validate(data, { skipMissingProperties: true });
+      if (errors.length > 0) {
+        return res
+          .status(StatusCodes.BAD_REQUEST)
+          .json({ errors: errors.map((err) => err.constraints) });
+      }
+
+      let thumbnailUrl = existingElection.thumbnail; // ✅ Keep old thumbnail by default
+
+      // ✅ If a new file is uploaded, process it
+      if (req.files && req.files.thumbnail) {
+        const file = req.files.thumbnail as UploadedFile;
+
+        // ✅ Check file size
+        if (file.size > FILE_SIZE) {
+          throw new BadRequestError(
+            "File too large. Please upload an image smaller than 10MB."
+          );
+        }
+
+        // ✅ Upload new file to Cloudinary
+        const cloudinaryUrl = await uploadToLocal(file);
+        thumbnailUrl =
+          (await uploadToCloudinary(cloudinaryUrl)) ?? thumbnailUrl;
+
+        // ✅ Delete old file from Cloudinary
+        if (existingElection.thumbnail) {
+          await deleteFromCloudinary(existingElection.thumbnail);
+        }
+
+        // ✅ Delete old file from local storage
+        deleteFromLocal(existingElection.thumbnail);
+      }
+
+      // ✅ Update the election record
+      const updatedElection = await this.electionService.update(id, {
+        ...data,
+        thumbnail: thumbnailUrl, // ✅ Update Cloudinary URL if changed
+      });
+
+      return res.status(StatusCodes.OK).json({
+        message: "Election updated successfully",
+        data: updatedElection,
+      });
+    } catch (error: unknown) {
+      next(error);
     }
   }
 
@@ -92,11 +180,20 @@ export class ElectionController {
    * @param req
    * @param res
    */
-  async getCandidatesByElectionId(req: Request, res: Response) {
+  async getCandidatesByElectionId(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     try {
-      res.status(200).json({ message: "Get Voter successful" });
+      const { id } = req.params;
+      if (!id) throw new BadRequestError("Election-id is missing");
+      const candidates = await this.candidateService.getAllByElectionId(id);
+      res
+        .status(StatusCodes.OK)
+        .json({ message: "Found Candidates", data: candidates });
     } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+      next(error);
     }
   }
   /**
@@ -104,11 +201,16 @@ export class ElectionController {
    * @param req
    * @param res
    */
-  async getVotersByElectionId(req: Request, res: Response) {
+  async getVotersByElectionId(req: Request, res: Response, next: NextFunction) {
     try {
-      res.status(200).json({ message: "Get Voter successful" });
+      const { id } = req.params;
+      if (!id) throw new BadRequestError("Election-id is missing");
+      const voters = await this.voterService.getAllVotersByElectionId(id);
+      res
+        .status(StatusCodes.OK)
+        .json({ message: "Found Candidates", data: voters });
     } catch (error) {
-      res.status(500).json({ message: "Internal server error" });
+      next(error);
     }
   }
 }
