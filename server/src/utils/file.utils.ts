@@ -16,7 +16,8 @@ export const uploadToLocal = (file: UploadedFile): Promise<string> => {
       fs.mkdirSync(UPLOADS_DIR, { recursive: true });
     }
     const fileExt = path.extname(file.name);
-    const fileName = `${path.basename(file.name, fileExt)}-${uuid()}${fileExt}`;
+    // ✅ Cloudinary converts the `.jpeg` to `.jpg` that is why it has also been converted here locally
+    const fileName = `${path.basename(file.name, fileExt)}-${uuid()}${fileExt === ".jpeg" ? ".jpg" : fileExt}`;
 
     const destinationPath = path.join(UPLOADS_DIR, fileName); // ✅ Append filename to the destination
 
@@ -29,10 +30,12 @@ export const uploadToLocal = (file: UploadedFile): Promise<string> => {
 
 /**
  *  ✅ Delete a file from local storage
- * @param filePath
+ * @param fileUrl
  */
-export const deleteFromLocal = (filePath: string) => {
+export const deleteFromLocal = (fileUrl: string) => {
   try {
+    const filename = getFilenameFromUrl(fileUrl);
+    const filePath = path.join(UPLOADS_DIR, filename);
     if (fs.existsSync(filePath)) {
       fs.unlinkSync(filePath);
       console.log(`✅ Deleted local file: ${filePath}`);
@@ -40,4 +43,15 @@ export const deleteFromLocal = (filePath: string) => {
   } catch (error) {
     console.error("❌ Failed to delete local file:", error);
   }
+};
+
+/**
+ * Returns the file name from the URL
+ * @param url
+ * @returns
+ */
+export const getFilenameFromUrl = (url: string) => {
+  const parsedUrl = new URL(url);
+  const pathname = parsedUrl.pathname;
+  return pathname.substring(pathname.lastIndexOf("/") + 1);
 };

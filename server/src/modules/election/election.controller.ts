@@ -105,6 +105,13 @@ export class ElectionController {
           message: "Election not found",
         });
       }
+      // ✅ Delete old file from Cloudinary
+      if (result.thumbnail) {
+        await deleteFromCloudinary(result.thumbnail);
+        // ✅ Delete old file from local storage
+        deleteFromLocal(result.thumbnail);
+      }
+
       return res.status(StatusCodes.OK).json({
         message: "Election removed successfully",
         data: null,
@@ -146,8 +153,9 @@ export class ElectionController {
           );
         }
 
-        // ✅ Upload new file to Cloudinary
+        // ✅ Upload new file to Locally
         const cloudinaryUrl = await uploadToLocal(file);
+        // ✅ Upload new file to Cloudinary
         thumbnailUrl =
           (await uploadToCloudinary(cloudinaryUrl)) ?? thumbnailUrl;
 
