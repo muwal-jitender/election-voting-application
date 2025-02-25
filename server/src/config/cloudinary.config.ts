@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
-import { env } from "../utils/env.config";
+import { env } from "../utils/env-config.utils";
 
 // ✅ Configure Cloudinary (Ensure it's set up in `env.config.ts`)
 cloudinary.config({

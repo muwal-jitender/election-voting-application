@@ -4,10 +4,10 @@ import * as dotenv from "dotenv";
 
 import express, { Request, Response } from "express";
 
-import { configureFileUpload } from "./middleware/fileupload.middleware";
+import { configureFileUpload } from "./middleware/file-upload.middleware";
 import { connect } from "mongoose";
 import cors from "cors";
-import { env } from "./utils/env.config";
+import { env } from "./utils/env-config.utils";
 import { errorHandler } from "./middleware/error.middleware";
 import router from "./routes/index";
 
