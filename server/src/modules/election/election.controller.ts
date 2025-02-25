@@ -17,7 +17,7 @@ import { plainToClass } from "class-transformer";
 import path from "path";
 import { deleteFromLocal, uploadToLocal } from "../../utils/file.utils";
 import { FILE_SIZE } from "../../utils/config.utils";
-import { BadRequestError } from "../../utils/exceptions.utils";
+import { BadRequestError, NotFoundError } from "../../utils/exceptions.utils";
 import { CandidateService } from "../candidate/candidate.service";
 import { VoterService } from "../voter/voter.service";
 
@@ -99,11 +99,11 @@ export class ElectionController {
     try {
       const { id } = req.params;
       if (!id) throw new BadRequestError("Election-id is missing");
+      // Delete Candidates assigned to this election
+      await this.candidateService.deleteMany(id);
       const result = await this.electionService.delete(id);
       if (!result) {
-        return res.status(StatusCodes.NOT_FOUND).json({
-          message: "Election not found",
-        });
+        throw new NotFoundError("Election not found");
       }
       // ✅ Delete old file from Cloudinary
       if (result.thumbnail) {

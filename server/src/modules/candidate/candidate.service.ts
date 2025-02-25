@@ -24,4 +24,13 @@ export class CandidateService {
   async getAllByElectionId(id: string) {
     return await this.candidateRepository.findAll({ electionId: id });
   }
+
+  /**
+   * Delete candidates based on Election-Id
+   * @param electionId
+   * @returns
+   */
+  async deleteMany(electionId: string) {
+    return await this.candidateRepository.deleteMany({ electionId });
+  }
 }
