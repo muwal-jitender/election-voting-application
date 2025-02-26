@@ -14,15 +14,22 @@ export class CandidateService {
   async create(data: CandidateDTO) {
     return await this.candidateRepository.create(data);
   }
-  async update(data: CandidateDTO, electionId: string) {
-    return await this.candidateRepository.update(electionId, data);
+  async update(id: string, data: CandidateDTO) {
+    return await this.candidateRepository.update(id, data);
   }
 
   async getAll() {
     return await this.candidateRepository.findAll();
   }
+  async getById(id: string) {
+    return await this.candidateRepository.findById(id);
+  }
   async getAllByElectionId(id: string) {
     return await this.candidateRepository.findAll({ electionId: id });
+  }
+
+  async delete(id: string) {
+    return await this.candidateRepository.delete(id);
   }
 
   /**

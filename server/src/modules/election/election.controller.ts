@@ -33,16 +33,16 @@ export class ElectionController {
     try {
       const data: ElectionDTO = plainToClass(ElectionDTO, req.body);
 
-      if (!req.files || !req.files.thumbnail) {
-        throw new BadRequestError("Thumbnail is required");
-      }
-
       // Validate Payload
       const errors = await validate(data);
       if (errors.length > 0) {
         return res
           .status(StatusCodes.BAD_REQUEST)
           .json({ errors: errors.map((err) => err.constraints) });
+      }
+
+      if (!req.files || !req.files.thumbnail) {
+        throw new BadRequestError("Thumbnail is required");
       }
 
       const file = req.files.thumbnail as UploadedFile;
