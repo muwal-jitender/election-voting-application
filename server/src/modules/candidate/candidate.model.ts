@@ -3,7 +3,6 @@ import { Document, Schema, Types, model } from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
 export interface CandidateDocument extends Document {
-  id: string;
   fullName: string;
   image: string;
   motto: string;
@@ -19,7 +18,6 @@ export interface AddCandidateModel {
 
 const candidateSchema = new Schema<CandidateDocument>(
   {
-    id: { type: String, default: uuidv4, unique: true },
     fullName: { type: String, required: true, trim: true },
     image: { type: String, required: true, trim: true },
     motto: { type: String, required: true, trim: true },
@@ -28,6 +26,16 @@ const candidateSchema = new Schema<CandidateDocument>(
   },
   { timestamps: true }
 );
+
+// Convert `_id` to `id` when returning data
+candidateSchema.set("toJSON", {
+  transform: function (doc, ret) {
+    ret.id = ret._id.toString(); // Map `_id` to `id`
+    delete ret._id; // Remove `_id`
+    delete ret.__v; // Remove version key
+    return ret;
+  },
+});
 
 export const CandidateModel = model<CandidateDocument>(
   "Candidate",

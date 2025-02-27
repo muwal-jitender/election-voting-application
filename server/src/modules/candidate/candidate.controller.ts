@@ -36,11 +36,11 @@ export class CandidateController {
           .json({ errors: errors.map((err) => err.constraints) });
       }
 
-      if (!req.files || !req.files.thumbnail) {
-        throw new BadRequestError("Thumbnail is required");
+      if (!req.files || !req.files.image) {
+        throw new BadRequestError("Image is required");
       }
 
-      const file = req.files.thumbnail as UploadedFile;
+      const file = req.files.image as UploadedFile;
 
       // ✅ File size should be less than 10MB
       if (file.size > FILE_SIZE) {
@@ -69,8 +69,10 @@ export class CandidateController {
   }
   async get(req: Request, res: Response, next: NextFunction) {
     try {
-      const elections = await this.candidateService.getAll();
-      return res.status(StatusCodes.OK).json(elections);
+      const candidates = await this.candidateService.getAll();
+      return res
+        .status(StatusCodes.OK)
+        .json({ message: "Found Candidate", data: candidates });
     } catch (error) {
       next(error);
     }
@@ -78,11 +80,11 @@ export class CandidateController {
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      if (!id) throw new BadRequestError("Election-id is missing");
-      const elections = await this.candidateService.getById(id);
+      if (!id) throw new BadRequestError("Candidate-id is missing");
+      const candidate = await this.candidateService.getById(id);
       return res
         .status(StatusCodes.OK)
-        .json({ message: "Found Election", data: elections });
+        .json({ message: "Found candidate", data: candidate });
     } catch (error) {
       next(error);
     }
@@ -92,18 +94,8 @@ export class CandidateController {
       const { id } = req.params;
       if (!id) throw new BadRequestError("Candidate-id is missing");
       // Delete Candidates assigned to this election
-      await this.candidateService.deleteMany(id);
-      const result = await this.candidateService.delete(id);
-      if (!result) {
-        throw new NotFoundError("Election not found");
-      }
-      // ✅ Delete old file from Cloudinary
-      if (result.image) {
-        await deleteFromCloudinary(result.image);
-        // ✅ Delete old file from local storage
-        deleteFromLocal(result.image);
-      }
 
+      const result = await this.candidateService.delete(id);
       return res.status(StatusCodes.OK).json({
         message: "Candidate removed successfully",
         data: null,
@@ -115,58 +107,23 @@ export class CandidateController {
   async update(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params; // ✅ Get Candidate ID from params
-      const existingElection = await this.candidateService.getById(id);
+      if (!id) throw new BadRequestError("Candidate-id is missing");
+      const { voterId, electionId } = req.body;
 
-      if (!existingElection) {
-        throw new BadRequestError("Candidate not found");
+      if (!electionId || !electionId.trim()) {
+        throw new BadRequestError("Election-id is missing");
       }
 
-      const data: CandidateDTO = plainToClass(CandidateDTO, req.body);
-
-      // ✅ Validate Partial Update Payload
-      const errors = await validate(data, { skipMissingProperties: true });
-      if (errors.length > 0) {
-        return res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ errors: errors.map((err) => err.constraints) });
-      }
-
-      let image = existingElection.image; // ✅ Keep old thumbnail by default
-
-      // ✅ If a new file is uploaded, process it
-      if (req.files && req.files.thumbnail) {
-        const file = req.files.thumbnail as UploadedFile;
-
-        // ✅ Check file size
-        if (file.size > FILE_SIZE) {
-          throw new BadRequestError(
-            "File too large. Please upload an image smaller than 10MB."
-          );
-        }
-
-        // ✅ Upload new file to Locally
-        const cloudinaryUrl = await uploadToLocal(file);
-        // ✅ Upload new file to Cloudinary
-        image = (await uploadToCloudinary(cloudinaryUrl)) ?? image;
-
-        // ✅ Delete old file from Cloudinary
-        if (existingElection.image) {
-          await deleteFromCloudinary(existingElection.image);
-        }
-
-        // ✅ Delete old file from local storage
-        deleteFromLocal(existingElection.image);
+      if (!voterId || !voterId.trim()) {
+        throw new BadRequestError("Voter-id is missing");
       }
 
       // ✅ Update the election record
-      const updatedElection = await this.candidateService.update(id, {
-        ...data,
-        image: image, // ✅ Update Cloudinary URL if changed
-      });
+      await this.candidateService.voteCandidate(id, voterId, electionId);
 
       return res.status(StatusCodes.OK).json({
-        message: "Election updated successfully",
-        data: updatedElection,
+        message: "Vote casted successfully",
+        data: null,
       });
     } catch (error: unknown) {
       next(error);

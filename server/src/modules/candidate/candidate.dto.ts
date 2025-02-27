@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional } from "class-validator";
+import { IsNotEmpty, IsOptional, isEmpty } from "class-validator";
 
 // DTO (Data Transfer Object) for Candidate
 export class CandidateDTO {
@@ -8,4 +8,8 @@ export class CandidateDTO {
   image!: string; // ✅ Accepts uploaded file
   @IsNotEmpty({ message: "Full name is required" })
   motto!: string;
+  @IsNotEmpty({ message: "Election-id is required" })
+  electionId!: string;
+  @IsOptional()
+  voteCount!: number;
 }

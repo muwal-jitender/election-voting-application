@@ -1,4 +1,4 @@
-import { Document, Model } from "mongoose";
+import mongoose, { Document, Model, UpdateQuery } from "mongoose";
 
 /**
  * Generic Repository for MongoDB CRUD operations using Mongoose
@@ -11,8 +11,8 @@ export class BaseRepository<T extends Document> {
   }
 
   /** Create a new document */
-  async create(data: Partial<T>): Promise<T> {
-    const document = new this.model(data);
+  async create(data: Partial<T>, session?: mongoose.ClientSession): Promise<T> {
+    const document = new this.model(data, session);
     return await document.save();
   }
 
@@ -22,9 +22,33 @@ export class BaseRepository<T extends Document> {
   }
 
   /** Find one document by ID */
-  async findById(id: string): Promise<T | null> {
-    return await this.model.findOne({ _id: id }).exec();
+  async findById1(
+    id: string,
+    populateFields: string[] = [],
+    session?: mongoose.ClientSession
+  ): Promise<T | null> {
+    let query = this.model.findOne({ _id: id }, { session });
+    if (populateFields.length > 0) {
+      query = query.populate(populateFields.join(" "));
+    }
+    return await query.exec();
   }
+
+  /** Find one document by ID */
+  async findById(
+    id: string,
+    populateFields: string[] = [],
+    session?: mongoose.ClientSession
+  ): Promise<T | null> {
+    let query = this.model.findOne({ _id: id }).session(session ?? null); // ✅ Correct way to pass session
+
+    if (populateFields.length > 0) {
+      query = query.populate(populateFields.join(" "));
+    }
+
+    return await query.exec();
+  }
+
   /** Find one document by column/field name */
   async findOneByField<K extends keyof T>(
     field: K,
@@ -54,9 +78,25 @@ export class BaseRepository<T extends Document> {
       .exec();
   }
 
+  async updateWithSession(
+    id: string,
+    updateData: UpdateQuery<T>,
+    session?: mongoose.ClientSession
+  ): Promise<T | null> {
+    return await this.model
+      .findOneAndUpdate({ _id: id }, updateData, {
+        new: true,
+        useFindAndModify: false,
+        session,
+      })
+      .exec();
+  }
   /** Delete a document by ID */
-  async delete(id: string): Promise<T | null> {
-    return await this.model.findOneAndDelete({ _id: id }).exec();
+  async delete(
+    id: string,
+    session?: mongoose.ClientSession
+  ): Promise<T | null> {
+    return await this.model.findOneAndDelete({ _id: id }, { session }).exec();
   }
   /** Delete a document by ID */
   async deleteMany(filter: object = {}): Promise<void> {
