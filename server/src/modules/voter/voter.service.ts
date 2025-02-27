@@ -5,6 +5,7 @@ import { VoterRepository } from "./voter.repository";
 import { VoterDocument } from "./voter.model";
 import jwt from "jsonwebtoken";
 import { env } from "../../utils/env-config.utils";
+import type { StringValue } from "ms";
 // Voter Service
 @singleton()
 export class VoterService {
@@ -53,8 +54,7 @@ export class VoterService {
       email: voter.email,
       isAdmin: voter.isAdmin,
     };
-    const options = { expiresIn: parseInt(env.JWT_EXPIRES_IN, 10) }; // Explicitly define type
-
+    const options = { expiresIn: env.JWT_EXPIRES_IN as StringValue };
     return jwt.sign(payload, env.JWT_SECRET, options);
   }
 }
