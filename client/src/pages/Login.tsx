@@ -1,7 +1,7 @@
 import "./Login.css";
 
-import { Link } from "react-router-dom";
 import React from "react";
+import { Link } from "react-router-dom";
 import { SignInModel } from "../types/index";
 
 const Login = () => {
@@ -37,6 +37,7 @@ const Login = () => {
             id="email"
             placeholder="Email Address"
             autoComplete="true"
+            autoFocus
             value={formData.email}
             onChange={handleChange}
           />

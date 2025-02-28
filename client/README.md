@@ -44,3 +44,54 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+```
+my-react-app/
+├── public/
+│   ├── favicon.ico
+│   ├── index.html
+│   └── robots.txt
+├── src/
+│   ├── app/                  # Main app configuration
+│   │   ├── routes/           # Routing configuration
+│   │   │   ├── AppRouter.jsx
+│   │   │   └── ProtectedRoute.jsx
+│   │   └── store/            # Redux store configuration (if using Redux)
+│   │       ├── slices/       # Redux Toolkit slices
+│   │       └── store.js
+│   ├── assets/               # Static assets
+│   │   ├── fonts/
+│   │   ├── images/
+│   │   └── styles/
+│   │       ├── base/         # Global styles, variables, mixins
+│   │       ├── components/   # Component-specific styles
+│   │       └── main.scss     # Main style import
+│   ├── components/           # Reusable UI components
+│   │   ├── common/           # Very generic components (Buttons, Inputs)
+│   │   └── features/         # Feature-specific components
+│   ├── constants/            # Application constants
+│   │   └── paths.js          # Route paths
+│   ├── contexts/             # React contexts
+│   ├── features/             # Feature-based modules
+│   │   ├── auth/             # Example feature module
+│   │   │   ├── api/          # Feature-specific API calls
+│   │   │   ├── components/   # Feature-specific components
+│   │   │   ├── hooks/        # Feature-specific hooks
+│   │   │   └── slices/       # Feature-specific Redux slices
+│   ├── hooks/                # Custom reusable hooks
+│   ├── layouts/              # Layout components
+│   ├── pages/                # Page components
+│   ├── services/             # API services
+│   │   ├── apiClient.js      # Axios instance
+│   │   └── authService.js    # Example service
+│   ├── utils/                # Utility functions
+│   ├── App.jsx
+│   └── main.jsx
+├── .env.development
+├── .env.production
+├── .eslintrc
+├── .prettierrc
+├── jest.config.js
+├── package.json
+└── README.md
+```

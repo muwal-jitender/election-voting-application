@@ -1,7 +1,9 @@
 import "./Register.css";
 
+import React, { useState } from "react";
+
 import { Link } from "react-router-dom";
-import React from "react";
+import { register } from "../services/voter.service";
 import { RegisterModel } from "../types/index";
 
 const Register = () => {
@@ -12,6 +14,7 @@ const Register = () => {
     confirmPassword: "",
   });
 
+  const [error, setError] = useState("");
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -26,8 +29,13 @@ const Register = () => {
       console.log("Passwords do not match");
       return;
     }
+    try {
+    } catch (error) {
+      setError(error.response.data.message);
+    }
+    const result = register(formData);
     // Submit form data
-    console.log("Form submitted", formData);
+    console.log("Form submitted", result);
   };
 
   return (
@@ -35,7 +43,7 @@ const Register = () => {
       <div className="container register__container">
         <h2>Register</h2>
         <form className="form" onSubmit={handleSubmit}>
-          <p className="form__error-message">Any error from the backend</p>
+          {error && <p className="form__error-message">{error}</p>}
           <input
             type="text"
             name="fullName"
