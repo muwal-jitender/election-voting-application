@@ -26,7 +26,7 @@ export class CandidateService {
       // ✅ Step 1: Create the new candidate
       const newCandidate = await this.candidateRepository.create(data, session);
       // ✅ Step 2: Push the new candidate into the election's `candidates` array
-      await this.electionRepository.updateWithSession(
+      await this.electionRepository.update(
         data.electionId,
         {
           $push: { candidates: newCandidate.id },
@@ -77,21 +77,21 @@ export class CandidateService {
       }
 
       // ✅ Step 4: Increment Candidate Vote Count (Efficient Update)
-      const result = await this.candidateRepository.updateWithSession(
+      const result = await this.candidateRepository.update(
         id,
         { $inc: { voteCount: 1 } }, // ✅ Efficient increment without fetching full document
         session
       );
 
       // ✅ Step 5: Update Election with Voter ID
-      await this.electionRepository.updateWithSession(
+      await this.electionRepository.update(
         electionId,
         { $push: { voters: dbVoter._id } }, // ✅ Use `_id` not `id`
         session
       );
 
       // ✅ Step 6: Update Voter with Election ID
-      await this.voterRepository.updateWithSession(
+      await this.voterRepository.update(
         voterId,
         { $push: { votedElectionIds: dbElection._id } }, // ✅ Use `_id` not `id`
         session
@@ -134,7 +134,7 @@ export class CandidateService {
       await this.candidateRepository.delete(id, session);
 
       // ✅ Step 3: Remove candidate from the `election.candidates` array
-      await this.electionRepository.updateWithSession(
+      await this.electionRepository.update(
         candidate.electionId,
         {
           $pull: { candidates: id }, // ✅ Removes the candidate ID from the array

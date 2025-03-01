@@ -72,13 +72,7 @@ export class BaseRepository<T extends Document> {
   }
 
   /** Update a document by ID */
-  async update(id: string, data: Partial<T>): Promise<T | null> {
-    return await this.model
-      .findOneAndUpdate({ _id: id }, data, { new: true })
-      .exec();
-  }
-
-  async updateWithSession(
+  async update(
     id: string,
     updateData: UpdateQuery<T>,
     session?: mongoose.ClientSession
