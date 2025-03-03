@@ -1,7 +1,7 @@
 // Voter Controller
 import "reflect-metadata";
 
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { inject, injectable, singleton } from "tsyringe";
 
 import { RegisterVoterDTO, SignInDTO } from "./voter.dto";
@@ -9,12 +9,13 @@ import { VoterService } from "./voter.service";
 import { plainToClass } from "class-transformer";
 import { validate } from "class-validator";
 import { StatusCodes, ReasonPhrases } from "http-status-codes";
+import { BadRequestError, ConflictError } from "../../utils/exceptions.utils";
 
 @injectable()
 export class VoterController {
   constructor(@inject(VoterService) private voterService: VoterService) {}
 
-  async register(req: Request, res: Response): Promise<Response> {
+  async register(req: Request, res: Response, next: NextFunction) {
     try {
       const voterData: RegisterVoterDTO = plainToClass(
         RegisterVoterDTO,
@@ -24,17 +25,19 @@ export class VoterController {
       // Validate Payload
       const errors = await validate(voterData);
       if (errors.length > 0) {
-        return res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ errors: errors.map((err) => err.constraints) });
+        throw new BadRequestError(
+          "Bad Requests",
+          errors.map((err) => err.constraints)
+        );
       }
 
       // Checking if email already exists
       const emailExists = await this.voterService.findByEmail(voterData.email);
       if (emailExists) {
-        return res
-          .status(StatusCodes.CONFLICT)
-          .json({ error: "Email already exists" });
+        throw new ConflictError(
+          "Email already exists",
+          errors.map((err) => err.constraints)
+        );
       }
 
       // Explicitly set isAdmin to false, so that no external voter can set itself as Admin
@@ -48,12 +51,10 @@ export class VoterController {
 
       return res.status(StatusCodes.CREATED).json({
         message: "Voter registered successfully",
-        data: voter,
+        data: null,
       });
     } catch (error: unknown) {
-      return res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ message: (error as Error).stack });
+      next(error);
     }
   }
 

@@ -20,6 +20,16 @@ export class NotFoundError extends Error {
     this.details = details;
   }
 }
+export class ConflictError extends Error {
+  statusCode: number;
+  details: any;
+
+  constructor(message: string, details: any = null) {
+    super(message);
+    this.statusCode = StatusCodes.CONFLICT;
+    this.details = details;
+  }
+}
 export class ForbiddenError extends Error {
   statusCode: number;
   details: any;

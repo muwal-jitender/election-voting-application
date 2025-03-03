@@ -1,10 +1,11 @@
 import "./Register.css";
 
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-import { Link } from "react-router-dom";
 import { register } from "../services/voter.service";
 import { RegisterModel } from "../types/index";
+import { IErrorResponse } from "../types/ResponseModel";
 
 const Register = () => {
   const [formData, setRegisterData] = React.useState<RegisterModel>({
@@ -14,7 +15,9 @@ const Register = () => {
     confirmPassword: "",
   });
 
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<string[]>([]); // Empty array
+
+  const navigate = useNavigate();
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -22,20 +25,21 @@ const Register = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Add form validation and submission logic here
     if (formData.password !== formData.confirmPassword) {
       console.log("Passwords do not match");
       return;
     }
-    try {
-    } catch (error) {
-      setError(error.response.data.message);
-    }
-    const result = register(formData);
+
     // Submit form data
-    console.log("Form submitted", result);
+    try {
+      await register(formData);
+      navigate("/");
+    } catch (error: unknown) {
+      setErrors((error as IErrorResponse).errorMessages || []);
+    }
   };
 
   return (
@@ -43,7 +47,14 @@ const Register = () => {
       <div className="container register__container">
         <h2>Register</h2>
         <form className="form" onSubmit={handleSubmit}>
-          {error && <p className="form__error-message">{error}</p>}
+          {errors.length > 0 && (
+            <div className="form__error-message">
+              {errors.map((msg, index) => (
+                <p key={index}>{`* ${msg}`}</p>
+              ))}
+            </div>
+          )}
+
           <input
             type="text"
             name="fullName"

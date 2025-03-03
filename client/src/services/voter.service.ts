@@ -1,5 +1,5 @@
 import { API_PATH } from "../utils/api-path.utils";
-import coreService from "./core.service";
+import { apiRequest } from "./api-request";
 
 // Define Voter model interface
 export interface Voter {
@@ -12,5 +12,6 @@ export interface Voter {
 
 /** Register voter */
 export const register = async (voter: Voter) => {
-  return await coreService.post(API_PATH.VOTER_REGISTER, voter);
+  // return await coreService.post(API_PATH.VOTER_REGISTER, voter);
+  return await apiRequest<Voter>(API_PATH.VOTER_REGISTER, "POST", voter);
 };

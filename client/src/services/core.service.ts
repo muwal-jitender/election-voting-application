@@ -1,10 +1,10 @@
 import axios, { AxiosRequestConfig } from "axios";
 
-import { env } from "../utils/env-config.utils";
+import { apiConfig } from "../utils/api-config.utils";
 
 // Create Axios instance
 const api = axios.create({
-  baseURL: env.API_BASE_URL,
+  baseURL: apiConfig.development.API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
