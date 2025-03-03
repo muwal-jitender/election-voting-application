@@ -18,7 +18,7 @@ export const errorHandler = (
 
   let errorMessages: string[] = [];
 
-  if (err.details && Array.isArray(err.details)) {
+  if (Array.isArray(err.details) && err.details.length > 0) {
     // Case: Validation errors (class-validator)
     errorMessages = err.details.map((e) => Object.values(e)[0] as string);
   } else if (err.message) {
