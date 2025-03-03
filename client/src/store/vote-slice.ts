@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { VoteState } from "../types";
 
-const currentVoter = { id: "v1", token: "john-donne", isAdmin: true };
+const currentVoter = { id: "", token: "", isAdmin: false };
 const initialState: VoteState = {
   addCandidateElectionId: "",
   currentVoter,
@@ -16,6 +16,9 @@ const VoteSlice = createSlice({
   reducers: {
     changeSelectedVoteCandidate(state, action) {
       state.selectedVoteCandidate = action.payload;
+    },
+    changeCurrentVoter(state, action) {
+      state.currentVoter = action.payload;
     },
     changeSelectedElection(state, action) {
       state.selectedElection = action.payload;

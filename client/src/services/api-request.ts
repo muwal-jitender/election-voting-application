@@ -21,6 +21,7 @@ export const apiRequest = async <T>(
 
     const response: IApiResponse<T> = {
       message: result.data.message,
+      data: result.data.data,
       status: result.data.status,
     }; // ✅ Ensures proper type safety
     return response;

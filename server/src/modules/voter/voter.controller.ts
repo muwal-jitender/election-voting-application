@@ -9,7 +9,11 @@ import { VoterService } from "./voter.service";
 import { plainToClass } from "class-transformer";
 import { validate } from "class-validator";
 import { StatusCodes, ReasonPhrases } from "http-status-codes";
-import { BadRequestError, ConflictError } from "../../utils/exceptions.utils";
+import {
+  BadRequestError,
+  ConflictError,
+  UnauthorizedError,
+} from "../../utils/exceptions.utils";
 
 @injectable()
 export class VoterController {
@@ -58,26 +62,26 @@ export class VoterController {
     }
   }
 
-  async login(req: Request, res: Response) {
+  async login(req: Request, res: Response, next: NextFunction) {
     try {
       const signInDTO: SignInDTO = plainToClass(SignInDTO, req.body);
       // Validate Payload
       const errors = await validate(signInDTO);
+
       if (errors.length > 0) {
-        return res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ errors: errors.map((err) => err.constraints) });
+        throw new BadRequestError(
+          "Bad Requests",
+          errors.map((err) => err.constraints)
+        );
       }
+
       const voter = await this.voterService.checkCredentials(
         signInDTO.email.toLowerCase(),
         signInDTO.password
       );
 
       if (!voter) {
-        return res.status(StatusCodes.UNAUTHORIZED).json({
-          message: "Invalid username or password",
-          data: null,
-        });
+        throw new UnauthorizedError("Invalid username or password");
       }
       const token = this.voterService.generateToken(voter);
       const { password, ...response } = voter.toJSON(); // .toJSON() converts `_id` to `id`
@@ -86,7 +90,7 @@ export class VoterController {
         data: { token, response },
       });
     } catch (error: unknown) {
-      return res.status(500).json({ message: (error as Error).stack });
+      next(error);
     }
   }
 
