@@ -1,5 +1,7 @@
-import axios, { AxiosRequestConfig } from "axios";
 import { IApiError, IApiResponse } from "../types/ResponseModel";
+
+import { AxiosRequestConfig } from "axios";
+import api from "./axios.config";
 
 export const apiRequest = async <T>(
   url: string,
@@ -8,14 +10,10 @@ export const apiRequest = async <T>(
   config: AxiosRequestConfig = {},
 ): Promise<IApiResponse<T>> => {
   try {
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL?.trim(); // Trim to remove unwanted spaces
-
-    const result = await axios({
-      baseURL: API_BASE_URL,
+    const result = await api({
       url,
       method,
       data,
-      headers: { "Content-Type": "application/json" },
       ...config,
     });
 

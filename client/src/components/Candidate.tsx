@@ -3,9 +3,9 @@ import "./Candidate.css";
 import { useDispatch } from "react-redux";
 import { UiActions } from "../store/ui-slice";
 import { voteActions } from "../store/vote-slice";
-import { CandidateModel } from "../types";
+import { ICandidateModel } from "../types";
 
-const Candidate = ({ image, id, fullName, motto }: CandidateModel) => {
+const Candidate = ({ image, id, fullName, motto }: ICandidateModel) => {
   const dispatch = useDispatch(); // Hook to send actions to Redux
 
   // Open the confirm vote modal

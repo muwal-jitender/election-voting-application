@@ -2,13 +2,13 @@ import "./ConfirmVote.css";
 
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CandidateModel, RootState } from "../types";
+import { ICandidateModel, RootState } from "../types";
 
 import { candidates } from "../data/data";
 import { UiActions } from "../store/ui-slice";
 
 const ConfirmVote = () => {
-  const [modalCandidate, setModalCandidate] = useState<CandidateModel | null>(
+  const [modalCandidate, setModalCandidate] = useState<ICandidateModel | null>(
     null,
   );
   const dispatch = useDispatch();

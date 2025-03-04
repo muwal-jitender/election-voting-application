@@ -72,11 +72,14 @@ export class ElectionController {
       next(error);
     }
   }
-
+  /** Get All elections */
   async get(req: Request, res: Response, next: NextFunction) {
     try {
       const elections = await this.electionService.getAll();
-      return res.status(StatusCodes.OK).json(elections);
+      return res.status(StatusCodes.OK).json({
+        message: "Found elections",
+        data: elections,
+      });
     } catch (error) {
       next(error);
     }

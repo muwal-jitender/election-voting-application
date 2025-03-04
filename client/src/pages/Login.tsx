@@ -1,9 +1,9 @@
 import "./Login.css";
 
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
 import { login } from "../services/voter.service";
 import { voteActions } from "../store/vote-slice";
 import { ILoginModel } from "../types/index";
@@ -16,12 +16,12 @@ const Login = () => {
   });
   const [errors, setErrors] = useState<string[]>([]); // Empty array
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setRegisterData({ ...formData, [name]: value });
   };
-
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,9 +32,15 @@ const Login = () => {
       // Save user in local storage
       localStorage.setItem("user", JSON.stringify(result.data));
       // Save in redux state
-      dispatch(voteActions.changeCurrentVoter(result.data));
-      console.log("Form submitted", result);
-      //navigate("/");
+      dispatch(
+        voteActions.changeCurrentVoter({
+          id: result.data?.response.id,
+          token: result.data?.token,
+          isAdmin: result.data?.response.isAdmin,
+        }),
+      );
+
+      navigate("/results");
     } catch (error: unknown) {
       setErrors((error as IErrorResponse).errorMessages || []);
     }

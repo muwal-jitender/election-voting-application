@@ -1,6 +1,6 @@
 import "./Candidates.css";
 
-import { CandidateModel, RootState } from "../types";
+import { ICandidateModel, RootState } from "../types";
 
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -14,7 +14,7 @@ const Candidates = () => {
     (state: RootState) => state.ui.voteCandidateModalShowing,
   );
   // Get Candidates that belongs to this election
-  const electionCandidates: CandidateModel[] = dummyCandidates.filter(
+  const electionCandidates: ICandidateModel[] = dummyCandidates.filter(
     (candidate) => candidate.electionId === id,
   );
 

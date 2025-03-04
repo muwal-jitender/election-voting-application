@@ -3,9 +3,9 @@ import "./Election.css";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { UiActions } from "../store/ui-slice";
-import { ElectionModel } from "../types";
+import { IElectionModel } from "../types";
 
-const Election = ({ id, title, description, thumbnail }: ElectionModel) => {
+const Election = ({ id, title, description, thumbnail }: IElectionModel) => {
   const dispatch = useDispatch();
   const openUpdateElectionModal = () => {
     dispatch(UiActions.openUpdateElectionModal());

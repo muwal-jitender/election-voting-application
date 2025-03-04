@@ -10,5 +10,18 @@ export const API_PATH = {
   // Candidate
   CANDIDATE_CREATE: `${CANDIDATE_CONTROLLER}/login`,
   // Election
-  ELECTION_CREATE: `${ELECTION_CONTROLLER}/login`,
+  ELECTION: `${ELECTION_CONTROLLER}`,
+  ELECTION_GET_CANDIDATES_BY_ID: `${ELECTION_CONTROLLER}/:id/candidates`,
+  ELECTION_GET_VOTERS_BY_ID: `${ELECTION_CONTROLLER}/:id/voters`,
+};
+
+/** Utility function to replace ":id" */
+export const getApiPath = (
+  path: string,
+  params: Record<string, string | number>,
+) => {
+  return Object.keys(params).reduce(
+    (acc, key) => acc.replace(`:${key}`, String(params[key])),
+    path,
+  );
 };

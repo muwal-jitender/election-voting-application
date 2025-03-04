@@ -1,9 +1,9 @@
 import "./ElectionCandidate.css";
 
 import { IoMdTrash } from "react-icons/io";
-import { CandidateModel } from "../types";
+import { ICandidateModel } from "../types";
 
-const ElectionCandidate = ({ fullName, image, motto, id }: CandidateModel) => {
+const ElectionCandidate = ({ fullName, image, motto, id }: ICandidateModel) => {
   return (
     <li className="election-candidate">
       <div className="election-candidate__image">

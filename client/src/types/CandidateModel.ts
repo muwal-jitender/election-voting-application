@@ -1,4 +1,4 @@
-export interface CandidateModel {
+export interface ICandidateModel {
   id: string;
   fullName: string;
   image: string;
