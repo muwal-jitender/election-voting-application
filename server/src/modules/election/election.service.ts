@@ -25,4 +25,13 @@ export class ElectionService {
   async delete(id: string) {
     return await this.electionRepository.delete(id);
   }
+
+  async getVotersWhoAlreadyVoted(id: string) {
+    const election = await this.electionRepository.findOneByFieldWithSelect(
+      "_id",
+      id,
+      ["voters"]
+    );
+    return election;
+  }
 }

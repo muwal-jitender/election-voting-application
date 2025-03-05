@@ -1,4 +1,4 @@
-import { ICandidateModel, IElectionModel } from "../types";
+import { ICandidateModel, IElectionModel, IVoterVotedResponse } from "../types";
 import { API_PATH, getApiPath } from "../utils/api-path.utils";
 
 import { apiRequest } from "./api-request";
@@ -13,6 +13,12 @@ export const getAllElections = async () => {
 export const getCandidatesByElectionId = async (id: string) => {
   return await apiRequest<ICandidateModel[]>(
     getApiPath(API_PATH.ELECTION_GET_CANDIDATES_BY_ID, { id: id }),
+    "GET",
+  );
+};
+export const checkIfVoterAlreadyVoted = async (id: string) => {
+  return await apiRequest<IVoterVotedResponse>(
+    getApiPath(API_PATH.ELECTION_CHECK_IF_VOTER_ALREADY_VOTED, { id: id }),
     "GET",
   );
 };

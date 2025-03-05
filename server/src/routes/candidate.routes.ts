@@ -18,7 +18,7 @@ candidateRouter.delete("/:id", async (req, res, next) => {
   await candidateController.remove(req, res, next);
 });
 candidateRouter.patch("/:id", async (req, res, next) => {
-  await candidateController.update(req, res, next);
+  await candidateController.vote(req, res, next);
 });
 
 export default candidateRouter;

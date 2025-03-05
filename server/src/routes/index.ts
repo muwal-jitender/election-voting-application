@@ -8,7 +8,7 @@ import voterRouter from "./voter.routes";
 const router = Router();
 // Voters
 router.use("/api/v1/voters", voterRouter);
-router.use("/api/v1/elections", authenticateJWT, isAdmin, electionRouter);
+router.use("/api/v1/elections", authenticateJWT, electionRouter);
 router.use("/api/v1/candidates", authenticateJWT, isAdmin, candidateRouter);
 
 export default router;

@@ -224,4 +224,37 @@ export class ElectionController {
       next(error);
     }
   }
+  /**
+   * Check if voter has already voted in Election or not
+   * @param req
+   * @param res
+   */
+  async checkIfVoterVoted(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      if (!id) throw new BadRequestError("Election-id is missing");
+      let hasVoted = false;
+      const voterId = req.user?.id;
+      if (!voterId) {
+        throw new NotFoundError("Voter not found");
+      }
+      const election = await this.electionService.getVotersWhoAlreadyVoted(id);
+      if (!election) {
+        throw new NotFoundError("Election not found");
+      }
+      if (
+        election.voters.length > 0 &&
+        election.voters.find((id) => id.toString() === voterId)
+      ) {
+        hasVoted = true;
+      }
+
+      res.status(StatusCodes.OK).json({
+        message: `Voter has ${hasVoted ? "has already" : "not"} voted`,
+        data: { voted: hasVoted },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

@@ -17,11 +17,13 @@ import {
   deleteFromCloudinary,
   uploadToCloudinary,
 } from "../../config/cloudinary.config";
+import { ElectionService } from "../election/election.service";
 
 @injectable()
 export class CandidateController {
   constructor(
-    @inject(CandidateService) private candidateService: CandidateService
+    @inject(CandidateService) private candidateService: CandidateService,
+    @inject(ElectionService) private electionService: ElectionService
   ) {}
 
   async create(req: Request, res: Response, next: NextFunction) {
@@ -104,7 +106,9 @@ export class CandidateController {
       next(error);
     }
   }
-  async update(req: Request, res: Response, next: NextFunction) {
+
+  /**Allow voters to cast their votes */
+  async vote(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params; // ✅ Get Candidate ID from params
       if (!id) throw new BadRequestError("Candidate-id is missing");
@@ -118,6 +122,17 @@ export class CandidateController {
         throw new BadRequestError("Voter-id is missing");
       }
 
+      const election =
+        await this.electionService.getVotersWhoAlreadyVoted(electionId);
+      if (!election) {
+        throw new BadRequestError("Election not found");
+      }
+      if (
+        election.voters.length > 0 &&
+        election.voters.find((id) => id.toString() === voterId)
+      ) {
+        throw new BadRequestError("Voter already voted");
+      }
       // ✅ Update the election record
       await this.candidateService.voteCandidate(id, voterId, electionId);
 

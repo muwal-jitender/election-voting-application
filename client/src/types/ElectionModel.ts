@@ -11,3 +11,6 @@ export interface AddElectionModel {
   description: string;
   thumbnail: string;
 }
+export interface IVoterVotedResponse {
+  voted: boolean;
+}
