@@ -44,6 +44,13 @@ const Navbar: React.FC = () => {
     showHideNav();
   };
 
+  // Logout user
+  const handleLogout = () => {
+    localStorage.removeItem("user"); // ✅ Remove token from localStorage
+    sessionStorage.removeItem("user"); // ✅ Remove from sessionStorage (if used)
+    showHideNav();
+  };
+
   useEffect(() => {
     document.body.className = localStorage.getItem(VOTING_APP_THEME) ?? "";
   }, [darkTheme]);
@@ -73,7 +80,7 @@ const Navbar: React.FC = () => {
                 <NavLink to="/results" onClick={toggleTheme}>
                   Results
                 </NavLink>
-                <NavLink to="/logout" onClick={toggleTheme}>
+                <NavLink to="/" onClick={handleLogout}>
                   Logout
                 </NavLink>
               </menu>
