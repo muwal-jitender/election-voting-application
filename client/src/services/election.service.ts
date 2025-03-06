@@ -1,6 +1,7 @@
 import {
   IAddElection,
   ICandidateModel,
+  IElectionDetail,
   IElectionModel,
   IVoterVotedResponse,
 } from "../types";
@@ -45,6 +46,12 @@ export const getCandidatesByElectionId = async (id: string) => {
 export const checkIfVoterAlreadyVoted = async (id: string) => {
   return await apiRequest<IVoterVotedResponse>(
     getApiPath(API_PATH.ELECTION_CHECK_IF_VOTER_ALREADY_VOTED, { id: id }),
+    "GET",
+  );
+};
+export const getFullDetail = async (id: string) => {
+  return await apiRequest<IElectionDetail>(
+    getApiPath(API_PATH.ELECTION_GET_DETAILS_BY_ID, { id: id }),
     "GET",
   );
 };

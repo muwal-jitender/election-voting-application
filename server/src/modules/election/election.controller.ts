@@ -20,6 +20,7 @@ import { FILE_SIZE } from "../../utils/config.utils";
 import { BadRequestError, NotFoundError } from "../../utils/exceptions.utils";
 import { CandidateService } from "../candidate/candidate.service";
 import { VoterService } from "../voter/voter.service";
+import { validateMongoId } from "../../utils/utils";
 
 @injectable()
 export class ElectionController {
@@ -88,11 +89,50 @@ export class ElectionController {
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      if (!id) throw new BadRequestError("Election-id is missing");
-      const elections = await this.electionService.getById(id);
+      validateMongoId(id);
+      const election = await this.electionService.getById(id);
       return res
         .status(StatusCodes.OK)
-        .json({ message: "Found Election", data: elections });
+        .json({ message: "Found Election", data: election });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /** Get the Election along with its voters and candidates details */
+  async getDetailsById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+
+      validateMongoId(id);
+
+      // ✅ Fetch election, voters, and candidates in parallel for better performance
+      const electionPromise = this.electionService.getById(id);
+      const election = await electionPromise;
+
+      if (!election) {
+        throw new NotFoundError("Election Not Found");
+      }
+
+      // ✅ Fetch voters & candidates only if they exist
+      const [voters, candidates] = await Promise.all([
+        election.voters.length > 0
+          ? this.voterService.findByIds(
+              election.voters.map((voter) => voter.toString())
+            )
+          : [],
+        election.candidates.length > 0
+          ? await this.candidateService.findByIds(
+              election.candidates.map((candidate) => candidate.toString())
+            )
+          : [],
+      ]);
+
+      // ✅ Send optimized response
+      return res.status(StatusCodes.OK).json({
+        message: "Found Election",
+        data: { election, voters, candidates },
+      });
     } catch (error) {
       next(error);
     }
@@ -101,7 +141,7 @@ export class ElectionController {
   async remove(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      if (!id) throw new BadRequestError("Election-id is missing");
+      validateMongoId(id);
       // Delete Candidates assigned to this election
       await this.candidateService.deleteMany(id);
       const result = await this.electionService.delete(id);
@@ -127,6 +167,8 @@ export class ElectionController {
   async update(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params; // ✅ Get election ID from params
+      validateMongoId(id);
+
       const existingElection = await this.electionService.getById(id);
 
       if (!existingElection) {
@@ -198,7 +240,7 @@ export class ElectionController {
   ) {
     try {
       const { id } = req.params;
-      if (!id) throw new BadRequestError("Election-id is missing");
+      validateMongoId(id);
       const candidates = await this.candidateService.getAllByElectionId(id);
       res
         .status(StatusCodes.OK)
@@ -215,7 +257,7 @@ export class ElectionController {
   async getVotersByElectionId(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      if (!id) throw new BadRequestError("Election-id is missing");
+      validateMongoId(id);
       const voters = await this.voterService.getAllVotersByElectionId(id);
       res
         .status(StatusCodes.OK)
@@ -232,7 +274,7 @@ export class ElectionController {
   async checkIfVoterVoted(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      if (!id) throw new BadRequestError("Election-id is missing");
+      validateMongoId(id);
       let hasVoted = false;
       const voterId = req.user?.id;
       if (!voterId) {

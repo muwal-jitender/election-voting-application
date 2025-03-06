@@ -1,3 +1,6 @@
+import { ICandidateModel } from "./CandidateModel";
+import { IVoterModel } from "./VoterModel";
+
 export interface IElectionModel {
   id: string;
   title: string;
@@ -5,6 +8,11 @@ export interface IElectionModel {
   thumbnail: string;
   candidates: string[];
   voters: string[];
+}
+export interface IElectionDetail {
+  election: IElectionModel;
+  candidates: ICandidateModel[];
+  voters: IVoterModel[];
 }
 export interface IAddElection {
   title: string;

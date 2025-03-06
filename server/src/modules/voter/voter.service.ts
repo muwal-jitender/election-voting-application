@@ -29,7 +29,9 @@ export class VoterService {
   async findByEmail(email: string) {
     return await this.voterRepository.findOneByField("email", email);
   }
-
+  async findByIds(ids: string[]) {
+    return await this.voterRepository.findByIds(ids);
+  }
   /** Check login credentials */
   async checkCredentials(
     email: string,

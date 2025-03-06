@@ -22,25 +22,27 @@ export class BaseRepository<T extends Document> {
   }
 
   /** Find one document by ID */
-  async findById1(
-    id: string,
-    populateFields: string[] = [],
-    session?: mongoose.ClientSession
-  ): Promise<T | null> {
-    let query = this.model.findOne({ _id: id }, { session });
-    if (populateFields.length > 0) {
-      query = query.populate(populateFields.join(" "));
-    }
-    return await query.exec();
-  }
-
-  /** Find one document by ID */
   async findById(
     id: string,
     populateFields: string[] = [],
     session?: mongoose.ClientSession
   ): Promise<T | null> {
-    let query = this.model.findOne({ _id: id }).session(session ?? null); // ✅ Correct way to pass session
+    let query = this.model.findOne({ _id: id }).session(session ?? null); // ✅ Pass the session to handle the transaction
+
+    if (populateFields.length > 0) {
+      query = query.populate(populateFields.join(" "));
+    }
+
+    return await query.exec();
+  }
+
+  /** Find multiple documents by an array of IDs */
+  async findByIds(
+    ids: string[],
+    populateFields: string[] = [],
+    session?: mongoose.ClientSession
+  ): Promise<T[]> {
+    let query = this.model.find({ _id: { $in: ids } }).session(session ?? null); // ✅ Match documents with IDs
 
     if (populateFields.length > 0) {
       query = query.populate(populateFields.join(" "));

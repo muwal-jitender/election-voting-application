@@ -16,6 +16,9 @@ electionRouter.get("/", async (req, res, next) => {
 electionRouter.get("/:id", async (req, res, next) => {
   await electionController.getById(req, res, next);
 });
+electionRouter.get("/:id/details", async (req, res, next) => {
+  await electionController.getDetailsById(req, res, next);
+});
 electionRouter.delete("/:id", isAdmin, async (req, res, next) => {
   await electionController.remove(req, res, next);
 });

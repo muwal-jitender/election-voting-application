@@ -116,6 +116,9 @@ export class CandidateService {
   async getById(id: string) {
     return await this.candidateRepository.findById(id, ["electionId"]);
   }
+  async findByIds(ids: string[]) {
+    return await this.candidateRepository.findByIds(ids);
+  }
   async getAllByElectionId(id: string) {
     return await this.candidateRepository.findAll({ electionId: id });
   }
