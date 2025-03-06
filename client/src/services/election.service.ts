@@ -1,10 +1,36 @@
-import { ICandidateModel, IElectionModel, IVoterVotedResponse } from "../types";
+import {
+  IAddElection,
+  ICandidateModel,
+  IElectionModel,
+  IVoterVotedResponse,
+} from "../types";
 import { API_PATH, getApiPath } from "../utils/api-path.utils";
 
+import { AxiosRequestConfig } from "axios";
 import { apiRequest } from "./api-request";
 
-// Define Voter model interface
+/** Create Election */
+export const createElection = async (payload: IAddElection) => {
+  // ✅ Create FormData for file upload
+  const formData = new FormData();
+  formData.append("title", payload.title);
+  formData.append("description", payload.description);
+  formData.append("thumbnail", payload.thumbnail as File);
 
+  // ✅ Configure request headers
+  const config: AxiosRequestConfig = {
+    headers: {
+      "Content-Type": "multipart/form-data", // Important for file uploads
+    },
+  };
+  // ✅ Call the API
+  return await apiRequest<IElectionModel>(
+    API_PATH.ELECTION,
+    "POST",
+    formData,
+    config,
+  );
+};
 /** Get All Elections */
 export const getAllElections = async () => {
   return await apiRequest<IElectionModel[]>(API_PATH.ELECTION, "GET");

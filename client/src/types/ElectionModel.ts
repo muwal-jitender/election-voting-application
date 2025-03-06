@@ -6,10 +6,10 @@ export interface IElectionModel {
   candidates: string[];
   voters: string[];
 }
-export interface AddElectionModel {
+export interface IAddElection {
   title: string;
   description: string;
-  thumbnail: string;
+  thumbnail: File | null;
 }
 export interface IVoterVotedResponse {
   voted: boolean;

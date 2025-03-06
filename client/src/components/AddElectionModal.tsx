@@ -1,16 +1,24 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { IAddElection, IElectionModel } from "../types";
+
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
+import { createElection } from "../services/election.service";
 import { UiActions } from "../store/ui-slice";
-import { AddElectionModel } from "../types";
 
-const AddElectionModal = () => {
-  const [formData, setFormData] = useState<AddElectionModel>({
+interface AddElectionModalProp {
+  // ✅ Accept callback prop
+  onElectionAdded: (newElection: IElectionModel) => void;
+}
+const AddElectionModal: React.FC<AddElectionModalProp> = ({
+  onElectionAdded,
+}) => {
+  const [formData, setFormData] = useState<IAddElection>({
     title: "",
     description: "",
-    thumbnail: "",
+    thumbnail: null,
   });
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   const dispatch = useDispatch();
 
   // Close add election modal
@@ -24,19 +32,19 @@ const AddElectionModal = () => {
   ) => {
     const { name, value, files } = e.target as HTMLInputElement;
     if (name === "thumbnail" && files && files.length > 0) {
-      setSelectedFile(files[0]);
+      setFormData({ ...formData, thumbnail: files[0] });
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // Handle Form Submission
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Submit form data
-    console.log("Form submitted", formData);
-    if (selectedFile) {
-      console.log("Selected file:", selectedFile);
-      // Handle file upload logic here
-    }
+    const response = await createElection(formData);
+    console.log(`Response ${response}`);
+    onElectionAdded(response.data as IElectionModel);
+    // Close Modal popup
+    closeElectionModal();
   };
   return (
     <section className="modal">

@@ -6,8 +6,8 @@ import { Link, NavLink } from "react-router-dom";
 
 import { AiOutlineClose } from "react-icons/ai";
 import { HiOutlineBars3 } from "react-icons/hi2";
-import { setupAxiosInterceptors } from "../services/axios.config";
-import Loader from "./layout/Loader";
+import { setupAxiosInterceptors } from "../../services/axios.config";
+import Loader from "./Loader";
 
 const Navbar: React.FC = () => {
   const VOTING_APP_THEME = "voting-app-theme";

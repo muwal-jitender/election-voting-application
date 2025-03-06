@@ -2,13 +2,13 @@ import { useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { UiActions } from "../store/ui-slice";
-import { AddElectionModel } from "../types";
+import { IAddElection } from "../types";
 
 const UpdateElectionModal = () => {
-  const [formData, setFormData] = useState<AddElectionModel>({
+  const [formData, setFormData] = useState<IAddElection>({
     title: "",
     description: "",
-    thumbnail: "",
+    thumbnail: null,
   });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const dispatch = useDispatch();
