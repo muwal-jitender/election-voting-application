@@ -6,8 +6,9 @@ export interface ICandidateModel {
   voteCount: number;
   electionId: string;
 }
-export interface AddCandidateModel {
+export interface IAddCandidateModel {
   fullName: string;
-  image: string;
+  image: File | null;
   motto: string;
+  electionId: string;
 }

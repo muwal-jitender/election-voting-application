@@ -33,9 +33,10 @@ export class CandidateController {
       // Validate Payload
       const errors = await validate(data);
       if (errors.length > 0) {
-        return res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ errors: errors.map((err) => err.constraints) });
+        throw new BadRequestError(
+          "Bad Requests",
+          errors.map((err) => err.constraints)
+        );
       }
 
       if (!req.files || !req.files.image) {

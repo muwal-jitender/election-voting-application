@@ -18,12 +18,6 @@
   flex-direction: column;
   gap: 1.5rem;
 }
-.register__container .form__error-message {
-  background: var(--color-danger);
-  color: var(--color-gray-0);
-  padding: 0.6rem 1.5rem;
-  border-radius: var(--radius-1);
-}
 
 .register__container .form input {
   padding: 0.7rem;

@@ -41,7 +41,6 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const response = await createElection(formData);
-    console.log(`Response ${response}`);
     onElectionAdded(response.data as IElectionModel);
     // Close Modal popup
     closeElectionModal();

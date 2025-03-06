@@ -161,6 +161,12 @@ body {
   color: var(--color-gray-700);
   line-height: 1.6;
 }
+.form__error-message {
+  background: var(--color-danger);
+  color: var(--color-gray-0);
+  padding: 0.6rem 1.5rem;
+  border-radius: var(--radius-1);
+}
 
 /* ---------- ERROR PAGE ----------- */
 .errorPage {
@@ -218,7 +224,6 @@ body {
   overflow: hidden;
 }
 .modal__content form {
-  margin-top: 2rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;

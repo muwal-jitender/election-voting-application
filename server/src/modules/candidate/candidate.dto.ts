@@ -6,9 +6,9 @@ export class CandidateDTO {
   fullName!: string;
   @IsOptional() // ✅ Optional because frontend sends the file, not a string
   image!: string; // ✅ Accepts uploaded file
-  @IsNotEmpty({ message: "Full name is required" })
+  @IsNotEmpty({ message: "Motto is required" })
   motto!: string;
-  @IsNotEmpty({ message: "Election-id is required" })
+  @IsNotEmpty({ message: "Election Id is required" })
   electionId!: string;
   @IsOptional()
   voteCount!: number;

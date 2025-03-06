@@ -46,7 +46,12 @@ const ElectionDetails = () => {
 
   useEffect(() => {
     getElections();
-  }, [getElections, errors]); // Now safe to include
+  }, [getElections, errors]);
+
+  // ✅ Callback function to update elections when a new election is added
+  const handleCandidateAdded = (newCandidate: ICandidateModel) => {
+    setCandidates((preCandidates) => [newCandidate, ...(preCandidates || [])]);
+  };
 
   return (
     <>
@@ -108,7 +113,12 @@ const ElectionDetails = () => {
           </menu>
         </div>
       </section>
-      {showAddCandidateModal && <AddCandidateModal />}
+      {showAddCandidateModal && (
+        <AddCandidateModal
+          onCandidateAdded={handleCandidateAdded}
+          electionId={id as string}
+        />
+      )}
     </>
   );
 };

@@ -1,17 +1,27 @@
+import { IAddCandidateModel, ICandidateModel } from "../types";
+
 import { useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
+import { createCandidate } from "../services/candidate.service";
 import { UiActions } from "../store/ui-slice";
-import { AddCandidateModel } from "../types";
+import { IErrorResponse } from "../types/ResponseModel";
 
-const AddCandidateModal = () => {
-  const [formData, setFormData] = useState<AddCandidateModel>({
+interface AddCandidateModalProp {
+  onCandidateAdded: (newElection: ICandidateModel) => void;
+  electionId: string;
+}
+const AddCandidateModal: React.FC<AddCandidateModalProp> = ({
+  onCandidateAdded,
+  electionId,
+}) => {
+  const [formData, setFormData] = useState<IAddCandidateModel>({
     fullName: "",
-    image: "",
+    image: null,
     motto: "",
+    electionId: "",
   });
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
+  const [errors, setErrors] = useState<string[]>([]); // Empty array
   const dispatch = useDispatch();
   const closeAddCandidateModal = () => {
     dispatch(UiActions.closeAddCandidateModal());
@@ -21,20 +31,24 @@ const AddCandidateModal = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value, files } = e.target as HTMLInputElement;
+
     if (name === "image" && files && files.length > 0) {
-      setSelectedFile(files[0]);
+      setFormData({ ...formData, image: files[0] });
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // Submit form data
-    console.log("Form submitted", formData);
-    if (selectedFile) {
-      console.log("Selected file:", selectedFile);
-      // Handle file upload logic here
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    try {
+      e.preventDefault();
+      // Submit form data
+
+      const response = await createCandidate(formData, electionId);
+      onCandidateAdded(response.data as ICandidateModel);
+      closeAddCandidateModal();
+    } catch (error: unknown) {
+      setErrors((error as IErrorResponse).errorMessages || []);
     }
   };
 
@@ -48,6 +62,13 @@ const AddCandidateModal = () => {
           </button>
         </header>
         <form onSubmit={handleSubmit}>
+          {errors.length > 0 && (
+            <div className="form__error-message">
+              {errors.map((msg, index) => (
+                <p key={index}>{`* ${msg}`}</p>
+              ))}
+            </div>
+          )}
           <div>
             <label htmlFor="fullName">Full Name</label>
             <input
@@ -55,7 +76,6 @@ const AddCandidateModal = () => {
               name="fullName"
               id="fullName"
               placeholder="Full Name"
-              required
               value={formData.fullName}
               onChange={handleChange}
             />
@@ -66,7 +86,6 @@ const AddCandidateModal = () => {
               name="motto"
               id="motto"
               placeholder="Enter Motto"
-              required
               cols={60}
               rows={10}
               value={formData.motto}
