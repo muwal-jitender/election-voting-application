@@ -20,6 +20,7 @@ import { IErrorResponse } from "../types/ResponseModel";
 const ElectionDetails = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+
   const openAddCandidateModal = () => {
     dispatch(UiActions.openAddCandidateModal());
   };
@@ -31,8 +32,9 @@ const ElectionDetails = () => {
   const [election, setElection] = useState<IElectionModel>();
   const [candidates, setCandidates] = useState<ICandidateModel[]>();
   const [voters, setVoters] = useState<IVoterModel[]>();
-  const [errors, setErrors] = useState<string[]>([]); // Empty array
+  const [errors, setErrors] = useState<string[]>([]);
 
+  /** ✅ Fetch Election Details */
   const getElections = useCallback(async () => {
     try {
       const result = await getFullDetail(id as string);
@@ -42,16 +44,29 @@ const ElectionDetails = () => {
     } catch (error: unknown) {
       setErrors((error as IErrorResponse).errorMessages || []);
     }
-  }, [id]); // No dependencies -> Won't be recreated on each render
+  }, [id]);
 
   useEffect(() => {
     getElections();
-  }, [getElections, errors]);
+  }, [getElections]);
 
-  // ✅ Callback function to update elections when a new election is added
+  /** ✅ Add Candidate Callback */
   const handleCandidateAdded = (newCandidate: ICandidateModel) => {
     setCandidates((preCandidates) => [newCandidate, ...(preCandidates || [])]);
   };
+
+  /** ✅ Format Date for Voter Table */
+  const formatDate = (dateString?: string) =>
+    dateString
+      ? new Date(dateString).toLocaleString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZone: "UTC",
+        })
+      : "...";
 
   return (
     <>
@@ -62,6 +77,7 @@ const ElectionDetails = () => {
           <div className="election-details__image">
             <img src={election?.thumbnail} alt={election?.title} />
           </div>
+          {/* ✅ Candidates Section */}
           <menu className="election-details__candidates">
             {candidates &&
               candidates.map((candidate) => (
@@ -70,49 +86,44 @@ const ElectionDetails = () => {
             <button
               className="add__candidate-btn"
               onClick={openAddCandidateModal}
+              title="Add new candidate"
             >
               <IoAddOutline />
             </button>
           </menu>
-
+          {/* ✅ Voters Section */}
           <menu className="voters">
-            <h2>Voters</h2>
-            <table className="voters__table">
-              <thead>
-                <tr>
-                  <th>Full Name</th>
-                  <th>Email Address</th>
-                  <th>Time</th>
-                </tr>
-              </thead>
-              <tbody>
-                {voters &&
-                  voters.map((voter) => (
-                    <tr key={voter.id}>
-                      <td>
-                        <h5>{voter.fullName}</h5>
-                      </td>
-                      <td>{voter.email}</td>
-                      <td>
-                        {voter.createdAt
-                          ? new Date(voter.createdAt).toLocaleString("en-US", {
-                              year: "numeric",
-                              month: "short",
-                              day: "2-digit",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              // hour12: true, // Use 12-hour format
-                              timeZone: "UTC", // Explicitly set to UTC
-                            })
-                          : "..."}
-                      </td>
+            {voters && voters.length === 0 ? (
+              <h2>No Voter have voted so far</h2>
+            ) : (
+              <>
+                <h2>Voters</h2>
+                <table className="voters__table">
+                  <thead>
+                    <tr>
+                      <th>Full Name</th>
+                      <th>Email Address</th>
+                      <th>Time</th>
                     </tr>
-                  ))}
-              </tbody>
-            </table>
+                  </thead>
+                  <tbody>
+                    {voters?.map((voter) => (
+                      <tr key={voter.id}>
+                        <td>
+                          <h5>{voter.fullName}</h5>
+                        </td>
+                        <td>{voter.email}</td>
+                        <td>{formatDate(voter.createdAt)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            )}
           </menu>
         </div>
       </section>
+      {/* ✅ Add Candidate Modal */}
       {showAddCandidateModal && (
         <AddCandidateModal
           onCandidateAdded={handleCandidateAdded}

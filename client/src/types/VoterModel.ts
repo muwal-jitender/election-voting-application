@@ -4,7 +4,7 @@ export interface IVoterModel {
   email: string;
   password: string;
   isAdmin?: boolean;
-  createdAt?: Date;
+  createdAt?: string;
   votedElectionIds?: string[];
 }
 export interface ILoginModel {
