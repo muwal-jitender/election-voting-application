@@ -1,16 +1,17 @@
-import "./Navbar.css";
+import "./PrivateLayout.css";
 
 import React, { useEffect, useState } from "react";
 import { IoIosMoon, IoMdSunny } from "react-icons/io";
-import { Link, NavLink } from "react-router-dom";
-import { isAdminUser, isLoggedIn, removeToken } from "../../utils/auth.utils";
+import { Link, NavLink, Outlet } from "react-router-dom";
+import { isAdminUser, removeToken } from "../../utils/auth.utils";
+import { getTheme, setTheme } from "../../utils/theme.utils";
 
 import { AiOutlineClose } from "react-icons/ai";
 import { HiOutlineBars3 } from "react-icons/hi2";
 import { setupAxiosInterceptors } from "../../services/axios.config";
 import Loader from "./Loader";
 
-const Navbar: React.FC = () => {
+const PrivateLayout: React.FC = () => {
   const VOTING_APP_THEME = "voting-app-theme";
   const [showNav, setShowNav] = useState(false);
   const [darkTheme, setDarkTheme] = useState(
@@ -53,22 +54,19 @@ const Navbar: React.FC = () => {
   };
 
   useEffect(() => {
-    document.body.className = localStorage.getItem(VOTING_APP_THEME) ?? "";
+    document.body.className = getTheme();
   }, [darkTheme]);
 
   // Function to toggle dark theme
   const changeThemeHandler = () => {
-    const currentTheme = localStorage.getItem(VOTING_APP_THEME);
-    const newTheme = currentTheme === "dark" ? "" : "dark";
-    localStorage.setItem(VOTING_APP_THEME, newTheme);
-    setDarkTheme(newTheme);
+    setTheme(setDarkTheme);
   };
   return (
     <>
       {loading && <Loader />}
       <nav className="nav">
         <div className="container nav__container">
-          <Link to={isLoggedIn() ? "/results" : "/"} className="nav__logo">
+          <Link to="/" className="nav__logo">
             Election Voting App
           </Link>
 
@@ -100,8 +98,9 @@ const Navbar: React.FC = () => {
           </div>
         </div>
       </nav>
+      <Outlet />
     </>
   );
 };
 
-export default Navbar;
+export default PrivateLayout;
