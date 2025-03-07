@@ -13,6 +13,7 @@ import {
 } from "./pages/index";
 
 import React from "react";
+import AdminRoute from "./components/layout/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
@@ -33,16 +34,21 @@ const router = createBrowserRouter([
         element: <Results />,
       },
       {
-        path: "/elections",
-        element: <Elections />,
-      },
-      {
-        path: "/elections/:id",
-        element: <ElectionDetails />,
-      },
-      {
-        path: "/elections/:id/candidates",
-        element: <Candidates />,
+        element: <AdminRoute />,
+        children: [
+          {
+            path: "/elections",
+            element: <Elections />,
+          },
+          {
+            path: "/elections/:id",
+            element: <ElectionDetails />,
+          },
+          {
+            path: "/elections/:id/candidates",
+            element: <Candidates />,
+          },
+        ],
       },
       {
         path: "/congrats",

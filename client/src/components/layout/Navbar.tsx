@@ -3,6 +3,7 @@ import "./Navbar.css";
 import React, { useEffect, useState } from "react";
 import { IoIosMoon, IoMdSunny } from "react-icons/io";
 import { Link, NavLink } from "react-router-dom";
+import { isAdminUser, isLoggedIn, removeToken } from "../../utils/auth.utils";
 
 import { AiOutlineClose } from "react-icons/ai";
 import { HiOutlineBars3 } from "react-icons/hi2";
@@ -19,7 +20,7 @@ const Navbar: React.FC = () => {
 
   useEffect(() => {
     setupAxiosInterceptors(setLoading); // ✅ Ensure Interceptors are Set Up Once
-  }, [setLoading]);
+  }, []);
 
   // Show or hide nav on page load and window resize
   useEffect(() => {
@@ -46,8 +47,8 @@ const Navbar: React.FC = () => {
 
   // Logout user
   const handleLogout = () => {
-    localStorage.removeItem("user"); // ✅ Remove token from localStorage
-    sessionStorage.removeItem("user"); // ✅ Remove from sessionStorage (if used)
+    removeToken(); // ✅ Remove token from localStorage
+
     showHideNav();
   };
 
@@ -67,16 +68,18 @@ const Navbar: React.FC = () => {
       {loading && <Loader />}
       <nav className="nav">
         <div className="container nav__container">
-          <Link to="/" className="nav__logo">
+          <Link to={isLoggedIn() ? "/results" : "/"} className="nav__logo">
             Election Voting App
           </Link>
 
           <div>
             {showNav && (
               <menu>
-                <NavLink to="/elections" onClick={toggleTheme}>
-                  Elections
-                </NavLink>
+                {isAdminUser() && (
+                  <NavLink to="/elections" onClick={toggleTheme}>
+                    Elections
+                  </NavLink>
+                )}
                 <NavLink to="/results" onClick={toggleTheme}>
                   Results
                 </NavLink>

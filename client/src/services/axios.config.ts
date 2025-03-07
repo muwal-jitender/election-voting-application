@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getToken } from "../utils/auth.utils";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL?.trim();
 
@@ -12,8 +13,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     // 🔥 Get the token from localStorage
-    const userData = localStorage.getItem("user");
-    const token = userData ? JSON.parse(userData)?.token : null;
+    const token = getToken();
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -30,8 +30,6 @@ api.interceptors.request.use(
 export const setupAxiosInterceptors = (
   setLoading: (loading: boolean) => void,
 ) => {
-  console.log("Setting up Axios Interceptors...");
-
   api.interceptors.request.use(
     (config) => {
       setLoading(true);
@@ -46,7 +44,6 @@ export const setupAxiosInterceptors = (
 
   api.interceptors.response.use(
     (response) => {
-      console.log("API Response Received, Hiding Loader...");
       setLoading(false);
       return response;
     },

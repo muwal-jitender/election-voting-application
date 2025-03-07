@@ -8,6 +8,7 @@ import { login } from "../services/voter.service";
 import { voteActions } from "../store/vote-slice";
 import { ILoginModel } from "../types/index";
 import { IErrorResponse } from "../types/ResponseModel";
+import { setToken } from "../utils/auth.utils";
 
 const Login = () => {
   const [formData, setRegisterData] = React.useState<ILoginModel>({
@@ -30,7 +31,7 @@ const Login = () => {
     try {
       const result = await login(formData);
       // Save user in local storage
-      localStorage.setItem("user", JSON.stringify(result.data));
+      result.data && setToken(result.data.token);
       // Save in redux state
       dispatch(
         voteActions.changeCurrentVoter({
