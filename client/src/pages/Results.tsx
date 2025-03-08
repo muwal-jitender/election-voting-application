@@ -1,6 +1,6 @@
 import "./Results.css";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import ResultElection from "../components/ResultElection";
 import { getAllElections } from "../services/election.service";
@@ -11,18 +11,19 @@ const Results = () => {
   const [elections, setElections] = React.useState<IElectionModel[]>();
   const [errors, setErrors] = useState<string[]>([]); // Empty array
 
-  const getElections = useCallback(async () => {
+  const getElections = async () => {
     try {
       const result = await getAllElections();
       setElections(result.data as IElectionModel[]);
     } catch (error: unknown) {
       setErrors((error as IErrorResponse).errorMessages || []);
+      console.log(errors);
     }
-  }, []); // No dependencies -> Won't be recreated on each render
+  }; // No dependencies -> Won't be recreated on each render
 
   useEffect(() => {
     getElections();
-  }, [getElections]); // Now safe to include
+  }, []); // Now safe to include
 
   return (
     <section className="results">

@@ -1,6 +1,6 @@
 import "./ResultElection.css";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ICandidateModel, IElectionModel } from "../types";
 
 import { Link } from "react-router-dom";
@@ -11,24 +11,29 @@ const ResultElection = ({ id, thumbnail, title }: IElectionModel) => {
   const [totalVotes, setTotalVotes] = useState(0);
   const [electionCandidates, setElectionCandidates] =
     useState<ICandidateModel[]>();
-  const getElections = useCallback(async (id: string) => {
+  const getElectionCandidates = async (id: string) => {
     try {
       const result = await getCandidatesByElectionId(id);
-      setElectionCandidates(result.data as ICandidateModel[]);
-      if (result.data) {
-        for (let i = 0; i < result.data.length; i++) {
-          const element = result.data[i];
-          setTotalVotes((prevState) => (prevState += element.voteCount));
-        }
-      }
+      const candidates: ICandidateModel[] = Array.isArray(result.data)
+        ? result.data
+        : [];
+
+      if (!candidates.length) return; // ✅ Exit early if no candidates
+
+      setElectionCandidates(candidates);
+      const totalVoteCount = candidates.reduce(
+        (acc, candidate) => acc + (candidate.voteCount ?? 0),
+        0,
+      );
+      setTotalVotes(totalVoteCount);
     } catch (error: unknown) {
-      console.log(error);
+      console.error("Failed to fetch candidates:", error);
     }
-  }, []); // No dependencies -> Won't be recreated on each render
+  };
 
   useEffect(() => {
-    getElections(id);
-  }, [getElections, id]); // Now safe to include
+    getElectionCandidates(id);
+  }, [id]); // ✅ Ensures this only runs once per election
 
   return (
     <article className="result">
