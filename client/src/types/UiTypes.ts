@@ -1,8 +1,11 @@
+import { IElectionModel } from "./ElectionModel";
+
 export interface UIState {
   addCandidateModalShowing: boolean;
   voteCandidateModalShowing: boolean;
   electionModalShowing: boolean;
   updateElectionModalShowing: boolean;
+  selectedElection: IElectionModel | null;
 }
 
 export interface Voter {

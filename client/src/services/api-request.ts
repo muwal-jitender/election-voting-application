@@ -5,7 +5,7 @@ import api from "./axios.config";
 
 export const apiRequest = async <T>(
   url: string,
-  method: "GET" | "POST" | "PUT" | "DELETE",
+  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
   data?: unknown,
   config: AxiosRequestConfig = {},
 ): Promise<IApiResponse<T>> => {

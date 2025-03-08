@@ -1,17 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { IAddElection, IElectionModel } from "../types";
+
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
+import { updateElection } from "../services/election.service";
 import { UiActions } from "../store/ui-slice";
-import { IAddElection } from "../types";
 
-const UpdateElectionModal = () => {
+// ✅ Define Props Interface
+interface UpdateElectionModalProps {
+  election: IElectionModel;
+  onElectionUpdated: (updatedElection: IElectionModel) => void;
+}
+
+const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
+  election,
+  onElectionUpdated,
+}) => {
   const [formData, setFormData] = useState<IAddElection>({
     title: "",
     description: "",
     thumbnail: null,
   });
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (election) {
+      setFormData({
+        title: election.title,
+        description: election.description,
+        thumbnail: null,
+      });
+    }
+  }, [election]);
 
   // Close add election modal
   const closeElectionModal = () => {
@@ -24,19 +45,18 @@ const UpdateElectionModal = () => {
   ) => {
     const { name, value, files } = e.target as HTMLInputElement;
     if (name === "thumbnail" && files && files.length > 0) {
-      setSelectedFile(files[0]);
+      setFormData({ ...formData, thumbnail: files[0] });
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // Handle Form Submission
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Submit form data
-    console.log("Form submitted", formData);
-    if (selectedFile) {
-      console.log("Selected file:", selectedFile);
-      // Handle file upload logic here
-    }
+    const response = await updateElection(election?.id, formData);
+    onElectionUpdated(response.data as IElectionModel);
+    // Close Modal popup
+    closeElectionModal();
   };
   return (
     <section className="modal">
@@ -80,7 +100,6 @@ const UpdateElectionModal = () => {
               name="thumbnail"
               id="thumbnail"
               onChange={handleChange}
-              required
               accept=".png, .jpg, .jpeg, .webp, .avif"
             />
           </div>

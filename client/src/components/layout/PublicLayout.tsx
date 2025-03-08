@@ -9,11 +9,7 @@ import { setupAxiosInterceptors } from "../../services/axios.config";
 import Loader from "./Loader";
 
 const PublicLayout: React.FC = () => {
-  const VOTING_APP_THEME = "voting-app-theme";
-
-  const [darkTheme, setDarkTheme] = useState(
-    localStorage.getItem(VOTING_APP_THEME),
-  );
+  const [darkTheme, setDarkTheme] = useState(getTheme());
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {

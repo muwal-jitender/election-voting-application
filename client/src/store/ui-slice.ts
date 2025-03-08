@@ -1,11 +1,12 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { UIState } from "../types";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { IElectionModel, UIState } from "../types";
 
 const initialState: UIState = {
   addCandidateModalShowing: false,
   voteCandidateModalShowing: false,
   electionModalShowing: false,
   updateElectionModalShowing: false,
+  selectedElection: null,
 };
 const UiSlice = createSlice({
   name: "ui",
@@ -29,8 +30,9 @@ const UiSlice = createSlice({
     closeAddElectionModal(state) {
       state.electionModalShowing = false;
     },
-    openUpdateElectionModal(state) {
+    openUpdateElectionModal(state, action: PayloadAction<IElectionModel>) {
       state.updateElectionModalShowing = true;
+      state.selectedElection = action.payload;
     },
     closeUpdateElectionModal(state) {
       state.updateElectionModalShowing = false;

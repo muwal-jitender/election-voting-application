@@ -12,11 +12,8 @@ import { setupAxiosInterceptors } from "../../services/axios.config";
 import Loader from "./Loader";
 
 const PrivateLayout: React.FC = () => {
-  const VOTING_APP_THEME = "voting-app-theme";
   const [showNav, setShowNav] = useState(false);
-  const [darkTheme, setDarkTheme] = useState(
-    localStorage.getItem(VOTING_APP_THEME),
-  );
+  const [darkTheme, setDarkTheme] = useState(getTheme());
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -66,7 +63,7 @@ const PrivateLayout: React.FC = () => {
       {loading && <Loader />}
       <nav className="nav">
         <div className="container nav__container">
-          <Link to="/" className="nav__logo">
+          <Link to="/results" className="nav__logo">
             Election Voting App
           </Link>
 

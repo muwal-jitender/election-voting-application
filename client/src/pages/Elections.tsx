@@ -41,10 +41,22 @@ const Elections = () => {
   const updateElectionModalShow = useSelector(
     (state: RootState) => state.ui.updateElectionModalShowing,
   );
+  const selectedElection = useSelector(
+    (state: RootState) => state.ui.selectedElection,
+  );
   // ✅ Callback function to update elections when a new election is added
   const handleElectionAdded = (newElection: IElectionModel) => {
     setElections((prevElections) => [newElection, ...(prevElections || [])]);
   };
+  // ✅ Callback function to update election in the list
+  const handleElectionUpdated = (updatedElection: IElectionModel) => {
+    setElections((prevElections) =>
+      prevElections?.map((e) =>
+        e.id === updatedElection.id ? updatedElection : e,
+      ),
+    );
+  };
+
   return (
     <>
       <section className="elections">
@@ -67,7 +79,12 @@ const Elections = () => {
       {addElectionModalShow && (
         <AddElectionModal onElectionAdded={handleElectionAdded} />
       )}
-      {updateElectionModalShow && <UpdateElectionModal />}
+      {updateElectionModalShow && selectedElection && (
+        <UpdateElectionModal
+          election={selectedElection}
+          onElectionUpdated={handleElectionUpdated}
+        />
+      )}
     </>
   );
 };

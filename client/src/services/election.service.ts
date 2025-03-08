@@ -32,6 +32,28 @@ export const createElection = async (payload: IAddElection) => {
     config,
   );
 };
+/** Update Election */
+export const updateElection = async (id: string, payload: IAddElection) => {
+  // ✅ Create FormData for file upload
+  const formData = new FormData();
+  formData.append("title", payload.title);
+  formData.append("description", payload.description);
+  formData.append("thumbnail", payload.thumbnail as File);
+
+  // ✅ Configure request headers
+  const config: AxiosRequestConfig = {
+    headers: {
+      "Content-Type": "multipart/form-data", // Important for file uploads
+    },
+  };
+  // ✅ Call the API
+  return await apiRequest<IElectionModel>(
+    getApiPath(API_PATH.ELECTION_UPDATE, { id: id }),
+    "PATCH",
+    formData,
+    config,
+  );
+};
 /** Get All Elections */
 export const getAllElections = async () => {
   return await apiRequest<IElectionModel[]>(API_PATH.ELECTION, "GET");
