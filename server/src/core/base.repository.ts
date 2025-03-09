@@ -21,6 +21,34 @@ export class BaseRepository<T extends Document> {
     return await this.model.find(filter).exec();
   }
 
+  /** Find all documents with pagination, sorting, and filtering */
+  async findAllPaginated({
+    filter = {},
+    page = 1,
+    limit = 10,
+    sortBy = "createdAt",
+    order = "desc",
+  }: {
+    filter?: object;
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    order: "asc" | "desc";
+  }): Promise<{ data: T[]; totalCount: number }> {
+    const skip = (page - 1) * limit;
+    const sortOrder = order === "desc" ? -1 : 1;
+    const [data, totalCount] = await Promise.all([
+      this.model
+        .find(filter)
+        .sort({ [sortBy]: sortOrder })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      this.model.countDocuments(filter),
+    ]);
+    return { data, totalCount };
+  }
+
   /** Find one document by ID */
   async findById(
     id: string,
@@ -95,7 +123,10 @@ export class BaseRepository<T extends Document> {
     return await this.model.findOneAndDelete({ _id: id }, { session }).exec();
   }
   /** Delete a document by ID */
-  async deleteMany(filter: object = {}): Promise<void> {
-    await this.model.deleteMany(filter).exec();
+  async deleteMany(
+    filter: object = {},
+    session?: mongoose.ClientSession
+  ): Promise<void> {
+    await this.model.deleteMany(filter, session).exec();
   }
 }

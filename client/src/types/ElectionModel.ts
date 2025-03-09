@@ -6,11 +6,8 @@ export interface IElectionModel {
   title: string;
   description: string;
   thumbnail: string;
-  candidates: string[];
-  voters: string[];
 }
-export interface IElectionDetail {
-  election: IElectionModel;
+export interface IElectionDetail extends IElectionModel {
   candidates: ICandidateModel[];
   voters: IVoterModel[];
 }

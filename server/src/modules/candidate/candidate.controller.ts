@@ -11,7 +11,7 @@ import { validate } from "class-validator";
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError, NotFoundError } from "../../utils/exceptions.utils";
 import { UploadedFile } from "express-fileupload";
-import { FILE_SIZE } from "../../utils/config.utils";
+
 import { deleteFromLocal, uploadToLocal } from "../../utils/file.utils";
 import {
   deleteFromCloudinary,
@@ -44,13 +44,6 @@ export class CandidateController {
       }
 
       const file = req.files.image as UploadedFile;
-
-      // ✅ File size should be less than 10MB
-      if (file.size > FILE_SIZE) {
-        throw new BadRequestError(
-          "Image too large. Please upload an image smaller than 10MB."
-        );
-      }
 
       const cloudinaryUrl = await uploadToLocal(file);
 

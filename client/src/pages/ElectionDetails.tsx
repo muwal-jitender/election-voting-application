@@ -38,7 +38,7 @@ const ElectionDetails = () => {
   const getElections = useCallback(async () => {
     try {
       const result = await getFullDetail(id as string);
-      setElection(result.data?.election as IElectionModel);
+      setElection(result.data as IElectionModel);
       setCandidates(result.data?.candidates as ICandidateModel[]);
       setVoters(result.data?.voters as IVoterModel[]);
     } catch (error: unknown) {

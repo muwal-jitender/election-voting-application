@@ -1,4 +1,4 @@
-// Voter Controller
+// Election Controller
 import "reflect-metadata";
 
 import { NextFunction, Request, Response } from "express";
@@ -16,7 +16,7 @@ import { validate } from "class-validator";
 import { plainToClass } from "class-transformer";
 import path from "path";
 import { deleteFromLocal, uploadToLocal } from "../../utils/file.utils";
-import { FILE_SIZE } from "../../utils/config.utils";
+
 import { BadRequestError, NotFoundError } from "../../utils/exceptions.utils";
 import { CandidateService } from "../candidate/candidate.service";
 import { VoterService } from "../voter/voter.service";
@@ -32,34 +32,30 @@ export class ElectionController {
 
   async create(req: Request, res: Response, next: NextFunction) {
     try {
+      // ✅ Validate request body using DTO
       const data: ElectionDTO = plainToClass(ElectionDTO, req.body);
-
-      // Validate Payload
       const errors = await validate(data);
+
       if (errors.length > 0) {
         return res
           .status(StatusCodes.BAD_REQUEST)
           .json({ errors: errors.map((err) => err.constraints) });
       }
 
-      if (!req.files || !req.files.thumbnail) {
+      // ✅ Check if thumbnail is sent or not
+      if (!req.files?.thumbnail) {
         throw new BadRequestError("Thumbnail is required");
       }
 
       const file = req.files.thumbnail as UploadedFile;
 
-      // ✅ Get file size should be less than 10MB
-      if (file.size > FILE_SIZE) {
-        throw new BadRequestError(
-          "File too large. Please upload an image smaller than 10MB."
-        );
-      }
-
+      // ✅ Upload file to local directory (We store files locally as well)
       const cloudinaryUrl = await uploadToLocal(file);
 
-      // ✅ Upload to Cloudinary file.tempFilePath
+      // ✅ Upload to Cloudinary
       const thumbnailUrl = await uploadToCloudinary(cloudinaryUrl);
 
+      // ✅ Create the election in DB
       const newElection = await this.electionService.create({
         ...data,
         thumbnail: thumbnailUrl ?? "", // ✅ Store Cloudinary URL
@@ -73,13 +69,46 @@ export class ElectionController {
       next(error);
     }
   }
-  /** Get All elections */
+
+  /**
+   * ✅ Get all elections with pagination, sorting, and optional filtering.
+   * Supports query parameters: page, limit, sortBy, order, search.
+   * @param req GET /api/v1/elections?page=2&limit=5&sortBy=title&order=asc
+   * @param res
+   * @param next
+   * @returns
+   */
   async get(req: Request, res: Response, next: NextFunction) {
     try {
-      const elections = await this.electionService.getAll();
+      // ✅ Extract query parameters with defaults
+      const page = Number(req.query.page) || 1; // Default to page 1
+      const limit = Number(req.query.limit) || 10; // Default limit to 10 per page
+      const sortBy = (req.query.sortBy as string) || "createdAt"; // Default sorting field
+
+      // ✅ Ensure `order` is either "asc" or "desc" (default: "desc")
+      const order = ["asc", "desc"].includes(req.query.order as string)
+        ? (req.query.order as "asc" | "desc")
+        : "desc"; // Sorting order
+
+      const searchQuery = (req.query.search as string)?.trim() || ""; // Search keyword
+
+      // ✅ Fetch elections with pagination & filtering
+      const { data, totalCount } = await this.electionService.getAll({
+        page,
+        limit,
+        sortBy,
+        order,
+        searchQuery,
+      });
+
       return res.status(StatusCodes.OK).json({
-        message: "Found elections",
-        data: elections,
+        message: "Elections retrieved successfully",
+        pagination: {
+          currentPage: page,
+          totalPages: Math.ceil(totalCount / limit),
+          totalRecords: totalCount,
+        },
+        data: data,
       });
     } catch (error) {
       next(error);
@@ -89,8 +118,14 @@ export class ElectionController {
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
+      // ✅ Validate if ID is missing or bit a valid MongoDB ObjectId
       validateMongoId(id);
+
       const election = await this.electionService.getById(id);
+      if (!election) {
+        throw new NotFoundError("Election not found.");
+      }
+
       return res
         .status(StatusCodes.OK)
         .json({ message: "Found Election", data: election });
@@ -114,24 +149,10 @@ export class ElectionController {
         throw new NotFoundError("Election Not Found");
       }
 
-      // ✅ Fetch voters & candidates only if they exist
-      const [voters, candidates] = await Promise.all([
-        election.voters.length > 0
-          ? this.voterService.findByIds(
-              election.voters.map((voter) => voter.toString())
-            )
-          : [],
-        election.candidates.length > 0
-          ? await this.candidateService.findByIds(
-              election.candidates.map((candidate) => candidate.toString())
-            )
-          : [],
-      ]);
-
       // ✅ Send optimized response
       return res.status(StatusCodes.OK).json({
         message: "Found Election",
-        data: { election, voters, candidates },
+        data: election,
       });
     } catch (error) {
       next(error);
@@ -142,14 +163,11 @@ export class ElectionController {
     try {
       const { id } = req.params;
       validateMongoId(id);
-      // Delete Candidates assigned to this election
-      await this.candidateService.deleteMany(id);
+
       const result = await this.electionService.delete(id);
-      if (!result) {
-        throw new NotFoundError("Election not found");
-      }
-      // ✅ Delete old file from Cloudinary
+
       if (result.thumbnail) {
+        // ✅ Delete old file from Cloudinary
         await deleteFromCloudinary(result.thumbnail);
         // ✅ Delete old file from local storage
         deleteFromLocal(result.thumbnail);
@@ -190,13 +208,6 @@ export class ElectionController {
       // ✅ If a new file is uploaded, process it
       if (req.files && req.files.thumbnail) {
         const file = req.files.thumbnail as UploadedFile;
-
-        // ✅ Check file size
-        if (file.size > FILE_SIZE) {
-          throw new BadRequestError(
-            "File too large. Please upload an image smaller than 10MB."
-          );
-        }
 
         // ✅ Upload new file to Locally
         const cloudinaryUrl = await uploadToLocal(file);
