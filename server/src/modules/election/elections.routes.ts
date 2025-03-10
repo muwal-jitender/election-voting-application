@@ -1,7 +1,7 @@
-import { ElectionController } from "../modules/election/election.controller";
+import { ElectionController } from "./election.controller";
 import { Router } from "express";
 import { container } from "tsyringe";
-import { isAdmin } from "../middleware/admin.middleware";
+import { isAdmin } from "../../middleware/admin.middleware";
 
 const electionRouter = Router();
 const electionController = container.resolve(ElectionController);

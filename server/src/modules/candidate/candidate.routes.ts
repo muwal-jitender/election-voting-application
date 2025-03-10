@@ -1,4 +1,4 @@
-import { CandidateController } from "../modules/candidate/candidate.controller";
+import { CandidateController } from "./candidate.controller";
 import { Router } from "express";
 import { container } from "tsyringe";
 

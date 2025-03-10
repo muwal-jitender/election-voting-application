@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { VoterController } from "../modules/voter/voter.controller";
+import { VoterController } from "./voter.controller";
 import { container } from "tsyringe";
 
 const voterRouter = Router();

@@ -9,7 +9,7 @@ import { connect } from "mongoose";
 import cors from "cors";
 import { env } from "./utils/env-config.utils";
 import { errorHandler } from "./middleware/error.middleware";
-import router from "./routes/index";
+import router from "./core/base.routes";
 
 dotenv.config();
 
