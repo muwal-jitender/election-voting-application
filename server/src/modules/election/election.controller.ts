@@ -187,48 +187,12 @@ export class ElectionController {
       const { id } = req.params; // ✅ Get election ID from params
       validateMongoId(id);
 
-      const existingElection = await this.electionService.getById(id);
-
-      if (!existingElection) {
-        throw new BadRequestError("Election not found");
-      }
-
-      const data: ElectionDTO = plainToClass(ElectionDTO, req.body);
-
-      // ✅ Validate Partial Update Payload
-      const errors = await validate(data, { skipMissingProperties: true });
-      if (errors.length > 0) {
-        return res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ errors: errors.map((err) => err.constraints) });
-      }
-
-      let thumbnailUrl = existingElection.thumbnail; // ✅ Keep old thumbnail by default
-
-      // ✅ If a new file is uploaded, process it
-      if (req.files && req.files.thumbnail) {
-        const file = req.files.thumbnail as UploadedFile;
-
-        // ✅ Upload new file to Locally
-        const cloudinaryUrl = await uploadToLocal(file);
-        // ✅ Upload new file to Cloudinary
-        thumbnailUrl =
-          (await uploadToCloudinary(cloudinaryUrl)) ?? thumbnailUrl;
-
-        // ✅ Delete old file from Cloudinary
-        if (existingElection.thumbnail) {
-          await deleteFromCloudinary(existingElection.thumbnail);
-        }
-
-        // ✅ Delete old file from local storage
-        deleteFromLocal(existingElection.thumbnail);
-      }
-
       // ✅ Update the election record
-      const updatedElection = await this.electionService.update(id, {
-        ...data,
-        thumbnail: thumbnailUrl, // ✅ Update Cloudinary URL if changed
-      });
+      const updatedElection = await this.electionService.update(
+        id,
+        req.body,
+        req.files
+      );
 
       return res.status(StatusCodes.OK).json({
         message: "Election updated successfully",

@@ -1,8 +1,10 @@
+import { FileArray, UploadedFile } from "express-fileupload";
+
 import { BadRequestError } from "./exceptions.utils";
 import { UPLOADS_DIR } from "./config.utils";
-import { UploadedFile } from "express-fileupload";
 import fs from "fs";
 import path from "path";
+import { uploadToCloudinary } from "../config/cloudinary.config";
 import { v4 as uuid } from "uuid";
 
 /** ✅ Allowed image file extensions */
@@ -76,10 +78,43 @@ const validateFileSize = (size: number) => {
     throw new BadRequestError("File too large. Maximum allowed size is 10MB.");
   }
 };
+
+/** Check if its a valid image  */
 const validateImageFile = (file: UploadedFile, throwError = true) => {
+  if (!throwError) return;
   if (!ALLOWED_IMAGE_TYPES.includes(file.mimetype)) {
     throw new BadRequestError(
       `Invalid file type. Allowed types: ${ALLOWED_IMAGE_TYPES.join(", ")}`
     );
   }
+};
+
+export const uploadFile = async (
+  files: FileArray | null | undefined,
+  propertyName: "thumbnail" | "image",
+  oldImage?: string
+) => {
+  // ✅ Step 1: Validate image
+  if (!files?.[propertyName] && oldImage) {
+    // Update Case
+    return oldImage;
+  } else if (!files?.[propertyName]) {
+    // Insert Case
+    throw new BadRequestError(`${propertyName} is missing`);
+  }
+
+  const file = files[propertyName];
+  if (Array.isArray(file)) {
+    throw new BadRequestError("Multiple file uploads are not allowed.");
+  }
+
+  validateImageFile(file);
+  validateFileSize(file.size);
+
+  // ✅ Step 2: upload image
+  const localFilePath = await uploadToLocal(file);
+  const cloudinaryUrl = await uploadToCloudinary(localFilePath);
+
+  if (!cloudinaryUrl) throw new Error("File upload failed.");
+  return cloudinaryUrl;
 };
