@@ -149,6 +149,12 @@ export class ElectionService {
       if (!deletedElection) {
         throw new NotFoundError("Election deletion failed.");
       }
+      if (deletedElection.thumbnail) {
+        // ✅ Delete old file from Cloudinary
+        await deleteFromCloudinary(deletedElection.thumbnail);
+        // ✅ Delete old file from local storage
+        deleteFromLocal(deletedElection.thumbnail);
+      }
       session.commitTransaction();
       session.endSession();
       return deletedElection;

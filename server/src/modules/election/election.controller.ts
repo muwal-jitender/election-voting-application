@@ -165,17 +165,9 @@ export class ElectionController {
       validateMongoId(id);
 
       const result = await this.electionService.delete(id);
-
-      if (result.thumbnail) {
-        // ✅ Delete old file from Cloudinary
-        await deleteFromCloudinary(result.thumbnail);
-        // ✅ Delete old file from local storage
-        deleteFromLocal(result.thumbnail);
-      }
-
       return res.status(StatusCodes.OK).json({
         message: "Election removed successfully",
-        data: null,
+        data: result,
       });
     } catch (error) {
       next(error);
