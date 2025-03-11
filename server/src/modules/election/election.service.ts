@@ -13,6 +13,7 @@ import {
 import fileUpload, { FileArray, UploadedFile } from "express-fileupload";
 import { validate } from "class-validator";
 import {
+  deleteFile,
   deleteFromLocal,
   uploadFile,
   uploadToLocal,
@@ -91,8 +92,7 @@ export class ElectionService {
 
       // ✅ Step 5: Update the DB
       if (existingElection.thumbnail !== newThumbnailUrl) {
-        await deleteFromCloudinary(existingElection.thumbnail);
-        deleteFromLocal(existingElection.thumbnail);
+        await deleteFile(existingElection.thumbnail);
       }
 
       // ✅ Step 6: Commit Transaction
@@ -165,10 +165,7 @@ export class ElectionService {
         throw new NotFoundError("Election deletion failed.");
       }
       if (deletedElection.thumbnail) {
-        // ✅ Delete old file from Cloudinary
-        await deleteFromCloudinary(deletedElection.thumbnail);
-        // ✅ Delete old file from local storage
-        deleteFromLocal(deletedElection.thumbnail);
+        await deleteFile(deletedElection.thumbnail);
       }
       session.commitTransaction();
       session.endSession();

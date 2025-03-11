@@ -9,12 +9,7 @@ cloudinary.config({
   secure: true,
 });
 
-/**
- * Uploads a file to Cloudinary and returns the file URL.
- * @param filePath - Local path to the file
- * @param folder - Cloudinary folder (optional)
- * @returns Secure URL of the uploaded file or null on failure
- */
+/** ✅ Upload to Cloudinary */
 export async function uploadToCloudinary(
   filePath: string,
   folder: string = "elections"
@@ -34,7 +29,7 @@ export async function uploadToCloudinary(
   }
 }
 
-// ✅ Function to delete a file from Cloudinary
+/** ✅ Delete file from Cloudinary */
 export const deleteFromCloudinary = async (cloudinaryUrl: string) => {
   try {
     const publicId = cloudinaryUrl.split("/").pop()?.split(".")[0]; // Extract public ID

@@ -6,7 +6,11 @@ import mongoose from "mongoose";
 import { ElectionRepository } from "../election/election.repository";
 import { BadRequestError, NotFoundError } from "../../utils/exceptions.utils";
 import { deleteFromCloudinary } from "../../config/cloudinary.config";
-import { deleteFromLocal, uploadFile } from "../../utils/file.utils";
+import {
+  deleteFile,
+  deleteFromLocal,
+  uploadFile,
+} from "../../utils/file.utils";
 import { VoterRepository } from "../voter/voter.repository";
 import { FileArray } from "express-fileupload";
 import { ElectionService } from "../election/election.service";
@@ -54,8 +58,7 @@ export class CandidateService {
     } catch (error) {
       // ❌ Remove the image in case of an exception
       if (newImageUrl) {
-        deleteFromCloudinary(newImageUrl);
-        deleteFromLocal(newImageUrl);
+        await deleteFile(newImageUrl);
       }
       // ❌ If any operation fails, rollback the transaction
       await session.abortTransaction();
@@ -174,10 +177,7 @@ export class CandidateService {
 
       // ✅ Step 4: Remove candidate image from cloudinary and locally
       if (candidate.image) {
-        // ✅ Delete old file from Cloudinary
-        await deleteFromCloudinary(candidate.image);
-        // ✅ Delete old file from local storage
-        deleteFromLocal(candidate.image);
+        await deleteFile(candidate.image);
       }
 
       // ✅ Step 4: Commit the transaction

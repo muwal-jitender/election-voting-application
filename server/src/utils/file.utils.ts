@@ -1,29 +1,21 @@
 import { FileArray, UploadedFile } from "express-fileupload";
+import {
+  deleteFromCloudinary,
+  uploadToCloudinary,
+} from "../config/cloudinary.config";
+import {
+  getFilenameFromUrl,
+  validateFileSize,
+  validateImageFile,
+} from "./file-validate.utils";
 
 import { BadRequestError } from "./exceptions.utils";
 import { UPLOADS_DIR } from "./config.utils";
 import fs from "fs";
 import path from "path";
-import { uploadToCloudinary } from "../config/cloudinary.config";
 import { v4 as uuid } from "uuid";
 
-/** ✅ Allowed image file extensions */
-const ALLOWED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/avif",
-];
-
-/** ✅ Max file size (10MB) */
-const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
-
-/**
- * Upload file to a specified directory locally and returns its path.
- * @param file - The uploaded file object.
- * @param destinationFolder - The folder where the file should be stored.
- * @returns A Promise that resolves with the file path.
- */
+/** ✅ Upload file to Local Storage */
 export const uploadToLocal = (file: UploadedFile): Promise<string> => {
   return new Promise((resolve, reject) => {
     if (!fs.existsSync(UPLOADS_DIR)) {
@@ -61,45 +53,18 @@ export const deleteFromLocal = (fileUrl: string) => {
   }
 };
 
-/**
- * Returns the file name from the URL
- * @param url
- * @returns
- */
-export const getFilenameFromUrl = (url: string) => {
-  const parsedUrl = new URL(url);
-  const pathname = parsedUrl.pathname;
-  return pathname.substring(pathname.lastIndexOf("/") + 1);
-};
-
-/** The file size should be less than 10MB */
-const validateFileSize = (size: number) => {
-  if (size > MAX_IMAGE_SIZE) {
-    throw new BadRequestError("File too large. Maximum allowed size is 10MB.");
-  }
-};
-
-/** Check if its a valid image  */
-const validateImageFile = (file: UploadedFile, throwError = true) => {
-  if (!throwError) return;
-  if (!ALLOWED_IMAGE_TYPES.includes(file.mimetype)) {
-    throw new BadRequestError(
-      `Invalid file type. Allowed types: ${ALLOWED_IMAGE_TYPES.join(", ")}`
-    );
-  }
-};
-
+/** ✅ Upload File to Local Storage & Cloudinary */
 export const uploadFile = async (
   files: FileArray | null | undefined,
   propertyName: "thumbnail" | "image",
-  oldImage?: string
+  oldImage?: string // ✅ Use old image for updates
 ) => {
-  // ✅ Step 1: Validate image
+  // ✅ If no image is submitted and we have old image too, means an Update case
   if (!files?.[propertyName] && oldImage) {
-    // Update Case
-    return oldImage;
+    // ✅ Update Case
+    return oldImage; // Return old image url to be used
   } else if (!files?.[propertyName]) {
-    // Insert Case
+    // ✅ Insert Case
     throw new BadRequestError(`${propertyName} is missing`);
   }
 
@@ -111,10 +76,21 @@ export const uploadFile = async (
   validateImageFile(file);
   validateFileSize(file.size);
 
-  // ✅ Step 2: upload image
+  // ✅ Upload to local storage
   const localFilePath = await uploadToLocal(file);
+  // ✅ Upload to Cloudinary
   const cloudinaryUrl = await uploadToCloudinary(localFilePath);
 
   if (!cloudinaryUrl) throw new Error("File upload failed.");
   return cloudinaryUrl;
+};
+
+/** ✅ Delete file from Local Storage & Cloudinary */
+export const deleteFile = async (fileUrl: string) => {
+  if (!fileUrl) return;
+
+  // ✅ Delete from Cloudinary
+  await deleteFromCloudinary(fileUrl);
+  // ✅ Delete from local storage
+  deleteFromLocal(fileUrl);
 };
