@@ -4,10 +4,12 @@ import { CandidateDTO } from "./candidate.dto";
 import { CandidateRepository } from "./candidate.repository";
 import mongoose from "mongoose";
 import { ElectionRepository } from "../election/election.repository";
-import { NotFoundError } from "../../utils/exceptions.utils";
+import { BadRequestError, NotFoundError } from "../../utils/exceptions.utils";
 import { deleteFromCloudinary } from "../../config/cloudinary.config";
-import { deleteFromLocal } from "../../utils/file.utils";
+import { deleteFromLocal, uploadFile } from "../../utils/file.utils";
 import { VoterRepository } from "../voter/voter.repository";
+import { FileArray } from "express-fileupload";
+import { ElectionService } from "../election/election.service";
 // Voter Service
 @singleton()
 export class CandidateService {
@@ -15,16 +17,27 @@ export class CandidateService {
     @inject(CandidateRepository)
     private candidateRepository: CandidateRepository,
     @inject(ElectionRepository) private electionRepository: ElectionRepository,
-    @inject(VoterRepository) private voterRepository: VoterRepository
+    @inject(VoterRepository) private voterRepository: VoterRepository,
+    @inject(ElectionService) private electionService: ElectionService
   ) {}
 
   /** Create a new candidate and push into election */
-  async create(data: CandidateDTO) {
+  async create(data: CandidateDTO, files: FileArray | null | undefined) {
     const session = await mongoose.startSession();
     session.startTransaction();
+    let newImageUrl: string | null = null;
     try {
+      // ✅ Step 1: Upload image on Cloud as well on Local Storage
+      newImageUrl = await uploadFile(files, "image", data.image);
+
       // ✅ Step 1: Create the new candidate
-      const newCandidate = await this.candidateRepository.create(data, session);
+      const newCandidate = await this.candidateRepository.create(
+        {
+          ...data,
+          image: newImageUrl,
+        },
+        session
+      );
       // ✅ Step 2: Push the new candidate into the election's `candidates` array
       await this.electionRepository.update(
         data.electionId,
@@ -39,6 +52,11 @@ export class CandidateService {
 
       return newCandidate;
     } catch (error) {
+      // ❌ Remove the image in case of an exception
+      if (newImageUrl) {
+        deleteFromCloudinary(newImageUrl);
+        deleteFromLocal(newImageUrl);
+      }
       // ❌ If any operation fails, rollback the transaction
       await session.abortTransaction();
       session.endSession();
@@ -50,7 +68,22 @@ export class CandidateService {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      // ✅ Step 1: Get Candidate and ensure it exists
+      // ✅ Step 1: Ensure election exists
+      const election =
+        await this.electionService.getVotersWhoAlreadyVoted(electionId);
+      if (!election) {
+        throw new BadRequestError("Election not found");
+      }
+
+      // ✅ Step 2: Ensure voter exists
+      if (
+        election.voters.length > 0 &&
+        election.voters.find((id) => id.toString() === voterId)
+      ) {
+        throw new BadRequestError("Voter already voted");
+      }
+
+      // ✅ Step 3: Get Candidate and ensure it exists
       const dbCandidate = await this.candidateRepository.findById(
         id,
         [],
@@ -60,13 +93,7 @@ export class CandidateService {
         throw new NotFoundError("Candidate not found");
       }
 
-      // ✅ Step 2: Get Voter and ensure it exists
-      const dbVoter = await this.voterRepository.findById(voterId, [], session);
-      if (!dbVoter) {
-        throw new NotFoundError("Voter not found");
-      }
-
-      // ✅ Step 3: Get Election and ensure it exists
+      // ✅ Step 4: Get Election and ensure it exists
       const dbElection = await this.electionRepository.findById(
         electionId,
         [],
@@ -76,28 +103,28 @@ export class CandidateService {
         throw new NotFoundError("Election not found");
       }
 
-      // ✅ Step 4: Increment Candidate Vote Count (Efficient Update)
+      // ✅ Step 5: Increment Candidate Vote Count (Efficient Update)
       const result = await this.candidateRepository.update(
         id,
         { $inc: { voteCount: 1 } }, // ✅ Efficient increment without fetching full document
         session
       );
 
-      // ✅ Step 5: Update Election with Voter ID
+      // ✅ Step 6: Update Election with Voter ID
       await this.electionRepository.update(
         electionId,
-        { $push: { voters: dbVoter._id } }, // ✅ Use `_id` not `id`
+        { $push: { voters: voterId } }, // ✅ Use `_id` not `id`
         session
       );
 
-      // ✅ Step 6: Update Voter with Election ID
+      // ✅ Step 7: Update Voter with Election ID
       await this.voterRepository.update(
         voterId,
         { $push: { votedElectionIds: dbElection._id } }, // ✅ Use `_id` not `id`
         session
       );
 
-      // ✅ Step 7: Commit transaction before returning
+      // ✅ Step 8: Commit transaction before returning
       await session.commitTransaction();
       session.endSession();
 

@@ -9,6 +9,6 @@ const router = Router();
 // Voters
 router.use("/api/v1/voters", voterRouter);
 router.use("/api/v1/elections", authenticateJWT, electionRouter);
-router.use("/api/v1/candidates", authenticateJWT, isAdmin, candidateRouter);
+router.use("/api/v1/candidates", authenticateJWT, candidateRouter);
 
 export default router;

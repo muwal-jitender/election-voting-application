@@ -18,6 +18,7 @@ import {
   uploadToCloudinary,
 } from "../../config/cloudinary.config";
 import { ElectionService } from "../election/election.service";
+import { validateMongoId } from "../../utils/utils";
 
 @injectable()
 export class CandidateController {
@@ -28,32 +29,12 @@ export class CandidateController {
 
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const data: CandidateDTO = plainToClass(CandidateDTO, req.body);
+      const data: CandidateDTO = req.body;
 
-      // Validate Payload
-      const errors = await validate(data);
-      if (errors.length > 0) {
-        throw new BadRequestError(
-          "Bad Requests",
-          errors.map((err) => err.constraints)
-        );
-      }
-
-      if (!req.files || !req.files.image) {
-        throw new BadRequestError("Image is required");
-      }
-
-      const file = req.files.image as UploadedFile;
-
-      const cloudinaryUrl = await uploadToLocal(file);
-
-      // ✅ Upload to Cloudinary file.tempFilePath
-      const profilePic = await uploadToCloudinary(cloudinaryUrl);
-
-      const newCandidate = await this.candidateService.create({
-        ...data,
-        image: profilePic ?? "", // ✅ Store Cloudinary URL
-      });
+      const newCandidate = await this.candidateService.create(
+        data,
+        req.files // ✅ Store Cloudinary URL
+      );
 
       return res.status(StatusCodes.CREATED).json({
         message: "Candidate added successfully",
@@ -76,7 +57,7 @@ export class CandidateController {
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      if (!id) throw new BadRequestError("Candidate-id is missing");
+      validateMongoId(id);
       const candidate = await this.candidateService.getById(id);
       return res
         .status(StatusCodes.OK)
@@ -88,9 +69,9 @@ export class CandidateController {
   async remove(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      if (!id) throw new BadRequestError("Candidate-id is missing");
-      // Delete Candidates assigned to this election
+      validateMongoId(id);
 
+      // Delete Candidates assigned to this election
       const result = await this.candidateService.delete(id);
       return res.status(StatusCodes.OK).json({
         message: "Candidate removed successfully",
@@ -104,31 +85,17 @@ export class CandidateController {
   /**Allow voters to cast their votes */
   async vote(req: Request, res: Response, next: NextFunction) {
     try {
-      const { id } = req.params; // ✅ Get Candidate ID from params
-      if (!id) throw new BadRequestError("Candidate-id is missing");
-      const { voterId, electionId } = req.body;
+      const { id } = req.params;
+      const { electionId } = req.params;
+      validateMongoId(id);
+      validateMongoId(electionId);
 
-      if (!electionId || !electionId.trim()) {
-        throw new BadRequestError("Election-id is missing");
-      }
-
-      if (!voterId || !voterId.trim()) {
-        throw new BadRequestError("Voter-id is missing");
-      }
-
-      const election =
-        await this.electionService.getVotersWhoAlreadyVoted(electionId);
-      if (!election) {
-        throw new BadRequestError("Election not found");
-      }
-      if (
-        election.voters.length > 0 &&
-        election.voters.find((id) => id.toString() === voterId)
-      ) {
-        throw new BadRequestError("Voter already voted");
-      }
       // ✅ Update the election record
-      await this.candidateService.voteCandidate(id, voterId, electionId);
+      await this.candidateService.voteCandidate(
+        id,
+        req.user?.id as string,
+        electionId
+      );
 
       return res.status(StatusCodes.OK).json({
         message: "Vote casted successfully",
