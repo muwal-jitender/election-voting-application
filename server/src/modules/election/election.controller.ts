@@ -32,34 +32,10 @@ export class ElectionController {
 
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-      // ✅ Validate request body using DTO
-      const data: ElectionDTO = plainToClass(ElectionDTO, req.body);
-      const errors = await validate(data);
-
-      if (errors.length > 0) {
-        return res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ errors: errors.map((err) => err.constraints) });
-      }
-
-      // ✅ Check if thumbnail is sent or not
-      if (!req.files?.thumbnail) {
-        throw new BadRequestError("Thumbnail is required");
-      }
-
-      const file = req.files.thumbnail as UploadedFile;
-
-      // ✅ Upload file to local directory (We store files locally as well)
-      const cloudinaryUrl = await uploadToLocal(file);
-
-      // ✅ Upload to Cloudinary
-      const thumbnailUrl = await uploadToCloudinary(cloudinaryUrl);
+      const data: ElectionDTO = req.body;
 
       // ✅ Create the election in DB
-      const newElection = await this.electionService.create({
-        ...data,
-        thumbnail: thumbnailUrl ?? "", // ✅ Store Cloudinary URL
-      });
+      const newElection = await this.electionService.create(data, req.files);
 
       return res.status(StatusCodes.CREATED).json({
         message: "Election created successfully",

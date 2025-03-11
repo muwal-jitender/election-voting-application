@@ -28,8 +28,30 @@ export class ElectionService {
     private candidateRepository: CandidateRepository
   ) {}
 
-  async create(data: ElectionDTO) {
-    return await this.electionRepository.create(data);
+  async create(data: ElectionDTO, files: FileArray | null | undefined) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+      // ✅ Step 1: Start file upload
+      const newThumbnailUrl = await uploadFile(
+        files,
+        "thumbnail",
+        data.thumbnail
+      );
+      // ✅ Step 2: Create new election
+      const newElection = await this.electionRepository.create({
+        ...data,
+        thumbnail: newThumbnailUrl,
+      });
+      // ✅ Step 3: Commit Transaction and return result
+      await session.commitTransaction();
+      session.endSession();
+      return newElection;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
   }
   async update(
     electionId: string,
@@ -46,15 +68,8 @@ export class ElectionService {
         throw new NotFoundError("Election not found.");
       }
 
-      // ✅ Step 2: Validate DTO
-      const data: ElectionDTO = plainToClass(ElectionDTO, dto);
-      const errors = await validate(data, { skipMissingProperties: true });
-      if (errors.length > 0) {
-        throw new BadRequestError(
-          "Validation failed.",
-          errors.map((err) => err.constraints)
-        );
-      }
+      // ✅ Step 2: Assign DTO
+      const data: ElectionDTO = dto;
 
       // ✅ Step 3: Process File Upload
       const newThumbnailUrl = await uploadFile(

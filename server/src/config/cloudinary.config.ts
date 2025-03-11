@@ -44,5 +44,6 @@ export const deleteFromCloudinary = async (cloudinaryUrl: string) => {
     console.log(`✅ Deleted from Cloudinary: ${cloudinaryUrl}`);
   } catch (error) {
     console.error("❌ Cloudinary Deletion Failed:", error);
+    throw error;
   }
 };

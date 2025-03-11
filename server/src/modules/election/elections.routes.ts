@@ -1,14 +1,21 @@
 import { ElectionController } from "./election.controller";
+import { ElectionDTO } from "./election.dto";
 import { Router } from "express";
 import { container } from "tsyringe";
 import { isAdmin } from "../../middleware/admin.middleware";
+import { validateRequest } from "../../middleware/validate-request.middleware";
 
 const electionRouter = Router();
 const electionController = container.resolve(ElectionController);
 
-electionRouter.post("/", isAdmin, async (req, res, next) => {
-  await electionController.create(req, res, next);
-});
+electionRouter.post(
+  "/",
+  isAdmin,
+  validateRequest(ElectionDTO),
+  async (req, res, next) => {
+    await electionController.create(req, res, next);
+  }
+);
 
 electionRouter.get("/", async (req, res, next) => {
   await electionController.get(req, res, next);
