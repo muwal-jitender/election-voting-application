@@ -6,6 +6,7 @@ import { VoterDocument } from "./voter.model";
 import jwt from "jsonwebtoken";
 import { env } from "../../utils/env-config.utils";
 import type { StringValue } from "ms";
+import { ConflictError, UnauthorizedError } from "../../utils/exceptions.utils";
 // Voter Service
 @singleton()
 export class VoterService {
@@ -13,8 +14,17 @@ export class VoterService {
     @inject(VoterRepository) private voterRepository: VoterRepository
   ) {}
 
-  async registerVoter(data: RegisterVoterDTO & { isAdmin: boolean }) {
-    return await this.voterRepository.create(data);
+  async registerVoter(data: RegisterVoterDTO) {
+    // ✅ Checking if email already exists
+    const emailExists = await this.findByEmail(data.email);
+    if (emailExists) {
+      throw new ConflictError("Email already exists");
+    }
+    // ✅ Explicitly set isAdmin to false, so that no external voter can set itself as Admin
+    return await this.voterRepository.create({
+      ...data,
+      isAdmin: false,
+    });
   }
 
   async getAllVoters() {
@@ -36,18 +46,19 @@ export class VoterService {
   async checkCredentials(
     email: string,
     password: string
-  ): Promise<VoterDocument | null> {
+  ): Promise<VoterDocument> {
+    // ✅ Fetch only required fields
     const voter = await this.voterRepository.findOneByFieldWithSelect(
       "email",
       email,
       ["_id", "email", "password", "isAdmin"]
     );
-    if (!voter) {
-      return null;
+    // ✅ Verify if voter exists and password also matches
+    if (!voter || !(await bcrypt.compare(password, voter.password))) {
+      throw new UnauthorizedError("Invalid username or password");
     }
 
-    const isMatch = await bcrypt.compare(password, voter.password);
-    return isMatch ? voter : null;
+    return voter;
   }
   /** Generate JWT token */
   generateToken(voter: VoterDocument): string {
