@@ -10,7 +10,7 @@ import {
 } from "./file-validate.utils";
 
 import { BadRequestError } from "./exceptions.utils";
-import { UPLOADS_DIR } from "./config.utils";
+import { UPLOADS_DIR } from "./file-validate.utils";
 import fs from "fs";
 import path from "path";
 import { v4 as uuid } from "uuid";

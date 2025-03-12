@@ -1,5 +1,6 @@
 import { BadRequestError } from "./exceptions.utils";
 import { UploadedFile } from "express-fileupload";
+import path from "path";
 
 /** ✅ Allowed image file extensions */
 const ALLOWED_IMAGE_TYPES = [
@@ -8,6 +9,8 @@ const ALLOWED_IMAGE_TYPES = [
   "image/webp",
   "image/avif",
 ];
+
+export const UPLOADS_DIR = path.join(__dirname, "../../uploads"); // ✅ Centralized uploads directory
 
 /** ✅ Max file size (10MB) */
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
