@@ -9,7 +9,7 @@ import { ICandidateModel, IVoterVotedResponse } from "../../types";
 
 import { useParams } from "react-router-dom";
 import Candidate from "../../components/candidate/Candidate";
-import ConfirmVote from "../../components/candidate/ConfirmVote";
+import ConfirmVote from "../../components/modals/ConfirmModal";
 
 const Candidates = () => {
   // Election Id

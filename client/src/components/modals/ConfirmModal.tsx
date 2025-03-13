@@ -1,4 +1,4 @@
-import "./ConfirmVote.css";
+import "./ConfirmModal.css";
 
 import { useDispatch, useSelector } from "react-redux";
 
