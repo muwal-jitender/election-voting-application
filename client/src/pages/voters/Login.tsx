@@ -2,13 +2,13 @@ import "./Login.css";
 
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getToken, getUser, setToken } from "../../utils/auth.utils";
 
 import { useDispatch } from "react-redux";
 import { login } from "../../services/voter.service";
 import { voteActions } from "../../store/vote-slice";
 import { ILoginModel } from "../../types/index";
 import { IErrorResponse } from "../../types/ResponseModel";
-import { setToken } from "../../utils/auth.utils";
 
 const Login = () => {
   const [formData, setRegisterData] = React.useState<ILoginModel>({
@@ -32,14 +32,16 @@ const Login = () => {
       const result = await login(formData);
       // Save user in local storage
       result.data && setToken(result.data.token);
+      const user = getUser();
       // Save in redux state
-      dispatch(
-        voteActions.changeCurrentVoter({
-          id: result.data?.response.id,
-          token: result.data?.token,
-          isAdmin: result.data?.response.isAdmin,
-        }),
-      );
+      user &&
+        dispatch(
+          voteActions.changeCurrentVoter({
+            id: user.id,
+            token: getToken(),
+            isAdmin: user.isAdmin,
+          }),
+        );
 
       navigate("/results");
     } catch (error: unknown) {
