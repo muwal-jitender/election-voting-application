@@ -1,7 +1,7 @@
 import "./ElectionCandidate.css";
 
 import { IoMdTrash } from "react-icons/io";
-import { ICandidateModel } from "../types";
+import { ICandidateModel } from "../../types";
 
 const ElectionCandidate = ({ fullName, image, motto, id }: ICandidateModel) => {
   return (

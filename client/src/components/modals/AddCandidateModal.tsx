@@ -1,11 +1,11 @@
-import { IAddCandidateModel, ICandidateModel } from "../types";
+import { IAddCandidateModel, ICandidateModel } from "../../types";
 
 import { useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
-import { createCandidate } from "../services/candidate.service";
-import { UiActions } from "../store/ui-slice";
-import { IErrorResponse } from "../types/ResponseModel";
+import { createCandidate } from "../../services/candidate.service";
+import { UiActions } from "../../store/ui-slice";
+import { IErrorResponse } from "../../types/ResponseModel";
 
 interface AddCandidateModalProp {
   onCandidateAdded: (newElection: ICandidateModel) => void;

@@ -1,12 +1,12 @@
-import Candidate1 from "../assets/candidate-1.jpeg";
-import Candidate2 from "../assets/candidate-2.jpeg";
-import Candidate3 from "../assets/candidate-3.jpeg";
-import Candidate4 from "../assets/candidate-4.jpeg";
-import Candidate5 from "../assets/candidate-5.jpeg";
-import Candidate6 from "../assets/candidate-6.jpeg";
-import Candidate7 from "../assets/candidate-7.jpeg";
-import Thumbnail2 from "../assets/flag_of_alabama.png";
-import Thumbnail3 from "../assets/flag_of_alaska.png";
+import Candidate1 from "../assets/images/candidates/candidate-1.jpeg";
+import Candidate2 from "../assets/images/candidates/candidate-2.jpeg";
+import Candidate3 from "../assets/images/candidates/candidate-3.jpeg";
+import Candidate4 from "../assets/images/candidates/candidate-4.jpeg";
+import Candidate5 from "../assets/images/candidates/candidate-5.jpeg";
+import Candidate6 from "../assets/images/candidates/candidate-6.jpeg";
+import Candidate7 from "../assets/images/candidates/candidate-7.jpeg";
+import Thumbnail2 from "../assets/images/flags/flag_of_alabama.png";
+import Thumbnail3 from "../assets/images/flags/flag_of_alaska.png";
 
 export const elections = [
   {

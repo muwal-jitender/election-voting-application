@@ -4,11 +4,11 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useDispatch } from "react-redux";
-import { login } from "../services/voter.service";
-import { voteActions } from "../store/vote-slice";
-import { ILoginModel } from "../types/index";
-import { IErrorResponse } from "../types/ResponseModel";
-import { setToken } from "../utils/auth.utils";
+import { login } from "../../services/voter.service";
+import { voteActions } from "../../store/vote-slice";
+import { ILoginModel } from "../../types/index";
+import { IErrorResponse } from "../../types/ResponseModel";
+import { setToken } from "../../utils/auth.utils";
 
 const Login = () => {
   const [formData, setRegisterData] = React.useState<ILoginModel>({

@@ -1,6 +1,6 @@
 import "./Loader.css";
 
-import Spinner from "../../assets/loader.gif";
+import Spinner from "../../assets/images/general/loader.gif";
 
 const Loader = () => {
   return (

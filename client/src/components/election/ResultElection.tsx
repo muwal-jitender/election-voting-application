@@ -1,11 +1,11 @@
 import "./ResultElection.css";
 
 import { useEffect, useState } from "react";
-import { ICandidateModel, IElectionModel } from "../types";
+import { ICandidateModel, IElectionModel } from "../../types";
 
 import { Link } from "react-router-dom";
-import { getCandidatesByElectionId } from "../services/election.service";
-import CandidateRating from "./CandidateRating";
+import { getCandidatesByElectionId } from "../../services/election.service";
+import CandidateRating from "../candidate/CandidateRating";
 
 const ResultElection = ({ id, thumbnail, title }: IElectionModel) => {
   const [totalVotes, setTotalVotes] = useState(0);

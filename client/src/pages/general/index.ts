@@ -1,0 +1,9 @@
+export { default as Candidates } from "../candidates/Candidates";
+export { default as ElectionDetails } from "../elections/ElectionDetails";
+export { default as Elections } from "../elections/Elections";
+export { default as Results } from "../elections/Results";
+export { default as Login } from "../voters/Login";
+export { default as Logout } from "../voters/Logout";
+export { default as Register } from "../voters/Register";
+export { default as Congrats } from "./Congrats";
+export { default as ErrorPage } from "./ErrorPage";

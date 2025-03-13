@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { IAddElection, IElectionModel } from "../types";
+import { IAddElection, IElectionModel } from "../../types";
 
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
-import { createElection } from "../services/election.service";
-import { UiActions } from "../store/ui-slice";
+import { createElection } from "../../services/election.service";
+import { UiActions } from "../../store/ui-slice";
 
 interface AddElectionModalProp {
   // ✅ Accept callback prop

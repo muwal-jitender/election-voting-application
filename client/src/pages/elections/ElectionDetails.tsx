@@ -7,15 +7,15 @@ import {
   IElectionModel,
   IVoterModel,
   RootState,
-} from "../types";
+} from "../../types";
 
 import { IoAddOutline } from "react-icons/io5";
 import { useParams } from "react-router-dom";
-import AddCandidateModal from "../components/AddCandidateModal";
-import ElectionCandidate from "../components/ElectionCandidate";
-import { getFullDetail } from "../services/election.service";
-import { UiActions } from "../store/ui-slice";
-import { IErrorResponse } from "../types/ResponseModel";
+import ElectionCandidate from "../../components/election/ElectionCandidate";
+import AddCandidateModal from "../../components/modals/AddCandidateModal";
+import { getFullDetail } from "../../services/election.service";
+import { UiActions } from "../../store/ui-slice";
+import { IErrorResponse } from "../../types/ResponseModel";
 
 const ElectionDetails = () => {
   const { id } = useParams();

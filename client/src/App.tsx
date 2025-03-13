@@ -9,7 +9,7 @@ import {
   Logout,
   Register,
   Results,
-} from "./pages/index";
+} from "./pages/general/index";
 
 import React from "react";
 import PrivateLayout from "./components/layout/PrivateLayout";

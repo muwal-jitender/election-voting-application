@@ -10,18 +10,12 @@ export interface CandidateDocument extends Document {
   electionId: string;
 }
 
-export interface AddCandidateModel {
-  fullName: string;
-  image: string;
-  motto: string;
-}
-
 const candidateSchema = new Schema<CandidateDocument>(
   {
     fullName: { type: String, required: true, trim: true },
     image: { type: String, required: true, trim: true },
     motto: { type: String, required: true, trim: true },
-    voteCount: { type: Number },
+    voteCount: { type: Number, default: 0 },
     electionId: [{ type: Types.ObjectId, ref: "Election", required: false }], // Not required initially
   },
   { timestamps: true }

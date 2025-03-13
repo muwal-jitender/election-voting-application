@@ -4,13 +4,13 @@ import { useCallback, useEffect, useState } from "react";
 import {
   checkIfVoterAlreadyVoted,
   getCandidatesByElectionId,
-} from "../services/election.service";
-import { ICandidateModel, IVoterVotedResponse, RootState } from "../types";
+} from "../../services/election.service";
+import { ICandidateModel, IVoterVotedResponse, RootState } from "../../types";
 
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import Candidate from "../components/Candidate";
-import ConfirmVote from "../components/ConfirmVote";
+import Candidate from "../../components/candidate/Candidate";
+import ConfirmVote from "../../components/candidate/ConfirmVote";
 
 const Candidates = () => {
   // Election Id

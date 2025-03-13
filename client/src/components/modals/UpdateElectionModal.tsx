@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { IAddElection, IElectionModel } from "../types";
+import { IAddElection, IElectionModel } from "../../types";
 
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
-import { updateElection } from "../services/election.service";
-import { UiActions } from "../store/ui-slice";
+import { updateElection } from "../../services/election.service";
+import { UiActions } from "../../store/ui-slice";
 
 // ✅ Define Props Interface
 interface UpdateElectionModalProps {

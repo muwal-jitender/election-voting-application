@@ -3,9 +3,9 @@ import "./Register.css";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import { register } from "../services/voter.service";
-import { RegisterModel } from "../types/index";
-import { IErrorResponse } from "../types/ResponseModel";
+import { register } from "../../services/voter.service";
+import { RegisterModel } from "../../types/index";
+import { IErrorResponse } from "../../types/ResponseModel";
 
 const Register = () => {
   const [formData, setRegisterData] = React.useState<RegisterModel>({
