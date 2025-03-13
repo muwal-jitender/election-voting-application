@@ -6,6 +6,10 @@ export interface UIState {
   electionModalShowing: boolean;
   updateElectionModalShowing: boolean;
   selectedElection: IElectionModel | null;
+  // ✅ States for the Confirm Dialog
+  openConfirmModal: boolean;
+  confirmModalHeading: string;
+  confirmModalCallback: (() => void) | null;
 }
 
 export interface Voter {

@@ -9,8 +9,15 @@ const Candidate = ({ image, id, fullName, motto }: ICandidateModel) => {
   const dispatch = useDispatch(); // Hook to send actions to Redux
 
   // Open the confirm vote modal
-  const openCandidateModal = () => {
-    dispatch(UiActions.openVoteCandidateModal());
+  const handleCastingVote = () => {
+    dispatch(
+      UiActions.openConfirmModalDialog({
+        heading: "Please confirm your vote",
+        callback: () => {
+          alert("Your vote casted");
+        },
+      }),
+    );
     dispatch(voteActions.changeSelectedVoteCandidate(id));
   };
 
@@ -25,7 +32,7 @@ const Candidate = ({ image, id, fullName, motto }: ICandidateModel) => {
       <small>
         {motto?.length > 25 ? motto.substring(0, 25) + "..." : motto}
       </small>
-      <button className="btn primary" onClick={openCandidateModal}>
+      <button className="btn primary" onClick={handleCastingVote}>
         Vote
       </button>
     </article>

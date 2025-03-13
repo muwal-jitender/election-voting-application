@@ -5,9 +5,8 @@ import {
   checkIfVoterAlreadyVoted,
   getCandidatesByElectionId,
 } from "../../services/election.service";
-import { ICandidateModel, IVoterVotedResponse, RootState } from "../../types";
+import { ICandidateModel, IVoterVotedResponse } from "../../types";
 
-import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import Candidate from "../../components/candidate/Candidate";
 import ConfirmVote from "../../components/candidate/ConfirmVote";
@@ -15,9 +14,6 @@ import ConfirmVote from "../../components/candidate/ConfirmVote";
 const Candidates = () => {
   // Election Id
   const { id } = useParams<{ id: string }>();
-  const voteCandidateModalShowing = useSelector(
-    (state: RootState) => state.ui.voteCandidateModalShowing,
-  );
 
   // Candidates and Voting State
   const [electionCandidates, setElectionCandidates] = useState<
@@ -99,7 +95,7 @@ const Candidates = () => {
         )}
       </section>
 
-      {voteCandidateModalShowing && <ConfirmVote />}
+      <ConfirmVote />
     </>
   );
 };

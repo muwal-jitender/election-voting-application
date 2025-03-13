@@ -1,62 +1,47 @@
 import "./ConfirmVote.css";
 
-import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ICandidateModel, RootState } from "../../types";
 
-import { candidates } from "../../data/data";
+import { RootState } from "../../store/store";
 import { UiActions } from "../../store/ui-slice";
 
 const ConfirmVote = () => {
-  const [modalCandidate, setModalCandidate] = useState<ICandidateModel | null>(
-    null,
-  );
   const dispatch = useDispatch();
 
-  // Close the confirm vote modal
-  const closeCandidateModal = () => {
-    dispatch(UiActions.closeVoteCandidateModal());
-  };
-
-  // Get selected candidate id (state) from redux store
-  const selectedVoteCandidate = useSelector(
-    (state: RootState) => state.vote.selectedVoteCandidate,
+  // ✅  Get modal state from Redux
+  const isOpen = useSelector((state: RootState) => state.ui.openConfirmModal);
+  const heading = useSelector(
+    (state: RootState) => state.ui.confirmModalHeading,
   );
-
-  const fetchCandidate = () => {
-    const candidate = candidates.find(
-      (candidate) => candidate.id === selectedVoteCandidate,
-    );
-    if (candidate) {
-      setModalCandidate(candidate);
-    }
+  const onConfirm = useSelector(
+    (state: RootState) => state.ui.confirmModalCallback,
+  );
+  // ✅ Close the confirm modal dialog
+  const closeCandidateModal = () => {
+    dispatch(UiActions.closeConfirmModalDialog());
   };
-  useEffect(() => {
-    fetchCandidate();
-  }, []);
+
+  // If modal is closed, return null (no render)
+  if (!isOpen) return null;
 
   return (
     <section className="modal">
       <div className="modal__content confirm__vote-content">
-        <h5>Please confirm your vote</h5>
-        {modalCandidate && (
-          <>
-            <div className="confirm__vote-image">
-              <img src={modalCandidate.image} alt={modalCandidate.fullName} />
-            </div>
-            <h2>{modalCandidate.fullName}</h2>
-            <p>
-              {modalCandidate.motto.length > 45
-                ? modalCandidate.motto.substring(0, 45) + "..."
-                : modalCandidate.motto}
-            </p>
-          </>
-        )}
+        <h5>{heading}</h5>
+
         <div className="confirm__vote-cta">
           <button className="btn danger" onClick={closeCandidateModal}>
             Cancel
           </button>
-          <button className="btn primary">Confirm</button>
+          <button
+            className="btn primary"
+            onClick={() => {
+              if (onConfirm) onConfirm();
+              closeCandidateModal();
+            }}
+          >
+            Confirm
+          </button>
         </div>
       </div>
     </section>

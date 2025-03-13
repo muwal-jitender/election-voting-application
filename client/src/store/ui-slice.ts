@@ -7,6 +7,10 @@ const initialState: UIState = {
   electionModalShowing: false,
   updateElectionModalShowing: false,
   selectedElection: null,
+  // ✅ Initial states for Confirm Dialog
+  openConfirmModal: false,
+  confirmModalHeading: "",
+  confirmModalCallback: null,
 };
 const UiSlice = createSlice({
   name: "ui",
@@ -36,6 +40,20 @@ const UiSlice = createSlice({
     },
     closeUpdateElectionModal(state) {
       state.updateElectionModalShowing = false;
+    },
+    // ✅ Manage Confirm Dialog
+    openConfirmModalDialog(
+      state,
+      action: PayloadAction<{ heading: string; callback: () => void }>,
+    ) {
+      state.openConfirmModal = true;
+      state.confirmModalHeading = action.payload.heading;
+      state.confirmModalCallback = action.payload.callback;
+    },
+    closeConfirmModalDialog(state) {
+      state.openConfirmModal = false;
+      state.confirmModalHeading = "";
+      state.confirmModalCallback = null;
     },
   },
 });
