@@ -87,15 +87,12 @@ export class CandidateController {
     try {
       const { id } = req.params;
       const { electionId } = req.params;
-      validateMongoId(id);
+      const voterId = req.user?.id as string;
+      validateMongoId(voterId);
       validateMongoId(electionId);
 
       // ✅ Update the election record
-      await this.candidateService.voteCandidate(
-        id,
-        req.user?.id as string,
-        electionId
-      );
+      await this.candidateService.voteCandidate(id, voterId, electionId);
 
       return res.status(StatusCodes.OK).json({
         message: "Vote casted successfully",

@@ -5,11 +5,11 @@ import {
   checkIfVoterAlreadyVoted,
   getCandidatesByElectionId,
 } from "../../services/election.service";
-import { ICandidateModel, IVoterVotedResponse } from "../../types";
 
 import { useParams } from "react-router-dom";
 import Candidate from "../../components/candidate/Candidate";
 import ConfirmVote from "../../components/modals/ConfirmModal";
+import { ICandidateModel } from "../../types";
 
 const Candidates = () => {
   // Election Id
@@ -35,7 +35,7 @@ const Candidates = () => {
   const checkIfVoted = useCallback(async (id: string) => {
     try {
       const result = await checkIfVoterAlreadyVoted(id);
-      setVoted((result.data as IVoterVotedResponse).voted);
+      result.data && setVoted(result.data.voted);
     } catch (error) {
       console.error("Error checking voter status:", error);
     }
@@ -44,10 +44,12 @@ const Candidates = () => {
   // Fetch Data on Component Mount
   useEffect(() => {
     if (id) {
-      getElections(id);
       checkIfVoted(id);
+      if (!voted) {
+        getElections(id);
+      }
     }
-  }, [getElections, checkIfVoted, id]);
+  }, [getElections, checkIfVoted, voted, id]);
 
   // ✅ Extracted JSX Logic for Readability
   const renderHeaderMessage = () => {

@@ -10,6 +10,7 @@ export const API_PATH = {
   // Candidate
   CANDIDATE: `${CANDIDATE_CONTROLLER}`,
   CANDIDATE_ID: `${CANDIDATE_CONTROLLER}/:id`,
+  CANDIDATE_VOTE: `${CANDIDATE_CONTROLLER}/:id/elections/:electionId`,
   // Election
   ELECTION: `${ELECTION_CONTROLLER}`,
   ELECTION_ID: `${ELECTION_CONTROLLER}/:id`,
@@ -25,8 +26,8 @@ export const getApiPath = (
   path: string,
   params: Record<string, string | number>,
 ) => {
-  return Object.keys(params).reduce(
-    (acc, key) => acc.replace(`:${key}`, String(params[key])),
+  return Object.entries(params).reduce(
+    (acc, [key, value]) => acc.replace(`:${key}`, String(params[key])),
     path,
   );
 };

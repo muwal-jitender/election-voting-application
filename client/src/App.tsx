@@ -30,12 +30,12 @@ const router = createBrowserRouter([
     element: <PrivateLayout />, // ✅ Private Layout for authenticated users
     children: [
       { path: "/results", element: <Results /> },
+      { path: "/elections/:id/candidates", element: <Candidates /> },
       {
         element: <AdminRoute />, // ✅ Protect admin routes
         children: [
           { path: "/elections", element: <Elections /> },
           { path: "/elections/:id", element: <ElectionDetails /> },
-          { path: "/elections/:id/candidates", element: <Candidates /> },
         ],
       },
       { path: "/congrats", element: <Congrats /> },
