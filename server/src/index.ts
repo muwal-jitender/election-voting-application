@@ -5,7 +5,7 @@ import * as dotenv from "dotenv";
 import express, { Request, Response } from "express";
 
 import { configureFileUpload } from "./middleware/file-upload.middleware";
-import { connect } from "mongoose";
+import { connectDB } from "./config/db.config"; // ✅ Import connectDB()
 import cors from "cors";
 import { env } from "./utils/env-config.utils";
 import { errorHandler } from "./middleware/error.middleware";
@@ -38,7 +38,7 @@ app.use(router);
 // ✅ Error handling middleware (MUST be last)
 app.use(errorHandler);
 // Start server
-connect(DB)
+connectDB()
   .then(() => {
     app.listen(PORT, () => {
       console.log("⚡ Process Id: " + process.pid);
