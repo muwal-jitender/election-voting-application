@@ -1,7 +1,7 @@
 import { IAddCandidateModel, ICandidateModel } from "../types";
+import { API_PATH, getApiPath } from "../utils/api-path.utils";
 
 import { AxiosRequestConfig } from "axios";
-import { API_PATH } from "../utils/api-path.utils";
 import { apiRequest } from "./api-request";
 
 /** Create Election */
@@ -28,5 +28,13 @@ export const createCandidate = async (
     "POST",
     formData,
     config,
+  );
+};
+
+/** Remove candidate */
+export const removeCandidate = async (id: string) => {
+  return await apiRequest<ICandidateModel>(
+    getApiPath(API_PATH.CANDIDATE_ID, { id: id }),
+    "DELETE",
   );
 };

@@ -48,7 +48,7 @@ export const updateElection = async (id: string, payload: IAddElection) => {
   };
   // ✅ Call the API
   return await apiRequest<IElectionModel>(
-    getApiPath(API_PATH.ELECTION_UPDATE, { id: id }),
+    getApiPath(API_PATH.ELECTION_ID, { id: id }),
     "PATCH",
     formData,
     config,
