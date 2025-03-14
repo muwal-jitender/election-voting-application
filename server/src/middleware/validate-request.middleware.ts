@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ValidationError, validate } from "class-validator";
 
+import { BadRequestError } from "../utils/exceptions.utils";
 import { StatusCodes } from "http-status-codes";
 import { plainToInstance } from "class-transformer";
 
@@ -18,10 +19,14 @@ export const validateRequest = <T extends object>(dtoClass: new () => T) => {
     const errors: ValidationError[] = await validate(dtoInstance);
 
     if (errors.length > 0) {
-      res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ errors: errors.map((err) => err.constraints) });
-      return; // ✅ Ensures no further execution
+      // ✅ Convert nested errors into a flat array of strings
+      const errorMessages: string[] = errors.flatMap((err) =>
+        Object.values(err.constraints || {})
+      );
+      res.status(StatusCodes.BAD_REQUEST).json({
+        message: "Bad Request",
+        errorMessages,
+      });
     }
 
     next(); // ✅ Pass control to next middleware
