@@ -5,6 +5,7 @@ import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { updateElection } from "../../services/election.service";
 import { UiActions } from "../../store/ui-slice";
+import { IErrorResponse } from "../../types/ResponseModel";
 
 // ✅ Define Props Interface
 interface UpdateElectionModalProps {
@@ -21,7 +22,7 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
     description: "",
     thumbnail: null,
   });
-
+  const [errors, setErrors] = useState<string[]>([]);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -52,11 +53,15 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
   };
   // Handle Form Submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const response = await updateElection(election?.id, formData);
-    onElectionUpdated(response.data as IElectionModel);
-    // Close Modal popup
-    closeElectionModal();
+    try {
+      e.preventDefault();
+      const response = await updateElection(election?.id, formData);
+      onElectionUpdated(response.data as IElectionModel);
+      // Close Modal popup
+      closeElectionModal();
+    } catch (error: unknown) {
+      setErrors((error as IErrorResponse).errorMessages || []);
+    }
   };
   return (
     <section className="modal">
@@ -68,6 +73,13 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
           </button>
         </header>
         <form onSubmit={handleSubmit}>
+          {errors.length > 0 && (
+            <div className="form__error-message">
+              {errors.map((msg, index) => (
+                <p key={index}>{`* ${msg}`}</p>
+              ))}
+            </div>
+          )}
           <div>
             <label htmlFor="title">Title</label>
             <input
@@ -75,7 +87,6 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
               name="title"
               id="title"
               placeholder="Election Title"
-              required
               value={formData.title}
               onChange={handleChange}
             />
@@ -86,7 +97,6 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
               name="description"
               id="description"
               placeholder="Enter Description"
-              required
               cols={60}
               rows={10}
               value={formData.description}

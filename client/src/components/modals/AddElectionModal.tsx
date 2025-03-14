@@ -5,6 +5,7 @@ import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { createElection } from "../../services/election.service";
 import { UiActions } from "../../store/ui-slice";
+import { IErrorResponse } from "../../types/ResponseModel";
 
 interface AddElectionModalProp {
   // ✅ Accept callback prop
@@ -18,7 +19,7 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
     description: "",
     thumbnail: null,
   });
-
+  const [errors, setErrors] = useState<string[]>([]);
   const dispatch = useDispatch();
 
   // Close add election modal
@@ -39,11 +40,15 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
   };
   // Handle Form Submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const response = await createElection(formData);
-    onElectionAdded(response.data as IElectionModel);
-    // Close Modal popup
-    closeElectionModal();
+    try {
+      e.preventDefault();
+      const response = await createElection(formData);
+      onElectionAdded(response.data as IElectionModel);
+      // Close Modal popup
+      closeElectionModal();
+    } catch (error: unknown) {
+      setErrors((error as IErrorResponse).errorMessages || []);
+    }
   };
   return (
     <section className="modal">
@@ -55,6 +60,13 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
           </button>
         </header>
         <form onSubmit={handleSubmit}>
+          {errors.length > 0 && (
+            <div className="form__error-message">
+              {errors.map((msg, index) => (
+                <p key={index}>{`* ${msg}`}</p>
+              ))}
+            </div>
+          )}
           <div>
             <label htmlFor="title">Title</label>
             <input
@@ -62,7 +74,6 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
               name="title"
               id="title"
               placeholder="Election Title"
-              required
               value={formData.title}
               onChange={handleChange}
             />
@@ -73,7 +84,6 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
               name="description"
               id="description"
               placeholder="Enter Description"
-              required
               cols={60}
               rows={10}
               value={formData.description}
@@ -87,7 +97,6 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
               name="thumbnail"
               id="thumbnail"
               onChange={handleChange}
-              required
               accept=".png, .jpg, .jpeg, .webp, .avif"
             />
           </div>

@@ -3,8 +3,6 @@ import mongoose from "mongoose";
 
 // ✅ MongoDB Connection Options for Stability
 const mongoOptions = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
   autoIndex: true, // ✅ Automatically build indexes, however disable on production
   connectTimeoutMS: 10000, // ✅ Give up initial connection after 10s
   socketTimeoutMS: 45000, // ✅ Close sockets after 45s of inactivity

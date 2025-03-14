@@ -27,6 +27,7 @@ export const validateRequest = <T extends object>(dtoClass: new () => T) => {
         message: "Bad Request",
         errorMessages,
       });
+      return;
     }
 
     next(); // ✅ Pass control to next middleware

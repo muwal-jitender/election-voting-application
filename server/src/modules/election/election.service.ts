@@ -34,11 +34,7 @@ export class ElectionService {
     session.startTransaction();
     try {
       // ✅ Step 1: Start file upload
-      const newThumbnailUrl = await uploadFile(
-        files,
-        "thumbnail",
-        data.thumbnail
-      );
+      const newThumbnailUrl = await uploadFile(files, "thumbnail");
       // ✅ Step 2: Create new election
       const newElection = await this.electionRepository.create({
         ...data,

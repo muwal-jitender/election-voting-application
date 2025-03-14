@@ -29,9 +29,14 @@ electionRouter.get("/:id/details", async (req, res, next) => {
 electionRouter.delete("/:id", isAdmin, async (req, res, next) => {
   await electionController.remove(req, res, next);
 });
-electionRouter.patch("/:id", isAdmin, async (req, res, next) => {
-  await electionController.update(req, res, next);
-});
+electionRouter.patch(
+  "/:id",
+  validateRequest(ElectionDTO),
+  isAdmin,
+  async (req, res, next) => {
+    await electionController.update(req, res, next);
+  }
+);
 electionRouter.get("/:id/candidates", async (req, res, next) => {
   await electionController.getCandidatesByElectionId(req, res, next);
 });
