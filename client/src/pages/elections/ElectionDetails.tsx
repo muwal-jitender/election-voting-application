@@ -13,6 +13,7 @@ import { IoAddOutline } from "react-icons/io5";
 import { useParams } from "react-router-dom";
 import ElectionCandidate from "../../components/election/ElectionCandidate";
 import AddCandidateModal from "../../components/modals/AddCandidateModal";
+import ConfirmModal from "../../components/modals/ConfirmModal";
 import { getFullDetail } from "../../services/election.service";
 import { UiActions } from "../../store/ui-slice";
 import { IErrorResponse } from "../../types/ResponseModel";
@@ -68,6 +69,13 @@ const ElectionDetails = () => {
         })
       : "...";
 
+  /** ✅ Remove Candidate from UI after deletion */
+  const handleDeletedCandidate = (deletedCandidate: string) => {
+    setCandidates((prevCandidates) =>
+      prevCandidates?.filter((candidate) => candidate.id !== deletedCandidate),
+    );
+  };
+
   return (
     <>
       <section className="election-details">
@@ -81,7 +89,11 @@ const ElectionDetails = () => {
           <menu className="election-details__candidates">
             {candidates &&
               candidates.map((candidate) => (
-                <ElectionCandidate key={candidate.id} {...candidate} />
+                <ElectionCandidate
+                  key={candidate.id}
+                  {...candidate}
+                  onCandidateDeleted={handleDeletedCandidate}
+                />
               ))}
             <button
               className="add__candidate-btn"
@@ -130,6 +142,7 @@ const ElectionDetails = () => {
           electionId={id as string}
         />
       )}
+      <ConfirmModal />
     </>
   );
 };

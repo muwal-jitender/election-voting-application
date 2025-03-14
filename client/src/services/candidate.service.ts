@@ -2,7 +2,6 @@ import { IAddCandidateModel, ICandidateModel } from "../types";
 import { API_PATH, getApiPath } from "../utils/api-path.utils";
 
 import { AxiosRequestConfig } from "axios";
-import { IApiResponse } from "../types/ResponseModel";
 import { apiRequest } from "./api-request";
 
 /** Create Election */
@@ -24,7 +23,7 @@ export const createCandidate = async (
     },
   };
   // ✅ Call the API
-  return await apiRequest<IApiResponse<ICandidateModel>>(
+  return await apiRequest<ICandidateModel>(
     API_PATH.CANDIDATE,
     "POST",
     formData,
@@ -34,14 +33,14 @@ export const createCandidate = async (
 
 /** Remove candidate */
 export const removeCandidate = async (id: string) => {
-  return await apiRequest<IApiResponse<ICandidateModel>>(
+  return await apiRequest<ICandidateModel>(
     getApiPath(API_PATH.CANDIDATE_ID, { id: id }),
     "DELETE",
   );
 };
 /** Remove candidate */
 export const VoteCandidate = async (id: string, electionId: string) => {
-  return await apiRequest<IApiResponse<ICandidateModel>>(
+  return await apiRequest<ICandidateModel>(
     getApiPath(API_PATH.CANDIDATE_VOTE, { id, electionId }),
     "PATCH",
   );

@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { UiActions } from "../../store/ui-slice";
 
-const ConfirmVote = () => {
+const ConfirmModal = () => {
   const dispatch = useDispatch();
 
   // ✅  Get modal state from Redux
@@ -48,4 +48,4 @@ const ConfirmVote = () => {
   );
 };
 
-export default ConfirmVote;
+export default ConfirmModal;

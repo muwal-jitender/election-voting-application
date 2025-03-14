@@ -8,7 +8,7 @@ import {
 
 import { useParams } from "react-router-dom";
 import Candidate from "../../components/candidate/Candidate";
-import ConfirmVote from "../../components/modals/ConfirmModal";
+import ConfirmModal from "../../components/modals/ConfirmModal";
 import { ICandidateModel } from "../../types";
 
 const Candidates = () => {
@@ -97,7 +97,7 @@ const Candidates = () => {
         )}
       </section>
 
-      <ConfirmVote />
+      <ConfirmModal />
     </>
   );
 };

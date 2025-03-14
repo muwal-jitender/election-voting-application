@@ -45,7 +45,7 @@ const AddCandidateModal: React.FC<AddCandidateModalProp> = ({
       // Submit form data
 
       const response = await createCandidate(formData, electionId);
-      onCandidateAdded(response.data?.data as ICandidateModel);
+      onCandidateAdded(response.data as ICandidateModel);
       closeAddCandidateModal();
     } catch (error: unknown) {
       setErrors((error as IErrorResponse).errorMessages || []);

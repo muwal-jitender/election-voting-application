@@ -13,7 +13,7 @@ const Candidate = ({ ...props }: ICandidateModel) => {
   const dispatch = useDispatch(); // Hook to send actions to Redux
   const [errors, setErrors] = useState<string[]>([]);
   const navigate = useNavigate();
-  // Open the confirm vote modal
+  /** ✅ Open the confirm vote modal */
   const handleCastingVote = () => {
     dispatch(
       UiActions.openConfirmModalDialog({
