@@ -1,32 +1,45 @@
 import "./Login.css";
 
-import React, { useState } from "react";
+import * as Yup from "yup";
+
 import { Link, useNavigate } from "react-router-dom";
 import { getToken, getUser, setToken } from "../../utils/auth.utils";
 
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { login } from "../../services/voter.service";
 import { voteActions } from "../../store/vote-slice";
 import { ILoginModel } from "../../types/index";
 import { IErrorResponse } from "../../types/ResponseModel";
 
+// ✅ Define Yup Validation Schema
+const validationSchema = Yup.object().shape({
+  email: Yup.string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+});
+
 const Login = () => {
-  const [formData, setRegisterData] = React.useState<ILoginModel>({
-    email: "",
-    password: "",
-  });
-  const [errors, setErrors] = useState<string[]>([]); // Empty array
+  const [serverErrors, setServerErrors] = useState<string[]>([]); // ✅ Server-side errors
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  // Handle input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setRegisterData({ ...formData, [name]: value });
-  };
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
 
+  // ✅ Initialize React Hook Form with Yup validation
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<ILoginModel>({
+    resolver: yupResolver(validationSchema), // Uses Yup for validation
+  });
+
+  // Handle form submission
+  const onSubmit = async (formData: ILoginModel) => {
     // Submit form data
     try {
       const result = await login(formData);
@@ -45,7 +58,7 @@ const Login = () => {
 
       navigate("/results");
     } catch (error: unknown) {
-      setErrors((error as IErrorResponse).errorMessages || []);
+      setServerErrors((error as IErrorResponse).errorMessages || []);
     }
   };
 
@@ -53,40 +66,50 @@ const Login = () => {
     <section className="login">
       <div className="container login__container">
         <h2>Log In</h2>
-        <form className="form" onSubmit={handleSubmit}>
-          {errors.length > 0 && (
+        <form className="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+          {serverErrors.length > 0 && (
             <div className="form__error-message">
-              {errors.map((msg, index) => (
+              {serverErrors.map((msg, index) => (
                 <p key={index}>{`* ${msg}`}</p>
               ))}
             </div>
           )}
+          {/* ✅ Display Client-Side Validation Errors */}
+          <div>
+            {errors.email && (
+              <p className="form__client-error-message">
+                * {errors.email.message}
+              </p>
+            )}
+            <input
+              type="email"
+              id="email"
+              placeholder="Email Address"
+              autoComplete="true"
+              autoFocus
+              {...register("email")}
+            />
+          </div>
+          <div>
+            {errors.password && (
+              <p className="form__client-error-message">
+                * {errors.password.message}
+              </p>
+            )}
 
-          <input
-            type="email"
-            name="email"
-            id="email"
-            placeholder="Email Address"
-            autoComplete="true"
-            autoFocus
-            value={formData.email}
-            onChange={handleChange}
-          />
-          <input
-            type="password"
-            name="password"
-            id="password"
-            placeholder="Password"
-            autoComplete="true"
-            value={formData.password}
-            onChange={handleChange}
-          />
-
+            <input
+              type="password"
+              id="password"
+              placeholder="Password"
+              autoComplete="true"
+              {...register("password")}
+            />
+          </div>
           <p>
             Don't have an account? <Link to="/register">Register</Link>
           </p>
           <button type="submit" className="btn primary">
-            Login
+            {isSubmitting ? "Logging in..." : "Login"}
           </button>
         </form>
       </div>

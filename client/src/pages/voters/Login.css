@@ -18,24 +18,21 @@
   flex-direction: column;
   gap: 1.5rem;
 }
-.login__container .form__error-message {
-  background: var(--color-danger);
-  color: var(--color-gray-0);
-  padding: 0.6rem 1.5rem;
-  border-radius: var(--radius-1);
-}
 
-.login__container .form input {
+.login__container .form div input {
   padding: 0.7rem;
   background: var(--color-gray-100);
   border-radius: var(--radius-1);
   color: var(--color-gray-900);
+  width: 100%;
 }
 .login__container .form p > a {
   color: var(--color-primary);
   font-weight: 500;
 }
-
+.form__client-error-message {
+  color: var(--color-danger);
+}
 @media screen and (max-width: 600px) {
   .login__container {
     width: 95%;
