@@ -18,7 +18,9 @@ export class VoterService {
     // ✅ Checking if email already exists
     const emailExists = await this.findByEmail(data.email);
     if (emailExists) {
-      throw new ConflictError("Email already exists");
+      throw new ConflictError(
+        "This email is already registered. Try signing in instead."
+      );
     }
     // ✅ Explicitly set isAdmin to false, so that no external voter can set itself as Admin
     return await this.voterRepository.create({
