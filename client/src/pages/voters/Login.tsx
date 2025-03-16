@@ -9,6 +9,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
+import PasswordInput from "../../components/ui/PasswordInput";
 import { login } from "../../services/voter.service";
 import { voteActions } from "../../store/vote-slice";
 import { ILoginModel } from "../../types/index";
@@ -74,34 +75,39 @@ const Login = () => {
           )}
           {/* ✅ Display Client-Side Validation Errors */}
           <div>
-            {errors.email && (
-              <p className="form__client-error-message">
-                * {errors.email.message}
-              </p>
-            )}
             <input
               type="email"
               id="email"
               placeholder="Email Address"
               autoComplete="true"
               autoFocus
+              className={`${errors.email ? "input-error" : ""}`}
               {...register("email")}
             />
+            {errors.email && (
+              <p className="form__client-error-message">
+                {errors.email.message}
+              </p>
+            )}
           </div>
           <div>
-            {errors.password && (
+            {/* {errors.password && (
               <p className="form__client-error-message">
                 * {errors.password.message}
               </p>
-            )}
-
-            <input
+            )} */}
+            <PasswordInput
+              id="password"
+              register={register}
+              error={errors.password}
+            />
+            {/* <input
               type="password"
               id="password"
               placeholder="Password"
               autoComplete="true"
               {...register("password")}
-            />
+            /> */}
           </div>
           <p>
             Don't have an account? <Link to="/register">Register</Link>
