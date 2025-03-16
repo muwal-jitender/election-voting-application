@@ -18,6 +18,21 @@
   flex-direction: column;
   gap: 1.5rem;
 }
+.password-validation {
+  list-style: none;
+  padding-left: 0;
+  font-size: smaller;
+  margin-top: 0.5rem;
+}
+
+.password-validation li {
+  color: var(--color-danger);
+}
+
+.password-validation li.valid {
+  color: var(--color-success);
+  font-weight: bold;
+}
 
 .register__container .form div input {
   padding: 0.7rem;

@@ -21,10 +21,10 @@ const validationSchema = Yup.object().shape({
     .email("Invalid email format")
     .required("Email is required"),
   password: Yup.string()
-    .min(8, "Password must be at least 8 characters")
-    .minUppercase(1, "Password must contain at least one uppercase letter")
-    .minNumbers(1, "Password must contain at least one number")
-    .minSymbols(1, "Password must contain at least one special character")
+    .min(8, "")
+    .minUppercase(1, "")
+    .minNumbers(1, "")
+    .minSymbols(1, "")
     .required("Password is required"),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Password do not match")
@@ -40,9 +40,19 @@ const Register = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    watch, // ✅ Add watch to track live changes in password input
   } = useForm<IRegisterModel>({
     resolver: yupResolver(validationSchema),
   });
+  // ✅ Watch password input value for live validation feedback
+  const passwordValue = watch("password", "");
+  // ✅ Define Password Rules for Dynamic Validation
+  const passwordRules = [
+    { rule: /.{8,}/, message: "At least 8 characters" },
+    { rule: /[A-Z]/, message: "At least one uppercase letter (A-Z)" },
+    { rule: /[0-9]/, message: "At least one number (0-9)" },
+    { rule: /[\W_]/, message: "At least one special character (!@#$%^&*)" },
+  ];
 
   // Handle form submission
   const onSubmit = async (formData: IRegisterModel) => {
@@ -104,12 +114,6 @@ const Register = () => {
             />
           </div>
           <div>
-            {errors.password && (
-              <p className="form__client-error-message">
-                * {errors.password.message}
-              </p>
-            )}
-
             <input
               type="password"
               id="password"
@@ -117,6 +121,16 @@ const Register = () => {
               autoComplete="true"
               {...register("password")}
             />
+            <ul className="password-validation">
+              {passwordRules.map(({ rule, message }, index) => (
+                <li
+                  key={index}
+                  className={rule.test(passwordValue) ? "valid" : "invalid"}
+                >
+                  {rule.test(passwordValue) ? "✔️" : "❌"} {message}
+                </li>
+              ))}
+            </ul>
           </div>
           <div>
             {errors.confirmPassword && (
