@@ -1,32 +1,51 @@
 import "./Register.css";
 
-import React, { useState } from "react";
+import * as Yup from "yup";
+
 import { Link, useNavigate } from "react-router-dom";
 
-import { register } from "../../services/voter.service";
-import { RegisterModel } from "../../types/index";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import YupPassword from "yup-password";
+import { registerVoter } from "../../services/voter.service";
+import { IRegisterModel } from "../../types/index";
 import { IErrorResponse } from "../../types/ResponseModel";
 
-const Register = () => {
-  const [formData, setRegisterData] = React.useState<RegisterModel>({
-    fullName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+YupPassword(Yup); // extend yup
 
-  const [errors, setErrors] = useState<string[]>([]); // Empty array
+// ✅ Define Yup Validation Schema
+const validationSchema = Yup.object().shape({
+  fullName: Yup.string().required("Fullname is required"),
+  email: Yup.string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  password: Yup.string()
+    .min(8, "Password must be at least 8 characters")
+    .minUppercase(1, "Password must contain at least one uppercase letter")
+    .minNumbers(1, "Password must contain at least one number")
+    .minSymbols(1, "Password must contain at least one special character")
+    .required("Password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password")], "Password do not match")
+    .required("Confirm Password is required"),
+});
+const Register = () => {
+  const [serverErrors, setServerErrors] = useState<string[]>([]); // Empty array
 
   const navigate = useNavigate();
-  // Handle input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setRegisterData({ ...formData, [name]: value });
-  };
+
+  // ✅ Initialize React Hook Form with Yup validation
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<IRegisterModel>({
+    resolver: yupResolver(validationSchema),
+  });
 
   // Handle form submission
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (formData: IRegisterModel) => {
     // Add form validation and submission logic here
     if (formData.password !== formData.confirmPassword) {
       console.log("Passwords do not match");
@@ -35,10 +54,10 @@ const Register = () => {
 
     // Submit form data
     try {
-      await register(formData);
+      await registerVoter(formData);
       navigate("/");
     } catch (error: unknown) {
-      setErrors((error as IErrorResponse).errorMessages || []);
+      setServerErrors((error as IErrorResponse).errorMessages || []);
     }
   };
 
@@ -46,57 +65,78 @@ const Register = () => {
     <section className="register">
       <div className="container register__container">
         <h2>Register</h2>
-        <form className="form" onSubmit={handleSubmit}>
-          {errors.length > 0 && (
+        <form className="form" onSubmit={handleSubmit(onSubmit)}>
+          {serverErrors.length > 0 && (
             <div className="form__error-message">
-              {errors.map((msg, index) => (
+              {serverErrors.map((msg, index) => (
                 <p key={index}>{`* ${msg}`}</p>
               ))}
             </div>
           )}
+          <div>
+            {errors.fullName && (
+              <p className="form__client-error-message">
+                * {errors.fullName?.message}
+              </p>
+            )}
+            <input
+              type="text"
+              id="fullName"
+              placeholder="Full name"
+              autoComplete="true"
+              autoFocus
+              {...register("fullName")}
+            />
+          </div>
+          <div>
+            {errors.email && (
+              <p className="form__client-error-message">
+                * {errors.email.message}
+              </p>
+            )}
 
-          <input
-            type="text"
-            name="fullName"
-            id="fullName"
-            placeholder="Full name"
-            autoComplete="true"
-            autoFocus
-            value={formData.fullName}
-            onChange={handleChange}
-          />
-          <input
-            type="email"
-            name="email"
-            id="email"
-            placeholder="Email Address"
-            autoComplete="true"
-            value={formData.email}
-            onChange={handleChange}
-          />
-          <input
-            type="password"
-            name="password"
-            id="password"
-            placeholder="Password"
-            autoComplete="true"
-            value={formData.password}
-            onChange={handleChange}
-          />
-          <input
-            type="password"
-            name="confirmPassword"
-            id="confirmPassword"
-            placeholder="Confirm Password"
-            autoComplete="true"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-          />
+            <input
+              type="email"
+              id="email"
+              placeholder="Email Address"
+              autoComplete="true"
+              {...register("email")}
+            />
+          </div>
+          <div>
+            {errors.password && (
+              <p className="form__client-error-message">
+                * {errors.password.message}
+              </p>
+            )}
+
+            <input
+              type="password"
+              id="password"
+              placeholder="Password"
+              autoComplete="true"
+              {...register("password")}
+            />
+          </div>
+          <div>
+            {errors.confirmPassword && (
+              <p className="form__client-error-message">
+                * {errors.confirmPassword.message}
+              </p>
+            )}
+            <input
+              type="password"
+              id="confirmPassword"
+              placeholder="Confirm Password"
+              autoComplete="true"
+              {...register("confirmPassword")}
+            />
+          </div>
           <p>
             Already have an account? <Link to="/">Sign In</Link>
           </p>
           <button type="submit" className="btn primary">
-            Register
+            {isSubmitting ? "Registering..." : "Register"}
           </button>
         </form>
       </div>

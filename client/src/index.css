@@ -141,6 +141,9 @@ button {
   color: var(--color-danger);
   font-weight: 600;
 }
+.form__client-error-message {
+  color: var(--color-danger);
+}
 .dark {
   --color-gray-0: #0e0d14;
   --color-gray-100: #2f2b42;

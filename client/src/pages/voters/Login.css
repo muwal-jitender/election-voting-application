@@ -30,9 +30,7 @@
   color: var(--color-primary);
   font-weight: 500;
 }
-.form__client-error-message {
-  color: var(--color-danger);
-}
+
 @media screen and (max-width: 600px) {
   .login__container {
     width: 95%;

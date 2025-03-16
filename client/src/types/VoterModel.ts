@@ -15,3 +15,10 @@ export interface ILoginResponse {
   token: string;
   response: IVoterModel;
 }
+
+export interface IRegisterModel {
+  fullName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
