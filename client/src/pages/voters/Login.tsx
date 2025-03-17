@@ -91,23 +91,11 @@ const Login = () => {
             )}
           </div>
           <div>
-            {/* {errors.password && (
-              <p className="form__client-error-message">
-                * {errors.password.message}
-              </p>
-            )} */}
             <PasswordInput
               id="password"
               register={register}
               error={errors.password}
             />
-            {/* <input
-              type="password"
-              id="password"
-              placeholder="Password"
-              autoComplete="true"
-              {...register("password")}
-            /> */}
           </div>
           <p>
             Don't have an account? <Link to="/register">Register</Link>

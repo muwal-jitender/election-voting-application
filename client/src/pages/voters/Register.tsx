@@ -8,6 +8,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import YupPassword from "yup-password";
+import PasswordInput from "../../components/ui/PasswordInput";
 import { registerVoter } from "../../services/voter.service";
 import { IRegisterModel } from "../../types/index";
 import { IErrorResponse } from "../../types/ResponseModel";
@@ -133,17 +134,11 @@ const Register = () => {
             </ul>
           </div>
           <div>
-            {errors.confirmPassword && (
-              <p className="form__client-error-message">
-                * {errors.confirmPassword.message}
-              </p>
-            )}
-            <input
-              type="password"
+            <PasswordInput
               id="confirmPassword"
-              placeholder="Confirm Password"
-              autoComplete="true"
-              {...register("confirmPassword")}
+              register={register}
+              error={errors.confirmPassword}
+              placeholder="Confirm password"
             />
           </div>
           <p>

@@ -1,15 +1,23 @@
 import "./PasswordInput.css";
 
+import { FieldErrors, Path, UseFormRegister } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 import { useState } from "react";
+import { FieldValues } from "react-hook-form";
 
-const PasswordInput = ({
+interface passwordInputProps<T extends FieldValues> {
+  id: Path<T>;
+  register: UseFormRegister<T>;
+  error: FieldErrors<T>[Path<T>];
+  placeholder?: string;
+}
+const PasswordInput = <T extends FieldValues>({
   id,
   register,
   error,
   placeholder = "password",
-}: any) => {
+}: passwordInputProps<T>) => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -31,7 +39,9 @@ const PasswordInput = ({
           {showPassword ? <FaEyeSlash /> : <FaEye />}
         </button>
       </div>
-      {error && <p className="form__client-error-message">{error.message}</p>}
+      {error && (
+        <p className="form__client-error-message">{String(error.message)}</p>
+      )}
     </div>
   );
 };
