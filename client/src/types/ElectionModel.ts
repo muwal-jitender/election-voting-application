@@ -14,7 +14,10 @@ export interface IElectionDetail extends IElectionModel {
 export interface IAddElection {
   title: string;
   description: string;
-  thumbnail: File | null;
+  thumbnail: File;
+}
+export interface IEditElection extends Omit<IAddElection, "thumbnail"> {
+  thumbnail?: File | null;
 }
 export interface IVoterVotedResponse {
   voted: boolean;

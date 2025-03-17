@@ -1,6 +1,7 @@
 import {
   IAddElection,
   ICandidateModel,
+  IEditElection,
   IElectionDetail,
   IElectionModel,
   IVoterVotedResponse,
@@ -33,7 +34,7 @@ export const createElection = async (payload: IAddElection) => {
   );
 };
 /** Update Election */
-export const updateElection = async (id: string, payload: IAddElection) => {
+export const updateElection = async (id: string, payload: IEditElection) => {
   // ✅ Create FormData for file upload
   const formData = new FormData();
   formData.append("title", payload.title);

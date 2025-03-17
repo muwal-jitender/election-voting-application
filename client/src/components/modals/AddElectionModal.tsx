@@ -1,25 +1,35 @@
+import * as Yup from "yup";
+
 import React, { useState } from "react";
 import { IAddElection, IElectionModel } from "../../types";
 
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { createElection } from "../../services/election.service";
 import { UiActions } from "../../store/ui-slice";
 import { IErrorResponse } from "../../types/ResponseModel";
+import ApiErrorMessage from "../ui/ApiErrorMessage";
+import TextInput from "../ui/TextInput";
 
 interface AddElectionModalProp {
   // ✅ Accept callback prop
   onElectionAdded: (newElection: IElectionModel) => void;
 }
+const addElectionValidationSchema = Yup.object().shape({
+  title: Yup.string().trim().required("Title is required"),
+  description: Yup.string().trim().required("Description is required"),
+  thumbnail: Yup.mixed<File>()
+    .required("Thumbnail is required")
+    .test("filesize", "File size is too large (max 10MB)", (value) => {
+      return value && (value as File).size <= 10 * 1024 * 1024; // ✅ Limits file size to 10MB
+    }),
+});
 const AddElectionModal: React.FC<AddElectionModalProp> = ({
   onElectionAdded,
 }) => {
-  const [formData, setFormData] = useState<IAddElection>({
-    title: "",
-    description: "",
-    thumbnail: null,
-  });
-  const [errors, setErrors] = useState<string[]>([]);
+  const [serverErrors, setServerErrors] = useState<string[]>([]);
   const dispatch = useDispatch();
 
   // Close add election modal
@@ -27,27 +37,23 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
     dispatch(UiActions.closeAddElectionModal());
   };
 
-  // Handle input changes
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value, files } = e.target as HTMLInputElement;
-    if (name === "thumbnail" && files && files.length > 0) {
-      setFormData({ ...formData, thumbnail: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm<IAddElection>({
+    resolver: yupResolver(addElectionValidationSchema),
+  });
   // Handle Form Submission
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (formData: IAddElection) => {
     try {
-      e.preventDefault();
       const response = await createElection(formData);
       onElectionAdded(response.data as IElectionModel);
       // Close Modal popup
       closeElectionModal();
     } catch (error: unknown) {
-      setErrors((error as IErrorResponse).errorMessages || []);
+      setServerErrors((error as IErrorResponse).errorMessages || []);
     }
   };
   return (
@@ -59,36 +65,37 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
             <IoMdClose />
           </button>
         </header>
-        <form onSubmit={handleSubmit}>
-          {errors.length > 0 && (
-            <div className="form__error-message">
-              {errors.map((msg, index) => (
-                <p key={index}>{`* ${msg}`}</p>
-              ))}
-            </div>
-          )}
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {/* ✅ Display Server-Side Validation Error messages */}
+          <ApiErrorMessage errors={serverErrors} />
+
           <div>
             <label htmlFor="title">Title</label>
-            <input
-              type="text"
-              name="title"
+            <TextInput
+              error={errors.title}
               id="title"
-              placeholder="Election Title"
-              value={formData.title}
-              onChange={handleChange}
+              placeholder="title"
+              register={register}
+              type="text"
+              autoFocus={true}
             />
           </div>
           <div>
             <label htmlFor="description">Description</label>
+
             <textarea
-              name="description"
               id="description"
               placeholder="Enter Description"
               cols={60}
               rows={10}
-              value={formData.description}
-              onChange={handleChange}
+              {...register("description")}
+              className={errors.description ? "input-error" : ""}
             ></textarea>
+            {errors.description && (
+              <p className="form__client-error-message">
+                *{errors.description.message}
+              </p>
+            )}
           </div>
           <div>
             <label htmlFor="thumbnail">Thumbnail</label>
@@ -96,12 +103,23 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
               type="file"
               name="thumbnail"
               id="thumbnail"
-              onChange={handleChange}
+              className={errors.thumbnail ? "input-error" : ""}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setValue("thumbnail", file);
+                }
+              }}
               accept=".png, .jpg, .jpeg, .webp, .avif"
             />
+            {errors.thumbnail && (
+              <p className="form__client-error-message">
+                *{errors.thumbnail.message}
+              </p>
+            )}
           </div>
           <button type="submit" className="btn primary">
-            Submit
+            {isSubmitting ? "Submitting..." : "Submit"}
           </button>
         </form>
       </div>

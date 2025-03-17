@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { IAddElection, IElectionModel } from "../../types";
+import { IEditElection, IElectionModel } from "../../types";
 
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
@@ -17,7 +17,7 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
   election,
   onElectionUpdated,
 }) => {
-  const [formData, setFormData] = useState<IAddElection>({
+  const [formData, setFormData] = useState<IEditElection>({
     title: "",
     description: "",
     thumbnail: null,
