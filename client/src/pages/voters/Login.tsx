@@ -9,6 +9,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
+import ApiErrorMessage from "../../components/ui/ApiErrorMessage";
 import PasswordInput from "../../components/ui/PasswordInput";
 import { login } from "../../services/voter.service";
 import { voteActions } from "../../store/vote-slice";
@@ -66,14 +67,9 @@ const Login = () => {
       <div className="container login__container">
         <h2>Log In</h2>
         <form className="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-          {serverErrors.length > 0 && (
-            <div className="form__error-message">
-              {serverErrors.map((msg, index) => (
-                <p key={index}>{`* ${msg}`}</p>
-              ))}
-            </div>
-          )}
-          {/* ✅ Display Client-Side Validation Errors */}
+          {/* ✅ Display Server-Side Validation Error messages */}
+          <ApiErrorMessage errors={serverErrors} />
+
           <div>
             <input
               type="email"
