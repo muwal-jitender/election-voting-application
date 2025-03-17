@@ -8,7 +8,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import YupPassword from "yup-password";
+import ApiErrorMessage from "../../components/ui/ApiErrorMessage";
 import PasswordInput from "../../components/ui/PasswordInput";
+import TextInput from "../../components/ui/TextInput";
 import { registerVoter } from "../../services/voter.service";
 import { IRegisterModel } from "../../types/index";
 import { IErrorResponse } from "../../types/ResponseModel";
@@ -57,12 +59,6 @@ const Register = () => {
 
   // Handle form submission
   const onSubmit = async (formData: IRegisterModel) => {
-    // Add form validation and submission logic here
-    if (formData.password !== formData.confirmPassword) {
-      console.log("Passwords do not match");
-      return;
-    }
-
     // Submit form data
     try {
       await registerVoter(formData);
@@ -77,50 +73,35 @@ const Register = () => {
       <div className="container register__container">
         <h2>Register</h2>
         <form className="form" onSubmit={handleSubmit(onSubmit)}>
-          {serverErrors.length > 0 && (
-            <div className="form__error-message">
-              {serverErrors.map((msg, index) => (
-                <p key={index}>{`* ${msg}`}</p>
-              ))}
-            </div>
-          )}
-          <div>
-            {errors.fullName && (
-              <p className="form__client-error-message">
-                * {errors.fullName?.message}
-              </p>
-            )}
-            <input
-              type="text"
-              id="fullName"
-              placeholder="Full name"
-              autoComplete="true"
-              autoFocus
-              {...register("fullName")}
-            />
-          </div>
-          <div>
-            {errors.email && (
-              <p className="form__client-error-message">
-                * {errors.email.message}
-              </p>
-            )}
+          {/* ✅ Display Server-Side Validation Error messages */}
+          <ApiErrorMessage errors={serverErrors} />
 
-            <input
-              type="email"
-              id="email"
-              placeholder="Email Address"
-              autoComplete="true"
-              {...register("email")}
+          <div>
+            <TextInput
+              error={errors.fullName}
+              id="fullName"
+              placeholder="full name"
+              register={register}
+              type="text"
+              autoFocus={true}
             />
           </div>
           <div>
-            <input
-              type="password"
+            <TextInput
+              error={errors.email}
+              id="email"
+              placeholder="email address"
+              register={register}
+              type="email"
+            />
+          </div>
+          <div>
+            <PasswordInput
               id="password"
-              placeholder="Password"
-              autoComplete="true"
-              {...register("password")}
+              register={register}
+              error={errors.password}
+              placeholder="password"
+              type="password"
             />
             <ul className="password-validation">
               {passwordRules.map(({ rule, message }, index) => (
@@ -139,6 +120,7 @@ const Register = () => {
               register={register}
               error={errors.confirmPassword}
               placeholder="Confirm password"
+              type="password"
             />
           </div>
           <p>

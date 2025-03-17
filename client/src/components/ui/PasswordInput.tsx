@@ -1,23 +1,17 @@
 import "./PasswordInput.css";
 
-import { FieldErrors, Path, UseFormRegister } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 import { useState } from "react";
 import { FieldValues } from "react-hook-form";
+import { IInputProps } from "../../types/InputTypes";
 
-interface passwordInputProps<T extends FieldValues> {
-  id: Path<T>;
-  register: UseFormRegister<T>;
-  error: FieldErrors<T>[Path<T>];
-  placeholder?: string;
-}
 const PasswordInput = <T extends FieldValues>({
   id,
   register,
   error,
-  placeholder = "password",
-}: passwordInputProps<T>) => {
+  placeholder,
+}: IInputProps<T>) => {
   const [showPassword, setShowPassword] = useState(false);
 
   return (

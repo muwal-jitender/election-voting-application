@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import ApiErrorMessage from "../../components/ui/ApiErrorMessage";
 import PasswordInput from "../../components/ui/PasswordInput";
+import TextInput from "../../components/ui/TextInput";
 import { login } from "../../services/voter.service";
 import { voteActions } from "../../store/vote-slice";
 import { ILoginModel } from "../../types/index";
@@ -71,26 +72,22 @@ const Login = () => {
           <ApiErrorMessage errors={serverErrors} />
 
           <div>
-            <input
-              type="email"
+            <TextInput
+              error={errors.email}
               id="email"
-              placeholder="Email Address"
-              autoComplete="true"
-              autoFocus
-              className={`${errors.email ? "input-error" : ""}`}
-              {...register("email")}
+              placeholder="email address"
+              register={register}
+              type="email"
+              autoFocus={true}
             />
-            {errors.email && (
-              <p className="form__client-error-message">
-                {errors.email.message}
-              </p>
-            )}
           </div>
           <div>
             <PasswordInput
               id="password"
               register={register}
               error={errors.password}
+              placeholder="password"
+              type="password"
             />
           </div>
           <p>
