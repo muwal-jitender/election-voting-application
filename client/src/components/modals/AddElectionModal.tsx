@@ -11,6 +11,8 @@ import { createElection } from "../../services/election.service";
 import { UiActions } from "../../store/ui-slice";
 import { IErrorResponse } from "../../types/ResponseModel";
 import ApiErrorMessage from "../ui/ApiErrorMessage";
+import FileInput from "../ui/FileInput";
+import TextareaInput from "../ui/TextareaInput";
 import TextInput from "../ui/TextInput";
 
 interface AddElectionModalProp {
@@ -41,6 +43,7 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
     register,
     handleSubmit,
     setValue,
+    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<IAddElection>({
     resolver: yupResolver(addElectionValidationSchema),
@@ -82,41 +85,21 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
           </div>
           <div>
             <label htmlFor="description">Description</label>
-
-            <textarea
+            <TextareaInput
+              error={errors.description}
               id="description"
-              placeholder="Enter Description"
-              cols={60}
-              rows={10}
-              {...register("description")}
-              className={errors.description ? "input-error" : ""}
-            ></textarea>
-            {errors.description && (
-              <p className="form__client-error-message">
-                *{errors.description.message}
-              </p>
-            )}
+              placeholder="description"
+              register={register}
+            />
           </div>
           <div>
             <label htmlFor="thumbnail">Thumbnail</label>
-            <input
-              type="file"
-              name="thumbnail"
+            <FileInput
               id="thumbnail"
-              className={errors.thumbnail ? "input-error" : ""}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  setValue("thumbnail", file);
-                }
-              }}
-              accept=".png, .jpg, .jpeg, .webp, .avif"
+              error={errors.thumbnail}
+              setValue={setValue}
+              clearErrors={clearErrors}
             />
-            {errors.thumbnail && (
-              <p className="form__client-error-message">
-                *{errors.thumbnail.message}
-              </p>
-            )}
           </div>
           <button type="submit" className="btn primary">
             {isSubmitting ? "Submitting..." : "Submit"}
