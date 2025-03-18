@@ -1,11 +1,40 @@
+import * as Yup from "yup";
+
+import { useEffect, useState } from "react";
 import { IAddCandidateModel, ICandidateModel } from "../../types";
 
-import { useState } from "react";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { createCandidate } from "../../services/candidate.service";
 import { UiActions } from "../../store/ui-slice";
 import { IErrorResponse } from "../../types/ResponseModel";
+import ApiErrorMessage from "../ui/ApiErrorMessage";
+import FileInput from "../ui/FileInput";
+import TextareaInput from "../ui/TextareaInput";
+import TextInput from "../ui/TextInput";
+
+const addCandidateValidationSchema = Yup.object().shape({
+  fullName: Yup.string().trim().required("Fullname is required"),
+  motto: Yup.string().trim().required("Motto is required"),
+  image: Yup.mixed<File>()
+    .required("image is required")
+    .test(
+      "fileType",
+      "Only .png, .jpg, .jpeg, .webp, .avif formats are allowed",
+      (value) => {
+        if (!value) return true; // ✅ No file selected, skip validation
+        return ["image/png", "image/jpeg", "image/webp", "image/avif"].includes(
+          (value as File).type,
+        );
+      },
+    )
+    .test("filesize", "File size is too large (max 10MB)", (value) => {
+      return value && (value as File).size <= 10 * 1024 * 1024; // ✅ Limits file size to 10MB
+    }),
+  electionId: Yup.string().required(),
+});
 
 interface AddCandidateModalProp {
   onCandidateAdded: (newElection: ICandidateModel) => void;
@@ -15,40 +44,34 @@ const AddCandidateModal: React.FC<AddCandidateModalProp> = ({
   onCandidateAdded,
   electionId,
 }) => {
-  const [formData, setFormData] = useState<IAddCandidateModel>({
-    fullName: "",
-    image: null,
-    motto: "",
-    electionId: "",
-  });
-  const [errors, setErrors] = useState<string[]>([]); // Empty array
+  const [serverErrors, setServerErrors] = useState<string[]>([]); // Empty array
   const dispatch = useDispatch();
   const closeAddCandidateModal = () => {
     dispatch(UiActions.closeAddCandidateModal());
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value, files } = e.target as HTMLInputElement;
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    clearErrors,
+    formState: { errors, isSubmitting },
+  } = useForm<IAddCandidateModel>({
+    resolver: yupResolver(addCandidateValidationSchema),
+  });
 
-    if (name === "image" && files && files.length > 0) {
-      setFormData({ ...formData, image: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
+  // ✅ Automatically set `electionId` when the component mounts
+  useEffect(() => {
+    setValue("electionId", electionId);
+  }, [electionId, setValue]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (formData: IAddCandidateModel) => {
     try {
-      e.preventDefault();
-      // Submit form data
-
       const response = await createCandidate(formData, electionId);
       onCandidateAdded(response.data as ICandidateModel);
       closeAddCandidateModal();
     } catch (error: unknown) {
-      setErrors((error as IErrorResponse).errorMessages || []);
+      setServerErrors((error as IErrorResponse).errorMessages || []);
     }
   };
 
@@ -61,50 +84,40 @@ const AddCandidateModal: React.FC<AddCandidateModalProp> = ({
             <IoMdClose />
           </button>
         </header>
-        <form onSubmit={handleSubmit}>
-          {errors.length > 0 && (
-            <div className="form__error-message">
-              {errors.map((msg, index) => (
-                <p key={index}>{`* ${msg}`}</p>
-              ))}
-            </div>
-          )}
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <ApiErrorMessage errors={serverErrors} />
+
           <div>
             <label htmlFor="fullName">Full Name</label>
-            <input
-              type="text"
-              name="fullName"
+            <TextInput
+              error={errors.fullName}
               id="fullName"
-              placeholder="Full Name"
-              value={formData.fullName}
-              onChange={handleChange}
+              placeholder="full name"
+              register={register}
+              type="text"
+              autoFocus={true}
             />
           </div>
           <div>
             <label htmlFor="motto">Motto</label>
-            <textarea
-              name="motto"
+            <TextareaInput
+              error={errors.motto}
               id="motto"
-              placeholder="Enter Motto"
-              cols={60}
-              rows={10}
-              value={formData.motto}
-              onChange={handleChange}
-            ></textarea>
+              placeholder="motto"
+              register={register}
+            />
           </div>
           <div>
             <label htmlFor="image">Photo</label>
-            <input
-              type="file"
-              name="image"
+            <FileInput
+              clearErrors={clearErrors}
+              error={errors.image}
               id="image"
-              onChange={handleChange}
-              required
-              accept=".png, .jpg, .jpeg, .webp, .avif"
+              setValue={setValue}
             />
           </div>
           <button type="submit" className="btn primary">
-            Add
+            {isSubmitting ? "Adding..." : "Add"}
           </button>
         </form>
       </div>
