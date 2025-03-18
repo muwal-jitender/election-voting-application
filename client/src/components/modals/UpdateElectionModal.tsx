@@ -1,11 +1,19 @@
-import { useEffect, useState } from "react";
+import * as Yup from "yup";
+
 import { IEditElection, IElectionModel } from "../../types";
 
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
 import { updateElection } from "../../services/election.service";
 import { UiActions } from "../../store/ui-slice";
 import { IErrorResponse } from "../../types/ResponseModel";
+import ApiErrorMessage from "../ui/ApiErrorMessage";
+import FileInput from "../ui/FileInput";
+import TextareaInput from "../ui/TextareaInput";
+import TextInput from "../ui/TextInput";
 
 // ✅ Define Props Interface
 interface UpdateElectionModalProps {
@@ -13,54 +21,54 @@ interface UpdateElectionModalProps {
   onElectionUpdated: (updatedElection: IElectionModel) => void;
 }
 
+const editElectionValidationSchema = Yup.object().shape({
+  title: Yup.string().trim().required("Title is required"),
+  description: Yup.string().trim().required("Description is required"),
+  thumbnail: Yup.mixed<File>()
+    .optional()
+    .nullable()
+    .test("filesize", "File size is too large (max 10MB)", (value) => {
+      if (!value) return true; // ✅ If no file is uploaded, pass validation
+      return value && (value as File).size <= 10 * 1024 * 1024; // ✅ Limits file size to 10MB
+    }),
+});
+
 const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
   election,
   onElectionUpdated,
 }) => {
-  const [formData, setFormData] = useState<IEditElection>({
-    title: "",
-    description: "",
-    thumbnail: null,
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    clearErrors,
+    formState: { errors, isSubmitting },
+  } = useForm<IEditElection>({
+    resolver: yupResolver(editElectionValidationSchema),
+    defaultValues: {
+      description: election.description,
+      title: election.title,
+      thumbnail: null,
+    },
   });
-  const [errors, setErrors] = useState<string[]>([]);
-  const dispatch = useDispatch();
 
-  useEffect(() => {
-    if (election) {
-      setFormData({
-        title: election.title,
-        description: election.description,
-        thumbnail: null,
-      });
-    }
-  }, [election]);
+  const [serverErrors, setServerErrors] = useState<string[]>([]);
+  const dispatch = useDispatch();
 
   // Close add election modal
   const closeElectionModal = () => {
     dispatch(UiActions.closeUpdateElectionModal());
   };
 
-  // Handle input changes
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value, files } = e.target as HTMLInputElement;
-    if (name === "thumbnail" && files && files.length > 0) {
-      setFormData({ ...formData, thumbnail: files[0] });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
   // Handle Form Submission
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (formData: IEditElection) => {
     try {
-      e.preventDefault();
       const response = await updateElection(election?.id, formData);
       onElectionUpdated(response.data as IElectionModel);
       // Close Modal popup
       closeElectionModal();
     } catch (error: unknown) {
-      setErrors((error as IErrorResponse).errorMessages || []);
+      setServerErrors((error as IErrorResponse).errorMessages || []);
     }
   };
   return (
@@ -72,49 +80,41 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
             <IoMdClose />
           </button>
         </header>
-        <form onSubmit={handleSubmit}>
-          {errors.length > 0 && (
-            <div className="form__error-message">
-              {errors.map((msg, index) => (
-                <p key={index}>{`* ${msg}`}</p>
-              ))}
-            </div>
-          )}
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {/* ✅ Display Server-Side Validation Error messages */}
+          <ApiErrorMessage errors={serverErrors} />
+
           <div>
             <label htmlFor="title">Title</label>
-            <input
-              type="text"
-              name="title"
+            <TextInput
+              error={errors.title}
               id="title"
-              placeholder="Election Title"
-              value={formData.title}
-              onChange={handleChange}
+              placeholder="title"
+              register={register}
+              type="text"
+              autoFocus={true}
             />
           </div>
           <div>
             <label htmlFor="description">Description</label>
-            <textarea
-              name="description"
+            <TextareaInput
+              error={errors.description}
               id="description"
-              placeholder="Enter Description"
-              cols={60}
-              rows={10}
-              value={formData.description}
-              onChange={handleChange}
-            ></textarea>
+              placeholder="description"
+              register={register}
+            />
           </div>
           <div>
             <label htmlFor="thumbnail">Thumbnail</label>
-            <input
-              type="file"
-              name="thumbnail"
+            <FileInput
+              clearErrors={clearErrors}
+              error={errors.thumbnail}
               id="thumbnail"
-              onChange={handleChange}
-              accept=".png, .jpg, .jpeg, .webp, .avif"
+              setValue={setValue}
             />
           </div>
           <button type="submit" className="btn primary">
-            Update
+            {isSubmitting ? "Updating..." : "Update"}
           </button>
         </form>
       </div>
