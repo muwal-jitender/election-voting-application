@@ -1,5 +1,3 @@
-import * as Yup from "yup";
-
 import { useEffect, useState } from "react";
 import { IAddCandidateModel, ICandidateModel } from "../../types";
 
@@ -10,31 +8,11 @@ import { useDispatch } from "react-redux";
 import { createCandidate } from "../../services/candidate.service";
 import { UiActions } from "../../store/ui-slice";
 import { IErrorResponse } from "../../types/ResponseModel";
+import { addCandidateValidationSchema } from "../../validations/schemas/candidate.validation";
 import ApiErrorMessage from "../ui/ApiErrorMessage";
 import FileInput from "../ui/FileInput";
 import TextareaInput from "../ui/TextareaInput";
 import TextInput from "../ui/TextInput";
-
-const addCandidateValidationSchema = Yup.object().shape({
-  fullName: Yup.string().trim().required("Fullname is required"),
-  motto: Yup.string().trim().required("Motto is required"),
-  image: Yup.mixed<File>()
-    .required("image is required")
-    .test(
-      "fileType",
-      "Only .png, .jpg, .jpeg, .webp, .avif formats are allowed",
-      (value) => {
-        if (!value) return true; // ✅ No file selected, skip validation
-        return ["image/png", "image/jpeg", "image/webp", "image/avif"].includes(
-          (value as File).type,
-        );
-      },
-    )
-    .test("filesize", "File size is too large (max 10MB)", (value) => {
-      return value && (value as File).size <= 10 * 1024 * 1024; // ✅ Limits file size to 10MB
-    }),
-  electionId: Yup.string().required(),
-});
 
 interface AddCandidateModalProp {
   onCandidateAdded: (newElection: ICandidateModel) => void;

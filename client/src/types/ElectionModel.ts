@@ -11,9 +11,7 @@ export interface IElectionDetail extends IElectionModel {
   candidates: ICandidateModel[];
   voters: IVoterModel[];
 }
-export interface IAddElection {
-  title: string;
-  description: string;
+export interface IAddElection extends Omit<IElectionModel, "id" | "thumbnail"> {
   thumbnail: File;
 }
 export interface IEditElection extends Omit<IAddElection, "thumbnail"> {

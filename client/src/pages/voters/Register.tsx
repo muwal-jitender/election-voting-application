@@ -1,13 +1,14 @@
 import "./Register.css";
 
-import * as Yup from "yup";
-
 import { Link, useNavigate } from "react-router-dom";
+import {
+  passwordRules,
+  registerValidationSchema,
+} from "../../validations/schemas/voter.validation";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import YupPassword from "yup-password";
 import ApiErrorMessage from "../../components/ui/ApiErrorMessage";
 import PasswordInput from "../../components/ui/PasswordInput";
 import TextInput from "../../components/ui/TextInput";
@@ -15,24 +16,6 @@ import { registerVoter } from "../../services/voter.service";
 import { IRegisterModel } from "../../types/index";
 import { IErrorResponse } from "../../types/ResponseModel";
 
-YupPassword(Yup); // extend yup
-
-// ✅ Define Yup Validation Schema
-const validationSchema = Yup.object().shape({
-  fullName: Yup.string().required("Fullname is required"),
-  email: Yup.string()
-    .email("Invalid email format")
-    .required("Email is required"),
-  password: Yup.string()
-    .min(8, "")
-    .minUppercase(1, "")
-    .minNumbers(1, "")
-    .minSymbols(1, "")
-    .required("Password is required"),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password")], "Password do not match")
-    .required("Confirm Password is required"),
-});
 const Register = () => {
   const [serverErrors, setServerErrors] = useState<string[]>([]); // Empty array
 
@@ -45,17 +28,10 @@ const Register = () => {
     formState: { errors, isSubmitting },
     watch, // ✅ Add watch to track live changes in password input
   } = useForm<IRegisterModel>({
-    resolver: yupResolver(validationSchema),
+    resolver: yupResolver(registerValidationSchema),
   });
   // ✅ Watch password input value for live validation feedback
   const passwordValue = watch("password", "");
-  // ✅ Define Password Rules for Dynamic Validation
-  const passwordRules = [
-    { rule: /.{8,}/, message: "At least 8 characters" },
-    { rule: /[A-Z]/, message: "At least one uppercase letter (A-Z)" },
-    { rule: /[0-9]/, message: "At least one number (0-9)" },
-    { rule: /[\W_]/, message: "At least one special character (!@#$%^&*)" },
-  ];
 
   // Handle form submission
   const onSubmit = async (formData: IRegisterModel) => {

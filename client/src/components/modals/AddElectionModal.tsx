@@ -1,5 +1,3 @@
-import * as Yup from "yup";
-
 import React, { useState } from "react";
 import { IAddElection, IElectionModel } from "../../types";
 
@@ -10,6 +8,7 @@ import { useDispatch } from "react-redux";
 import { createElection } from "../../services/election.service";
 import { UiActions } from "../../store/ui-slice";
 import { IErrorResponse } from "../../types/ResponseModel";
+import { addElectionValidationSchema } from "../../validations/schemas/election.validation";
 import ApiErrorMessage from "../ui/ApiErrorMessage";
 import FileInput from "../ui/FileInput";
 import TextareaInput from "../ui/TextareaInput";
@@ -19,15 +18,7 @@ interface AddElectionModalProp {
   // ✅ Accept callback prop
   onElectionAdded: (newElection: IElectionModel) => void;
 }
-const addElectionValidationSchema = Yup.object().shape({
-  title: Yup.string().trim().required("Title is required"),
-  description: Yup.string().trim().required("Description is required"),
-  thumbnail: Yup.mixed<File>()
-    .required("Thumbnail is required")
-    .test("filesize", "File size is too large (max 10MB)", (value) => {
-      return value && (value as File).size <= 10 * 1024 * 1024; // ✅ Limits file size to 10MB
-    }),
-});
+
 const AddElectionModal: React.FC<AddElectionModalProp> = ({
   onElectionAdded,
 }) => {

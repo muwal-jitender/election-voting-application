@@ -1,7 +1,5 @@
 import "./Login.css";
 
-import * as Yup from "yup";
-
 import { Link, useNavigate } from "react-router-dom";
 import { getToken, getUser, setToken } from "../../utils/auth.utils";
 
@@ -16,14 +14,7 @@ import { login } from "../../services/voter.service";
 import { voteActions } from "../../store/vote-slice";
 import { ILoginModel } from "../../types/index";
 import { IErrorResponse } from "../../types/ResponseModel";
-
-// ✅ Define Yup Validation Schema
-const validationSchema = Yup.object().shape({
-  email: Yup.string()
-    .email("Invalid email format")
-    .required("Email is required"),
-  password: Yup.string().required("Password is required"),
-});
+import { loginValidationSchema } from "../../validations/schemas/voter.validation";
 
 const Login = () => {
   const [serverErrors, setServerErrors] = useState<string[]>([]); // ✅ Server-side errors
@@ -36,7 +27,7 @@ const Login = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ILoginModel>({
-    resolver: yupResolver(validationSchema), // Uses Yup for validation
+    resolver: yupResolver(loginValidationSchema), // Uses Yup for validation
   });
 
   // Handle form submission

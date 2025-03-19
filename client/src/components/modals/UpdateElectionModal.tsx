@@ -1,5 +1,3 @@
-import * as Yup from "yup";
-
 import { IEditElection, IElectionModel } from "../../types";
 
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -10,6 +8,7 @@ import { useDispatch } from "react-redux";
 import { updateElection } from "../../services/election.service";
 import { UiActions } from "../../store/ui-slice";
 import { IErrorResponse } from "../../types/ResponseModel";
+import { editElectionValidationSchema } from "../../validations/schemas/election.validation";
 import ApiErrorMessage from "../ui/ApiErrorMessage";
 import FileInput from "../ui/FileInput";
 import TextareaInput from "../ui/TextareaInput";
@@ -20,18 +19,6 @@ interface UpdateElectionModalProps {
   election: IElectionModel;
   onElectionUpdated: (updatedElection: IElectionModel) => void;
 }
-
-const editElectionValidationSchema = Yup.object().shape({
-  title: Yup.string().trim().required("Title is required"),
-  description: Yup.string().trim().required("Description is required"),
-  thumbnail: Yup.mixed<File>()
-    .optional()
-    .nullable()
-    .test("filesize", "File size is too large (max 10MB)", (value) => {
-      if (!value) return true; // ✅ If no file is uploaded, pass validation
-      return value && (value as File).size <= 10 * 1024 * 1024; // ✅ Limits file size to 10MB
-    }),
-});
 
 const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
   election,
