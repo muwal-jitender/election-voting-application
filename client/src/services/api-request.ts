@@ -1,4 +1,4 @@
-import { IApiError, IApiResponse } from "../types/ResponseModel";
+import { IApiError, IApiResponse } from "types/ResponseModel";
 
 import { AxiosRequestConfig } from "axios";
 import api from "./axios.config";

@@ -1,21 +1,21 @@
 import "./Login.css";
 
 import { Link, useNavigate } from "react-router-dom";
-import { getToken, getUser, setToken } from "../../utils/auth.utils";
+import { getToken, getUser, setToken } from "utils/auth.utils";
 
 import { yupResolver } from "@hookform/resolvers/yup";
+import ApiErrorMessage from "components/ui/ApiErrorMessage";
+import Button from "components/ui/Button";
+import PasswordInput from "components/ui/PasswordInput";
+import TextInput from "components/ui/TextInput";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import ApiErrorMessage from "../../components/ui/ApiErrorMessage";
-import Button from "../../components/ui/Button";
-import PasswordInput from "../../components/ui/PasswordInput";
-import TextInput from "../../components/ui/TextInput";
-import { login } from "../../services/voter.service";
-import { voteActions } from "../../store/vote-slice";
-import { ILoginModel } from "../../types/index";
-import { IErrorResponse } from "../../types/ResponseModel";
-import { loginValidationSchema } from "../../validations/schemas/voter.validation";
+import { login } from "services/voter.service";
+import { voteActions } from "store/vote-slice";
+import { ILoginModel } from "types/index";
+import { IErrorResponse } from "types/ResponseModel";
+import { loginValidationSchema } from "validations/schemas/voter.validation";
 
 const Login = () => {
   const [serverErrors, setServerErrors] = useState<string[]>([]); // ✅ Server-side errors

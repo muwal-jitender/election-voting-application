@@ -4,12 +4,12 @@ import { useCallback, useEffect, useState } from "react";
 import {
   checkIfVoterAlreadyVoted,
   getCandidatesByElectionId,
-} from "../../services/election.service";
+} from "services/election.service";
 
+import Candidate from "components/candidate/Candidate";
+import ConfirmModal from "components/modals/ConfirmModal";
 import { useParams } from "react-router-dom";
-import Candidate from "../../components/candidate/Candidate";
-import ConfirmModal from "../../components/modals/ConfirmModal";
-import { ICandidateModel } from "../../types";
+import { ICandidateModel } from "types";
 
 const Candidates = () => {
   // Election Id

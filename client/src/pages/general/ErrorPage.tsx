@@ -1,6 +1,6 @@
+import Image from "assets/images/general/404.gif";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Image from "../../assets/images/general/404.gif";
 
 const ErrorPage = () => {
   const navigateBack = useNavigate();

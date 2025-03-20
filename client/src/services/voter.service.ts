@@ -1,6 +1,6 @@
 import { ILoginModel, ILoginResponse, IRegisterModel } from "../types";
 
-import { API_PATH } from "../utils/api-path.utils";
+import { API_PATH } from "utils/api-path.utils";
 import { apiRequest } from "./api-request";
 
 // Define Voter model interface

@@ -3,11 +3,11 @@ import "./Candidate.css";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { VoteCandidate } from "../../services/candidate.service";
-import { UiActions } from "../../store/ui-slice";
-import { voteActions } from "../../store/vote-slice";
-import { ICandidateModel } from "../../types";
-import { IErrorResponse } from "../../types/ResponseModel";
+import { VoteCandidate } from "services/candidate.service";
+import { UiActions } from "store/ui-slice";
+import { voteActions } from "store/vote-slice";
+import { ICandidateModel } from "types";
+import { IErrorResponse } from "types/ResponseModel";
 import Button from "../ui/Button";
 
 const Candidate = ({ ...props }: ICandidateModel) => {

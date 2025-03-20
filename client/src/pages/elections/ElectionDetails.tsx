@@ -2,21 +2,16 @@ import "./ElectionDetails.css";
 
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  ICandidateModel,
-  IElectionModel,
-  IVoterModel,
-  RootState,
-} from "../../types";
+import { ICandidateModel, IElectionModel, IVoterModel, RootState } from "types";
 
+import ElectionCandidate from "components/election/ElectionCandidate";
+import AddCandidateModal from "components/modals/AddCandidateModal";
+import ConfirmModal from "components/modals/ConfirmModal";
 import { IoAddOutline } from "react-icons/io5";
 import { useParams } from "react-router-dom";
-import ElectionCandidate from "../../components/election/ElectionCandidate";
-import AddCandidateModal from "../../components/modals/AddCandidateModal";
-import ConfirmModal from "../../components/modals/ConfirmModal";
-import { getFullDetail } from "../../services/election.service";
-import { UiActions } from "../../store/ui-slice";
-import { IErrorResponse } from "../../types/ResponseModel";
+import { getFullDetail } from "services/election.service";
+import { UiActions } from "store/ui-slice";
+import { IErrorResponse } from "types/ResponseModel";
 
 const ElectionDetails = () => {
   const { id } = useParams();

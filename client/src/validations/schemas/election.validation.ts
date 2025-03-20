@@ -5,7 +5,7 @@ import {
   FILE_SIZE,
   FILE_SIZE_MESSAGE,
   FILE_TYPE_MESSAGE,
-} from "../validationConstants";
+} from "validations/validationConstants";
 
 // ✅ Reusable Schemas
 const titleSchema = Yup.string().trim().required("Title is required");

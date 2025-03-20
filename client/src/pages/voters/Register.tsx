@@ -4,18 +4,18 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   passwordRules,
   registerValidationSchema,
-} from "../../validations/schemas/voter.validation";
+} from "validations/schemas/voter.validation";
 
 import { yupResolver } from "@hookform/resolvers/yup";
+import ApiErrorMessage from "components/ui/ApiErrorMessage";
+import Button from "components/ui/Button";
+import PasswordInput from "components/ui/PasswordInput";
+import TextInput from "components/ui/TextInput";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import ApiErrorMessage from "../../components/ui/ApiErrorMessage";
-import Button from "../../components/ui/Button";
-import PasswordInput from "../../components/ui/PasswordInput";
-import TextInput from "../../components/ui/TextInput";
-import { registerVoter } from "../../services/voter.service";
-import { IRegisterModel } from "../../types/index";
-import { IErrorResponse } from "../../types/ResponseModel";
+import { registerVoter } from "services/voter.service";
+import { IRegisterModel } from "types/index";
+import { IErrorResponse } from "types/ResponseModel";
 
 const Register = () => {
   const [serverErrors, setServerErrors] = useState<string[]>([]); // Empty array

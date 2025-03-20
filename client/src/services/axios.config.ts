@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getToken } from "../utils/auth.utils";
+import { getToken } from "utils/auth.utils";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL?.trim();
 

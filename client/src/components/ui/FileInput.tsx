@@ -1,7 +1,7 @@
 import { FieldValues, Path, PathValue } from "react-hook-form";
 
 import { useRef } from "react";
-import { IFileProps } from "../../types/InputTypes";
+import { IFileProps } from "types/InputTypes";
 
 const FileInput = <T extends FieldValues>({
   id,

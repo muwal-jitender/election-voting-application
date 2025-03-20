@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "src",
     "target": "ESNext", // Target modern JavaScript
     "lib": ["DOM", "DOM.Iterable", "ESNext"], // Include DOM and modern JS features
     "allowJs": true, // Allow JavaScript files

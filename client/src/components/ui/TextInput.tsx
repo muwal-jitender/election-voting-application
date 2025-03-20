@@ -1,5 +1,5 @@
 import { FieldValues } from "react-hook-form";
-import { IInputProps } from "../../types/InputTypes";
+import { IInputProps } from "types/InputTypes";
 
 const TextInput = <T extends FieldValues>({
   id,

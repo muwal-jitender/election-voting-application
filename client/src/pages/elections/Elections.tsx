@@ -2,15 +2,15 @@ import "./Elections.css";
 
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { IElectionModel, RootState } from "../../types";
+import { IElectionModel, RootState } from "types";
 
-import Election from "../../components/election/Election";
-import AddElectionModal from "../../components/modals/AddElectionModal";
-import UpdateElectionModal from "../../components/modals/UpdateElectionModal";
-import Button from "../../components/ui/Button";
-import { getAllElections } from "../../services/election.service";
-import { UiActions } from "../../store/ui-slice";
-import { IErrorResponse } from "../../types/ResponseModel";
+import Election from "components/election/Election";
+import AddElectionModal from "components/modals/AddElectionModal";
+import UpdateElectionModal from "components/modals/UpdateElectionModal";
+import Button from "components/ui/Button";
+import { getAllElections } from "services/election.service";
+import { UiActions } from "store/ui-slice";
+import { IErrorResponse } from "types/ResponseModel";
 
 const Elections = () => {
   const [elections, setElections] = useState<IElectionModel[]>();

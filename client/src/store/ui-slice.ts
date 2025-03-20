@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IElectionModel, UIState } from "../types";
+import { IElectionModel, UIState } from "types";
 
 const initialState: UIState = {
   addCandidateModalShowing: false,

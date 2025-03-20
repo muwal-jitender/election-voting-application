@@ -1,6 +1,6 @@
 import "./CandidateRating.css";
 
-import { calculateVoteCount } from "../../utils/utils";
+import { calculateVoteCount } from "utils/utils";
 
 interface CandidateRatingProps {
   fullName: string;

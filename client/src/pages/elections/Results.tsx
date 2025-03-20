@@ -2,10 +2,10 @@ import "./Results.css";
 
 import React, { useEffect, useState } from "react";
 
-import ResultElection from "../../components/election/ResultElection";
-import { getAllElections } from "../../services/election.service";
-import { IElectionModel } from "../../types";
-import { IErrorResponse } from "../../types/ResponseModel";
+import ResultElection from "components/election/ResultElection";
+import { getAllElections } from "services/election.service";
+import { IElectionModel } from "types";
+import { IErrorResponse } from "types/ResponseModel";
 
 const Results = () => {
   const [elections, setElections] = React.useState<IElectionModel[]>();

@@ -1,5 +1,5 @@
 import { FieldValues } from "react-hook-form";
-import { ITextareaProps } from "../../types/InputTypes";
+import { ITextareaProps } from "types/InputTypes";
 
 const TextareaInput = <T extends FieldValues>({
   id,

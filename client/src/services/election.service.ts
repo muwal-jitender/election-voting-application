@@ -5,8 +5,8 @@ import {
   IElectionDetail,
   IElectionModel,
   IVoterVotedResponse,
-} from "../types";
-import { API_PATH, getApiPath } from "../utils/api-path.utils";
+} from "types";
+import { API_PATH, getApiPath } from "utils/api-path.utils";
 
 import { AxiosRequestConfig } from "axios";
 import { apiRequest } from "./api-request";

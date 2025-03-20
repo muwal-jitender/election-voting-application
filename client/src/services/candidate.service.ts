@@ -1,5 +1,5 @@
-import { IAddCandidateModel, ICandidateModel } from "../types";
-import { API_PATH, getApiPath } from "../utils/api-path.utils";
+import { IAddCandidateModel, ICandidateModel } from "types";
+import { API_PATH, getApiPath } from "utils/api-path.utils";
 
 import { AxiosRequestConfig } from "axios";
 import { apiRequest } from "./api-request";

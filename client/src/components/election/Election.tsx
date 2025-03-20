@@ -1,10 +1,10 @@
 import "./Election.css";
 
+import Button from "components/ui/Button";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import { UiActions } from "../../store/ui-slice";
-import { IElectionModel } from "../../types";
-import Button from "../ui/Button";
+import { UiActions } from "store/ui-slice";
+import { IElectionModel } from "types";
 
 const Election = (election: IElectionModel) => {
   const dispatch = useDispatch();

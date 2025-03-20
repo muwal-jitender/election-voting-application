@@ -3,10 +3,10 @@ import "./ElectionCandidate.css";
 import { useState } from "react";
 import { IoMdTrash } from "react-icons/io";
 import { useDispatch } from "react-redux";
-import { removeCandidate } from "../../services/candidate.service";
-import { UiActions } from "../../store/ui-slice";
-import { ICandidateModel } from "../../types";
-import { IErrorResponse } from "../../types/ResponseModel";
+import { removeCandidate } from "services/candidate.service";
+import { UiActions } from "store/ui-slice";
+import { ICandidateModel } from "types";
+import { IErrorResponse } from "types/ResponseModel";
 
 const ElectionCandidate = ({
   fullName,
