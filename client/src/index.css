@@ -142,6 +142,21 @@ button {
   font-weight: 600;
 }
 
+.btn-container {
+  display: flex;
+}
+.btn-left {
+  justify-content: flex-start;
+}
+
+.btn-center {
+  justify-content: center;
+}
+
+.btn-right {
+  justify-content: flex-end;
+}
+
 .dark {
   --color-gray-0: #0e0d14;
   --color-gray-100: #2f2b42;

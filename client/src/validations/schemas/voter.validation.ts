@@ -14,7 +14,7 @@ YupPassword(Yup); // extend yup
 
 // ✅ Define Yup Validation Schema
 export const registerValidationSchema = Yup.object().shape({
-  fullName: Yup.string().required("Fullname is required"),
+  fullName: Yup.string().required("Full name is required"),
   email: Yup.string()
     .email("Invalid email format")
     .required("Email is required"),

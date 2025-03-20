@@ -8,6 +8,7 @@ import { UiActions } from "../../store/ui-slice";
 import { voteActions } from "../../store/vote-slice";
 import { ICandidateModel } from "../../types";
 import { IErrorResponse } from "../../types/ResponseModel";
+import Button from "../ui/Button";
 
 const Candidate = ({ ...props }: ICandidateModel) => {
   const dispatch = useDispatch(); // Hook to send actions to Redux
@@ -46,9 +47,9 @@ const Candidate = ({ ...props }: ICandidateModel) => {
           ? props.motto.substring(0, 25) + "..."
           : props.motto}
       </small>
-      <button className="btn primary" onClick={handleCastingVote}>
+      <Button variant="primary" align="center" onClick={handleCastingVote}>
         Vote
-      </button>
+      </Button>
     </article>
   );
 };

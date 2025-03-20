@@ -8,6 +8,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import ApiErrorMessage from "../../components/ui/ApiErrorMessage";
+import Button from "../../components/ui/Button";
 import PasswordInput from "../../components/ui/PasswordInput";
 import TextInput from "../../components/ui/TextInput";
 import { login } from "../../services/voter.service";
@@ -84,9 +85,11 @@ const Login = () => {
           <p>
             Don't have an account? <Link to="/register">Register</Link>
           </p>
-          <button type="submit" className="btn primary">
-            {isSubmitting ? "Logging in..." : "Login"}
-          </button>
+          <div>
+            <Button type="submit" variant="primary" isLoading={isSubmitting}>
+              Login
+            </Button>
+          </div>
         </form>
       </div>
     </section>

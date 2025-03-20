@@ -10,6 +10,7 @@ import { UiActions } from "../../store/ui-slice";
 import { IErrorResponse } from "../../types/ResponseModel";
 import { editElectionValidationSchema } from "../../validations/schemas/election.validation";
 import ApiErrorMessage from "../ui/ApiErrorMessage";
+import Button from "../ui/Button";
 import FileInput from "../ui/FileInput";
 import TextareaInput from "../ui/TextareaInput";
 import TextInput from "../ui/TextInput";
@@ -100,9 +101,9 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
               setValue={setValue}
             />
           </div>
-          <button type="submit" className="btn primary">
-            {isSubmitting ? "Updating..." : "Update"}
-          </button>
+          <Button type="submit" variant="primary" isLoading={isSubmitting}>
+            Update
+          </Button>
         </form>
       </div>
     </section>

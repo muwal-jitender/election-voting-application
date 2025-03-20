@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { UiActions } from "../../store/ui-slice";
 import { IElectionModel } from "../../types";
+import Button from "../ui/Button";
 
 const Election = (election: IElectionModel) => {
   const dispatch = useDispatch();
@@ -29,9 +30,9 @@ const Election = (election: IElectionModel) => {
           <Link to={`/elections/${election.id}`} className="btn sm primary">
             View
           </Link>
-          <button className="btn sm primary" onClick={openUpdateElectionModal}>
+          <Button variant="primary" size="sm" onClick={openUpdateElectionModal}>
             Edit
-          </button>
+          </Button>
         </div>
       </div>
     </article>

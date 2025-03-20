@@ -10,6 +10,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import ApiErrorMessage from "../../components/ui/ApiErrorMessage";
+import Button from "../../components/ui/Button";
 import PasswordInput from "../../components/ui/PasswordInput";
 import TextInput from "../../components/ui/TextInput";
 import { registerVoter } from "../../services/voter.service";
@@ -102,9 +103,9 @@ const Register = () => {
           <p>
             Already have an account? <Link to="/">Sign In</Link>
           </p>
-          <button type="submit" className="btn primary">
-            {isSubmitting ? "Registering..." : "Register"}
-          </button>
+          <Button variant="primary" type="submit" isLoading={isSubmitting}>
+            Register
+          </Button>
         </form>
       </div>
     </section>

@@ -7,6 +7,7 @@ import { IElectionModel, RootState } from "../../types";
 import Election from "../../components/election/Election";
 import AddElectionModal from "../../components/modals/AddElectionModal";
 import UpdateElectionModal from "../../components/modals/UpdateElectionModal";
+import Button from "../../components/ui/Button";
 import { getAllElections } from "../../services/election.service";
 import { UiActions } from "../../store/ui-slice";
 import { IErrorResponse } from "../../types/ResponseModel";
@@ -63,9 +64,9 @@ const Elections = () => {
         <div className="container elections__container">
           <header className="elections__header">
             <h1>Ongoing Elections</h1>
-            <button className="btn primary" onClick={openElectionModal}>
+            <Button variant="primary" onClick={openElectionModal}>
               Create New Election
-            </button>
+            </Button>
           </header>
           <menu className="elections__menu">
             {elections &&

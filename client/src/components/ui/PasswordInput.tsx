@@ -34,7 +34,7 @@ const PasswordInput = <T extends FieldValues>({
         </button>
       </div>
       {error && (
-        <p className="form__client-error-message">{String(error.message)}</p>
+        <p className="form__client-error-message">* {String(error.message)}</p>
       )}
     </div>
   );

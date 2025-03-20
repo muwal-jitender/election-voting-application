@@ -10,6 +10,7 @@ import { UiActions } from "../../store/ui-slice";
 import { IErrorResponse } from "../../types/ResponseModel";
 import { addElectionValidationSchema } from "../../validations/schemas/election.validation";
 import ApiErrorMessage from "../ui/ApiErrorMessage";
+import Button from "../ui/Button";
 import FileInput from "../ui/FileInput";
 import TextareaInput from "../ui/TextareaInput";
 import TextInput from "../ui/TextInput";
@@ -92,9 +93,9 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
               clearErrors={clearErrors}
             />
           </div>
-          <button type="submit" className="btn primary">
-            {isSubmitting ? "Submitting..." : "Submit"}
-          </button>
+          <Button type="submit" variant="primary" isLoading={isSubmitting}>
+            Add
+          </Button>
         </form>
       </div>
     </section>
