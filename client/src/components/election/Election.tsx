@@ -1,35 +1,71 @@
 import "./Election.css";
 
+import { IElectionModel, IErrorResponse } from "types";
+
 import Button from "components/ui/Button";
+import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { deleteElection } from "services/election.service";
 import { UiActions } from "store/ui-slice";
-import { IElectionModel } from "types";
 
-const Election = (election: IElectionModel) => {
+const Election = ({
+  id,
+  title,
+  description,
+  thumbnail,
+  onElectionDeleted,
+}: IElectionModel & { onElectionDeleted: (id: string) => void }) => {
+  const [serverErrors, setServerErrors] = useState<string[]>([]);
   const dispatch = useDispatch();
+
   const openUpdateElectionModal = () => {
-    dispatch(UiActions.openUpdateElectionModal(election));
+    dispatch(
+      UiActions.openUpdateElectionModal({ id, title, description, thumbnail }),
+    );
+  };
+  const handleDeleteElection = (id: string) => {
+    dispatch(
+      UiActions.openConfirmModalDialog({
+        heading: "Are you sure?",
+        callback: async () => {
+          try {
+            await deleteElection(id);
+            onElectionDeleted(id);
+          } catch (error: unknown) {
+            setServerErrors((error as IErrorResponse).errorMessages || []);
+          }
+        },
+      }),
+    );
   };
 
   return (
     <article className="election">
       <div className="election__image">
-        <img src={election.thumbnail} alt={election.title} />
+        <img src={thumbnail} alt={title} />
       </div>
       <div className="election__info">
-        <Link to={`/elections/${election.id}`}>
-          <h4>{election.title}</h4>
+        <Link to={`/elections/${id}`}>
+          <h4>{title}</h4>
         </Link>
         <p>
-          {election.description.length > 255
-            ? election.description.substring(0, 255) + "..."
-            : election.description}
+          {description.length > 255
+            ? description.substring(0, 255) + "..."
+            : description}
         </p>
         <div className="election__cta">
-          <Link to={`/elections/${election.id}`} className="btn sm primary">
+          <Link to={`/elections/${id}`} className="btn sm primary">
             View
           </Link>
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={() => handleDeleteElection(id)}
+          >
+            Delete
+          </Button>
+
           <Button variant="primary" size="sm" onClick={openUpdateElectionModal}>
             Edit
           </Button>

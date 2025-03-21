@@ -66,6 +66,12 @@ export const getCandidatesByElectionId = async (id: string) => {
     "GET",
   );
 };
+export const deleteElection = async (id: string) => {
+  return await apiRequest<IElectionModel>(
+    getApiPath(API_PATH.ELECTION_ID, { id: id }),
+    "DELETE",
+  );
+};
 export const checkIfVoterAlreadyVoted = async (id: string) => {
   return await apiRequest<IVoterVotedResponse>(
     getApiPath(API_PATH.ELECTION_CHECK_IF_VOTER_ALREADY_VOTED, { id: id }),

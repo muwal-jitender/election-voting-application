@@ -6,6 +6,7 @@ import { IElectionModel, RootState } from "types";
 
 import Election from "components/election/Election";
 import AddElectionModal from "components/modals/AddElectionModal";
+import ConfirmModal from "components/modals/ConfirmModal";
 import UpdateElectionModal from "components/modals/UpdateElectionModal";
 import Button from "components/ui/Button";
 import { getAllElections } from "services/election.service";
@@ -57,7 +58,11 @@ const Elections = () => {
       ),
     );
   };
-
+  const handleElectionDeletion = (deletedElectionId: string) => {
+    setElections((prevElections) =>
+      prevElections?.filter((election) => election.id !== deletedElectionId),
+    );
+  };
   return (
     <>
       <section className="elections">
@@ -72,7 +77,11 @@ const Elections = () => {
             {elections &&
               elections.length > 0 &&
               elections.map((election) => (
-                <Election key={election.id} {...election} />
+                <Election
+                  key={election.id}
+                  {...election}
+                  onElectionDeleted={handleElectionDeletion}
+                />
               ))}
           </menu>
         </div>
@@ -86,6 +95,7 @@ const Elections = () => {
           onElectionUpdated={handleElectionUpdated}
         />
       )}
+      <ConfirmModal />
     </>
   );
 };

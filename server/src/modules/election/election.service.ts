@@ -163,13 +163,14 @@ export class ElectionService {
       if (deletedElection.thumbnail) {
         await deleteFile(deletedElection.thumbnail);
       }
-      session.commitTransaction();
-      session.endSession();
+      await session.commitTransaction();
+
       return deletedElection;
     } catch (error) {
       await session.abortTransaction();
-      session.endSession();
       throw error;
+    } finally {
+      session.endSession();
     }
   }
 
