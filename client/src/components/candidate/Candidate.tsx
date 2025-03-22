@@ -1,5 +1,6 @@
 import "./Candidate.css";
 
+import ApiErrorMessage from "components/ui/ApiErrorMessage";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -19,9 +20,9 @@ const Candidate = ({ ...props }: ICandidateModel) => {
     dispatch(
       UiActions.openConfirmModalDialog({
         heading: "Please confirm your vote",
-        callback: () => {
+        callback: async () => {
           try {
-            VoteCandidate(props.id, props.electionId);
+            await VoteCandidate(props.id, props.electionId);
             navigate("/congrats");
           } catch (error: unknown) {
             setErrors((error as IErrorResponse).errorMessages || []);
@@ -50,6 +51,11 @@ const Candidate = ({ ...props }: ICandidateModel) => {
       <Button variant="primary" align="center" onClick={handleCastingVote}>
         Vote
       </Button>
+      {errors.length > 0 && (
+        <div className="api-message">
+          <ApiErrorMessage errors={errors} />
+        </div>
+      )}
     </article>
   );
 };

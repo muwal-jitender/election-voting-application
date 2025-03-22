@@ -2,6 +2,7 @@ import "./Election.css";
 
 import { IElectionModel, IErrorResponse } from "types";
 
+import ApiErrorMessage from "components/ui/ApiErrorMessage";
 import Button from "components/ui/Button";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
@@ -71,6 +72,7 @@ const Election = ({
           </Button>
         </div>
       </div>
+      {serverErrors.length > 0 && <ApiErrorMessage errors={serverErrors} />}
     </article>
   );
 };

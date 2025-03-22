@@ -19,6 +19,7 @@ import {
   uploadToLocal,
 } from "../../utils/file.utils";
 import { plainToClass } from "class-transformer";
+import { ElectionDocument } from "./election.model";
 
 // Voter Service
 @singleton()
@@ -147,7 +148,7 @@ export class ElectionService {
     // ✅ Start a MongoDB transaction
     const session = await mongoose.startSession();
     session.startTransaction();
-
+    let deletedElection: ElectionDocument | null = null;
     try {
       // ✅ Check if election exists before proceeding
       const election = await this.electionRepository.findById(id);
@@ -156,13 +157,11 @@ export class ElectionService {
       await this.candidateRepository.deleteMany({ electionId: id }, session);
 
       // ✅ Delete the election itself
-      const deletedElection = await this.electionRepository.delete(id, session);
+      deletedElection = await this.electionRepository.delete(id, session);
       if (!deletedElection) {
         throw new NotFoundError("Election deletion failed.");
       }
-      if (deletedElection.thumbnail) {
-        await deleteFile(deletedElection.thumbnail);
-      }
+
       await session.commitTransaction();
 
       return deletedElection;
@@ -171,6 +170,14 @@ export class ElectionService {
       throw error;
     } finally {
       session.endSession();
+      if (deletedElection?.thumbnail) {
+        try {
+          await deleteFile(deletedElection.thumbnail);
+        } catch (e) {
+          // Optionally log this error but don’t crash the app
+          console.error("Failed to delete thumbnail:", e);
+        }
+      }
     }
   }
 

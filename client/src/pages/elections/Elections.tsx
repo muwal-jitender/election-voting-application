@@ -8,6 +8,7 @@ import Election from "components/election/Election";
 import AddElectionModal from "components/modals/AddElectionModal";
 import ConfirmModal from "components/modals/ConfirmModal";
 import UpdateElectionModal from "components/modals/UpdateElectionModal";
+import ApiErrorMessage from "components/ui/ApiErrorMessage";
 import Button from "components/ui/Button";
 import { getAllElections } from "services/election.service";
 import { UiActions } from "store/ui-slice";
@@ -67,8 +68,13 @@ const Elections = () => {
     <>
       <section className="elections">
         <div className="container elections__container">
+          <ApiErrorMessage errors={errors} />
           <header className="elections__header">
-            <h1>Ongoing Elections</h1>
+            <h1>
+              {elections && elections.length > 0
+                ? "Ongoing Elections"
+                : "There are currently no elections."}
+            </h1>
             <Button variant="primary" onClick={openElectionModal}>
               Create New Election
             </Button>
