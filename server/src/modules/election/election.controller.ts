@@ -9,10 +9,10 @@ import { ElectionService } from "./election.service";
 
 import { StatusCodes } from "http-status-codes";
 
-import { NotFoundError } from "../../utils/exceptions.utils";
-import { CandidateService } from "../candidate/candidate.service";
-import { VoterService } from "../voter/voter.service";
-import { validateMongoId } from "../../utils/utils";
+import { NotFoundError } from "utils/exceptions.utils";
+import { CandidateService } from "modules/candidate/candidate.service";
+import { VoterService } from "modules/voter/voter.service";
+import { validateMongoId } from "utils/utils";
 
 @injectable()
 export class ElectionController {

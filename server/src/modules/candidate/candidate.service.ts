@@ -3,12 +3,12 @@ import { inject, singleton } from "tsyringe";
 import { CandidateDTO } from "./candidate.dto";
 import { CandidateRepository } from "./candidate.repository";
 import mongoose from "mongoose";
-import { ElectionRepository } from "../election/election.repository";
-import { BadRequestError, NotFoundError } from "../../utils/exceptions.utils";
-import { deleteFile, uploadFile } from "../../utils/file.utils";
-import { VoterRepository } from "../voter/voter.repository";
+import { ElectionRepository } from "modules/election/election.repository";
+import { BadRequestError, NotFoundError } from "utils/exceptions.utils";
+import { deleteFile, uploadFile } from "utils/file.utils";
+import { VoterRepository } from "modules/voter/voter.repository";
 import { FileArray } from "express-fileupload";
-import { ElectionService } from "../election/election.service";
+import { ElectionService } from "modules/election/election.service";
 // Voter Service
 @singleton()
 export class CandidateService {

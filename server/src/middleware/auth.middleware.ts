@@ -1,7 +1,7 @@
-import { ForbiddenError, UnauthorizedError } from "../utils/exceptions.utils";
+import { ForbiddenError, UnauthorizedError } from "utils/exceptions.utils";
 import { NextFunction, Request, Response } from "express";
 
-import { env } from "../utils/env-config.utils"; // ✅ Import environment variables
+import { env } from "utils/env-config.utils"; // ✅ Import environment variables
 import jwt from "jsonwebtoken";
 
 // ✅ Define a TypeScript interface for req.user

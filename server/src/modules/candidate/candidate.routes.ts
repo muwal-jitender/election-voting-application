@@ -1,10 +1,10 @@
 import { CandidateController } from "./candidate.controller";
 import { CandidateDTO } from "./candidate.dto";
 import { Router } from "express";
-import { authenticateJWT } from "../../middleware/auth.middleware";
+import { authenticateJWT } from "middleware/auth.middleware";
 import { container } from "tsyringe";
-import { isAdmin } from "../../middleware/admin.middleware";
-import { validateRequest } from "../../middleware/validate-request.middleware";
+import { isAdmin } from "middleware/admin.middleware";
+import { validateRequest } from "middleware/validate-request.middleware";
 
 const candidateRouter = Router();
 const candidateController = container.resolve(CandidateController);

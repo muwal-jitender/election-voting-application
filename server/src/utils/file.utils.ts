@@ -2,7 +2,7 @@ import { FileArray, UploadedFile } from "express-fileupload";
 import {
   deleteFromCloudinary,
   uploadToCloudinary,
-} from "../config/cloudinary.config";
+} from "config/cloudinary.config";
 import {
   getFilenameFromUrl,
   validateFileSize,

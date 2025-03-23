@@ -9,7 +9,7 @@ import { CandidateService } from "./candidate.service";
 
 import { StatusCodes } from "http-status-codes";
 
-import { validateMongoId } from "../../utils/utils";
+import { validateMongoId } from "utils/utils";
 
 @injectable()
 export class CandidateController {

@@ -3,13 +3,13 @@ import { inject, singleton } from "tsyringe";
 import { ElectionDTO } from "./election.dto";
 import { ElectionRepository } from "./election.repository";
 import mongoose from "mongoose";
-import { NotFoundError } from "../../utils/exceptions.utils";
-import { CandidateRepository } from "../candidate/candidate.repository";
+import { NotFoundError } from "utils/exceptions.utils";
+import { CandidateRepository } from "modules/candidate/candidate.repository";
 
-import { deleteFromCloudinary } from "../../config/cloudinary.config";
+import { deleteFromCloudinary } from "config/cloudinary.config";
 import { FileArray } from "express-fileupload";
 
-import { deleteFile, uploadFile } from "../../utils/file.utils";
+import { deleteFile, uploadFile } from "utils/file.utils";
 
 import { ElectionDocument } from "./election.model";
 

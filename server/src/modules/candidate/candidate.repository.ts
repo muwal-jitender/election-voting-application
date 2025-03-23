@@ -1,6 +1,6 @@
-import {CandidateDocument, CandidateModel} from "./candidate.model"
+import { CandidateDocument, CandidateModel } from "./candidate.model";
 
-import { BaseRepository } from "../../core/base.repository";
+import { BaseRepository } from "core/base.repository";
 import { singleton } from "tsyringe";
 
 // Voter Repository

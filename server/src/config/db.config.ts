@@ -1,4 +1,4 @@
-import { env } from "../utils/env-config.utils"; // Import environment configs
+import { env } from "utils/env-config.utils"; // Import environment configs
 import mongoose from "mongoose";
 
 // ✅ MongoDB Connection Options for Stability

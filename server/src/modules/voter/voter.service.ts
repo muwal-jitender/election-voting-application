@@ -4,9 +4,9 @@ import { RegisterVoterDTO } from "./voter.dto";
 import { VoterRepository } from "./voter.repository";
 import { VoterDocument } from "./voter.model";
 import jwt from "jsonwebtoken";
-import { env } from "../../utils/env-config.utils";
+import { env } from "utils/env-config.utils";
 import type { StringValue } from "ms";
-import { ConflictError, UnauthorizedError } from "../../utils/exceptions.utils";
+import { ConflictError, UnauthorizedError } from "utils/exceptions.utils";
 // Voter Service
 @singleton()
 export class VoterService {

@@ -2,8 +2,8 @@ import { ElectionController } from "./election.controller";
 import { ElectionDTO } from "./election.dto";
 import { Router } from "express";
 import { container } from "tsyringe";
-import { isAdmin } from "../../middleware/admin.middleware";
-import { validateRequest } from "../../middleware/validate-request.middleware";
+import { isAdmin } from "middleware/admin.middleware";
+import { validateRequest } from "middleware/validate-request.middleware";
 
 const electionRouter = Router();
 const electionController = container.resolve(ElectionController);

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import { UnauthorizedError } from "../utils/exceptions.utils";
+import { UnauthorizedError } from "utils/exceptions.utils";
 
 /**
  * Middleware to allow only admins to access certain routes.
