@@ -3,8 +3,6 @@ import {
   IsNotEmpty,
   Matches,
   MinLength,
-  ValidateIf,
-  isEmail,
 } from "class-validator";
 
 // DTO (Data Transfer Object) for Voter Registration

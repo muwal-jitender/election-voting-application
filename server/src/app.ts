@@ -15,7 +15,6 @@ dotenv.config();
 
 const app = express();
 const PORT = env.PORT || 5000;
-const DB = (env.DB_URI as string) || "";
 
 // ✅ Enable CORS
 app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
@@ -28,7 +27,7 @@ app.use(express.urlencoded({ extended: true })); // For form submissions
 configureFileUpload(app);
 
 // ✅ Test route
-app.get("/", (req: Request, res: Response) => {
+app.get("/", (_: Request, res: Response) => {
   res.send("Express + TypeScript Server is running!");
 });
 

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, isEmpty } from "class-validator";
+import { IsNotEmpty, IsOptional } from "class-validator";
 
 // DTO (Data Transfer Object) for Candidate
 export class CandidateDTO {

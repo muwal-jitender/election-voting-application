@@ -2,22 +2,14 @@
 import "reflect-metadata";
 
 import { NextFunction, Request, Response } from "express";
-import { inject, injectable, singleton } from "tsyringe";
+import { inject, injectable } from "tsyringe";
 
 import { ElectionDTO } from "./election.dto";
 import { ElectionService } from "./election.service";
-import { UploadedFile } from "express-fileupload";
-import {
-  deleteFromCloudinary,
-  uploadToCloudinary,
-} from "../../config/cloudinary.config";
-import { StatusCodes } from "http-status-codes";
-import { validate } from "class-validator";
-import { plainToClass } from "class-transformer";
-import path from "path";
-import { deleteFromLocal, uploadToLocal } from "../../utils/file.utils";
 
-import { BadRequestError, NotFoundError } from "../../utils/exceptions.utils";
+import { StatusCodes } from "http-status-codes";
+
+import { NotFoundError } from "../../utils/exceptions.utils";
 import { CandidateService } from "../candidate/candidate.service";
 import { VoterService } from "../voter/voter.service";
 import { validateMongoId } from "../../utils/utils";

@@ -2,7 +2,6 @@ import { Router } from "express";
 import { authenticateJWT } from "../middleware/auth.middleware";
 import candidateRouter from "../modules/candidate/candidate.routes";
 import electionRouter from "../modules/election/elections.routes";
-import { isAdmin } from "../middleware/admin.middleware";
 import voterRouter from "../modules/voter/voter.routes";
 
 const router = Router();

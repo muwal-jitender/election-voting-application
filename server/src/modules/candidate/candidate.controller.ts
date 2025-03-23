@@ -6,25 +6,15 @@ import { inject, injectable } from "tsyringe";
 
 import { CandidateDTO } from "./candidate.dto";
 import { CandidateService } from "./candidate.service";
-import { plainToClass } from "class-transformer";
-import { validate } from "class-validator";
-import { StatusCodes } from "http-status-codes";
-import { BadRequestError, NotFoundError } from "../../utils/exceptions.utils";
-import { UploadedFile } from "express-fileupload";
 
-import { deleteFromLocal, uploadToLocal } from "../../utils/file.utils";
-import {
-  deleteFromCloudinary,
-  uploadToCloudinary,
-} from "../../config/cloudinary.config";
-import { ElectionService } from "../election/election.service";
+import { StatusCodes } from "http-status-codes";
+
 import { validateMongoId } from "../../utils/utils";
 
 @injectable()
 export class CandidateController {
   constructor(
-    @inject(CandidateService) private candidateService: CandidateService,
-    @inject(ElectionService) private electionService: ElectionService
+    @inject(CandidateService) private candidateService: CandidateService
   ) {}
 
   async create(req: Request, res: Response, next: NextFunction) {
@@ -44,7 +34,7 @@ export class CandidateController {
       next(error);
     }
   }
-  async get(req: Request, res: Response, next: NextFunction) {
+  async get(_: Request, res: Response, next: NextFunction) {
     try {
       const candidates = await this.candidateService.getAll();
       return res
@@ -75,7 +65,7 @@ export class CandidateController {
       const result = await this.candidateService.delete(id);
       return res.status(StatusCodes.OK).json({
         message: "Candidate removed successfully",
-        data: null,
+        data: result,
       });
     } catch (error) {
       next(error);
@@ -108,7 +98,7 @@ export class CandidateController {
    * @param req
    * @param res
    */
-  async getCandidatesByElectionId(req: Request, res: Response) {
+  async getCandidatesByElectionId(_: Request, res: Response) {
     try {
       res.status(200).json({ message: "Get Voter successful" });
     } catch (error) {
@@ -120,7 +110,7 @@ export class CandidateController {
    * @param req
    * @param res
    */
-  async getVotersByElectionId(req: Request, res: Response) {
+  async getVotersByElectionId(_: Request, res: Response) {
     try {
       res.status(200).json({ message: "Get Voter successful" });
     } catch (error) {

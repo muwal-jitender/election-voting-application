@@ -5,7 +5,7 @@ import { UnauthorizedError } from "../utils/exceptions.utils";
 /**
  * Middleware to allow only admins to access certain routes.
  */
-export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
+export const isAdmin = (req: Request, _: Response, next: NextFunction) => {
   if (!req.user) {
     throw new UnauthorizedError("Unauthorized. Please log in.");
   }

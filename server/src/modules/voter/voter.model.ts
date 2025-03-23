@@ -1,7 +1,6 @@
 import { Document, Schema, Types, model } from "mongoose";
 
 import bcrypt from "bcryptjs";
-import { v4 as uuidv4 } from "uuid";
 
 export interface VoterDocument extends Document {
   fullName: string;
@@ -47,7 +46,7 @@ voterSchema.pre("save", async function (next) {
 
 // Convert `_id` to `id` when returning data
 voterSchema.set("toJSON", {
-  transform: function (doc, ret) {
+  transform: (_, ret) => {
     ret.id = ret._id.toString(); // Map `_id` to `id`
     delete ret._id; // Remove `_id`
     delete ret.__v; // Remove version key

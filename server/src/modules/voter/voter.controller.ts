@@ -2,18 +2,12 @@
 import "reflect-metadata";
 
 import { NextFunction, Request, Response } from "express";
-import { inject, injectable, singleton } from "tsyringe";
+import { inject, injectable } from "tsyringe";
 
 import { RegisterVoterDTO, SignInDTO } from "./voter.dto";
 import { VoterService } from "./voter.service";
-import { plainToClass } from "class-transformer";
-import { validate } from "class-validator";
-import { StatusCodes, ReasonPhrases } from "http-status-codes";
-import {
-  BadRequestError,
-  ConflictError,
-  UnauthorizedError,
-} from "../../utils/exceptions.utils";
+
+import { StatusCodes } from "http-status-codes";
 
 @injectable()
 export class VoterController {

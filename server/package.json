@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write .",
     "lint": "eslint . --fix",
+    "lint:strict": "eslint . --ext .ts --max-warnings=0",
     "prepare": "husky install"
   },
   "lint-staged": {
@@ -20,12 +21,15 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@eslint/js": "^9.23.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/express-fileupload": "^1.5.1",
     "@types/jsonwebtoken": "^9.0.8",
     "@types/node": "^22.13.4",
-    "eslint": "^9.20.1",
+    "@typescript-eslint/eslint-plugin": "^8.27.0",
+    "@typescript-eslint/parser": "^8.27.0",
+    "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.3",
     "husky": "^9.1.7",

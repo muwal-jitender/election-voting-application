@@ -3,22 +3,14 @@ import { inject, singleton } from "tsyringe";
 import { ElectionDTO } from "./election.dto";
 import { ElectionRepository } from "./election.repository";
 import mongoose from "mongoose";
-import { BadRequestError, NotFoundError } from "../../utils/exceptions.utils";
+import { NotFoundError } from "../../utils/exceptions.utils";
 import { CandidateRepository } from "../candidate/candidate.repository";
-import { VoterRepository } from "../voter/voter.repository";
-import {
-  deleteFromCloudinary,
-  uploadToCloudinary,
-} from "../../config/cloudinary.config";
-import fileUpload, { FileArray, UploadedFile } from "express-fileupload";
-import { validate } from "class-validator";
-import {
-  deleteFile,
-  deleteFromLocal,
-  uploadFile,
-  uploadToLocal,
-} from "../../utils/file.utils";
-import { plainToClass } from "class-transformer";
+
+import { deleteFromCloudinary } from "../../config/cloudinary.config";
+import { FileArray } from "express-fileupload";
+
+import { deleteFile, uploadFile } from "../../utils/file.utils";
+
 import { ElectionDocument } from "./election.model";
 
 // Voter Service

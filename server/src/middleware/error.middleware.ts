@@ -10,9 +10,9 @@ interface AppError {
 // ✅ Error Middleware to Catch All Errors
 export const errorHandler = (
   err: AppError,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) => {
   console.error("🔥 Error: ", err.message);
 

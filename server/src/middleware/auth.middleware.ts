@@ -18,7 +18,7 @@ declare global {
  */
 export const authenticateJWT = (
   req: Request,
-  res: Response,
+  _: Response,
   next: NextFunction
 ) => {
   const authorization = req.headers.authorization;
