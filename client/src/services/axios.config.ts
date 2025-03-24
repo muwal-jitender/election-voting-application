@@ -1,5 +1,4 @@
 import axios from "axios";
-import { getToken } from "utils/auth.utils";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL?.trim();
 
@@ -7,24 +6,25 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL?.trim();
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: { "Content-Type": "application/json" },
+  withCredentials: true,
 });
 
 // 🔥 Add an interceptor to inject the token automatically
-api.interceptors.request.use(
-  (config) => {
-    // 🔥 Get the token from localStorage
-    const token = getToken();
+// api.interceptors.request.use(
+//   (config) => {
+//     // 🔥 Get the token from localStorage
+//     const token = getToken();
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
 
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   },
+// );
 
 // ✅ Function to Set Up Axios Interceptors (Run Once)
 export const setupAxiosInterceptors = (

@@ -1,7 +1,7 @@
 import "./Login.css";
 
 import { Link, useNavigate } from "react-router-dom";
-import { getToken, getUser, setToken } from "utils/auth.utils";
+import { getToken } from "utils/auth.utils";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import ApiErrorMessage from "components/ui/ApiErrorMessage";
@@ -37,8 +37,8 @@ const Login = () => {
     try {
       const result = await login(formData);
       // Save user in local storage
-      result.data && setToken(result.data.token);
-      const user = getUser();
+      //result.data && setToken(result.data.token);
+      const user = result.data && result.data.response;
       // Save in redux state
       user &&
         dispatch(

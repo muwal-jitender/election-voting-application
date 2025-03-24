@@ -17,7 +17,12 @@ const app = express();
 const PORT = env.PORT || 5000;
 
 // ✅ Enable CORS
-app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
+app.use(
+  cors({
+    credentials: true, // ✅ allow sending cookies cross-origin
+    origin: "http://localhost:3000",
+  })
+);
 
 // ✅ Ensure Express Can Parse JSON & URL Encoded Requests
 app.use(express.json()); // For JSON payloads

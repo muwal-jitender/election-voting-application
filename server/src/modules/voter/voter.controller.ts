@@ -8,6 +8,7 @@ import { RegisterVoterDTO, SignInDTO } from "./voter.dto";
 import { VoterService } from "./voter.service";
 
 import { StatusCodes } from "http-status-codes";
+import { env } from "utils/env-config.utils";
 
 @injectable()
 export class VoterController {
@@ -41,9 +42,16 @@ export class VoterController {
 
       const token = this.voterService.generateToken(voter);
 
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
+      });
+
       return res.status(StatusCodes.OK).json({
         message: "You are now logged in",
-        data: { token },
+        data: { email: voter.email, fullName: voter.fullName },
       });
     } catch (error: unknown) {
       next(error);
@@ -58,5 +66,13 @@ export class VoterController {
     } catch (error) {
       next(error);
     }
+  }
+  async logout(_req: Request, res: Response, _next: NextFunction) {
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+    res.status(StatusCodes.OK).json({ message: "Logged out successfully" });
   }
 }
