@@ -22,7 +22,7 @@ const electionSchema = new Schema<ElectionDocument>(
 
 // Convert `_id` to `id` when returning data
 electionSchema.set("toJSON", {
-  transform: function (doc, ret) {
+  transform: function (_doc, ret) {
     ret.id = ret._id.toString(); // Map `_id` to `id`
     delete ret._id; // Remove `_id`
     delete ret.__v; // Remove version key

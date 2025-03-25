@@ -98,7 +98,7 @@ export class CandidateController {
    * @param req
    * @param res
    */
-  async getCandidatesByElectionId(_: Request, res: Response) {
+  async getCandidatesByElectionId(_req: Request, res: Response) {
     try {
       res.status(200).json({ message: "Get Voter successful" });
     } catch (error) {
@@ -110,7 +110,7 @@ export class CandidateController {
    * @param req
    * @param res
    */
-  async getVotersByElectionId(_: Request, res: Response) {
+  async getVotersByElectionId(_req: Request, res: Response) {
     try {
       res.status(200).json({ message: "Get Voter successful" });
     } catch (error) {

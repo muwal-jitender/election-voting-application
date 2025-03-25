@@ -4,12 +4,12 @@ import * as dotenv from "dotenv";
 
 import express, { Request, Response } from "express";
 
-import { configureFileUpload } from "./middleware/file-upload.middleware";
-import { connectDB } from "./config/db.config"; // ✅ Import connectDB()
+import { configureFileUpload } from "middleware/file-upload.middleware";
+import { connectDB } from "config/db.config"; // ✅ Import connectDB()
 import cors from "cors";
-import { env } from "./utils/env-config.utils";
-import { errorHandler } from "./middleware/error.middleware";
-import router from "./core/base.routes";
+import { env } from "utils/env-config.utils";
+import { errorHandler } from "middleware/error.middleware";
+import router from "core/base.routes";
 
 dotenv.config();
 
