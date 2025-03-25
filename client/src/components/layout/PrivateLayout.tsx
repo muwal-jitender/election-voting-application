@@ -2,23 +2,25 @@ import "./PrivateLayout.css";
 
 import React, { useEffect, useState } from "react";
 import { IoIosMoon, IoMdSunny } from "react-icons/io";
-import { Link, NavLink, Outlet } from "react-router-dom";
-import { isAdminUser, removeToken } from "../../utils/auth.utils";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { getTheme, setTheme } from "../../utils/theme.utils";
 
 import { AiOutlineClose } from "react-icons/ai";
 import { HiOutlineBars3 } from "react-icons/hi2";
+import { logout } from "services/voter.service";
 import { setupAxiosInterceptors } from "../../services/axios.config";
+import { isAdminUser } from "../../utils/auth.utils";
 import Loader from "./Loader";
 
 const PrivateLayout: React.FC = () => {
   const [showNav, setShowNav] = useState(false);
   const [darkTheme, setDarkTheme] = useState(getTheme());
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    setupAxiosInterceptors(setLoading); // ✅ Ensure Interceptors are Set Up Once
-  }, []);
+    setupAxiosInterceptors(setLoading, navigate); // ✅ Ensure Interceptors are Set Up Once
+  }, [navigate]);
 
   // Show or hide nav on page load and window resize
   useEffect(() => {
@@ -44,9 +46,8 @@ const PrivateLayout: React.FC = () => {
   };
 
   // Logout user
-  const handleLogout = () => {
-    removeToken(); // ✅ Remove token from localStorage
-
+  const handleLogout = async () => {
+    await logout();
     showHideNav();
   };
 

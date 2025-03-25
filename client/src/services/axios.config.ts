@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL?.trim();
 
@@ -9,26 +10,10 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// 🔥 Add an interceptor to inject the token automatically
-// api.interceptors.request.use(
-//   (config) => {
-//     // 🔥 Get the token from localStorage
-//     const token = getToken();
-
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   },
-// );
-
 // ✅ Function to Set Up Axios Interceptors (Run Once)
 export const setupAxiosInterceptors = (
   setLoading: (loading: boolean) => void,
+  navigate: ReturnType<typeof useNavigate>,
 ) => {
   api.interceptors.request.use(
     (config) => {
@@ -49,6 +34,11 @@ export const setupAxiosInterceptors = (
     },
     (error) => {
       setLoading(false);
+      // ✅ Redirect user to Login page if unauthorized
+      if (error.status === 401) {
+        navigate("/");
+      }
+
       return Promise.reject(error);
     },
   );

@@ -2,7 +2,7 @@ import "./PrivateLayout";
 
 import React, { useEffect, useState } from "react";
 import { IoIosMoon, IoMdSunny } from "react-icons/io";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { getTheme, setTheme } from "../../utils/theme.utils";
 
 import { setupAxiosInterceptors } from "../../services/axios.config";
@@ -11,10 +11,10 @@ import Loader from "./Loader";
 const PublicLayout: React.FC = () => {
   const [darkTheme, setDarkTheme] = useState(getTheme());
   const [loading, setLoading] = useState(false);
-
+  const navigate = useNavigate();
   useEffect(() => {
-    setupAxiosInterceptors(setLoading); // ✅ Ensure Interceptors are Set Up Once
-  }, []);
+    setupAxiosInterceptors(setLoading, navigate); // ✅ Ensure Interceptors are Set Up Once
+  }, [navigate]);
 
   useEffect(() => {
     document.body.className = getTheme();

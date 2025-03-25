@@ -27,5 +27,8 @@ voterRouter.post(
 voterRouter.get("/:id", authenticateJWT, async (req, res, next) => {
   await voterController.getById(req, res, next);
 });
+voterRouter.post("/logout", authenticateJWT, async (req, res, next) => {
+  await voterController.logout(req, res, next);
+});
 
 export default voterRouter;

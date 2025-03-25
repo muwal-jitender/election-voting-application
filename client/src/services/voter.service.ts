@@ -18,3 +18,6 @@ export const registerVoter = async (voter: IRegisterModel) => {
 export const login = async (user: ILoginModel) => {
   return await apiRequest<ILoginResponse>(API_PATH.VOTER_LOGIN, "POST", user);
 };
+export const logout = async () => {
+  return await apiRequest<null>(API_PATH.VOTER_LOGOUT, "POST");
+};
