@@ -23,3 +23,8 @@ export interface IRegisterModel
   > {
   confirmPassword: string;
 }
+export interface IUserDetail
+  extends Omit<
+    IVoterModel,
+    "id" | "password" | "createdAt" | "votedElectionIds"
+  > {}

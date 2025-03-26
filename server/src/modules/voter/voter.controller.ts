@@ -67,6 +67,17 @@ export class VoterController {
       next(error);
     }
   }
+  /** Get Logged-in user's detail */
+  async me(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user?.id;
+
+      const voter = await this.voterService.getUserDetail(userId);
+      res.status(StatusCodes.OK).json({ message: "User found", data: voter });
+    } catch (error) {
+      next(error);
+    }
+  }
   async logout(_req: Request, res: Response, _next: NextFunction) {
     res.clearCookie("token", {
       httpOnly: true,

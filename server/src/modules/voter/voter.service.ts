@@ -6,7 +6,12 @@ import { VoterDocument } from "./voter.model";
 import jwt from "jsonwebtoken";
 import { env } from "utils/env-config.utils";
 import type { StringValue } from "ms";
-import { ConflictError, UnauthorizedError } from "utils/exceptions.utils";
+import {
+  ConflictError,
+  NotFoundError,
+  UnauthorizedError,
+} from "utils/exceptions.utils";
+import { stripMongoMeta } from "utils/utils";
 // Voter Service
 @singleton()
 export class VoterService {
@@ -37,6 +42,20 @@ export class VoterService {
   }
   async getVoterById(id: string) {
     return await this.voterRepository.findById(id);
+  }
+  async getUserDetail(voterId: string | undefined) {
+    if (!voterId) {
+      throw new NotFoundError("No logged-in user id found");
+    }
+    // ✅ Fetch only required fields
+    const voter = await this.voterRepository.findDocumentById(
+      voterId,
+      [],
+      undefined,
+      ["fullName", "email", "isAdmin"]
+    );
+    if (!voter) throw new NotFoundError("User not found");
+    else return stripMongoMeta(voter);
   }
   async findByEmail(email: string) {
     return await this.voterRepository.findOneByField("email", email);

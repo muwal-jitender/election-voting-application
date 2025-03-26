@@ -24,6 +24,9 @@ voterRouter.post(
   }
 );
 
+voterRouter.get("/me", authenticateJWT, async (req, res, next) => {
+  await voterController.me(req, res, next);
+});
 voterRouter.get("/:id", authenticateJWT, async (req, res, next) => {
   await voterController.getById(req, res, next);
 });

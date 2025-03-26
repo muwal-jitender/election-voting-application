@@ -64,6 +64,28 @@ export class BaseRepository<T extends Document> {
     return await query.exec();
   }
 
+  /** Find one document by ID with optional population and field selection */
+  async findDocumentById<K extends keyof T>(
+    id: string,
+    populateFields: string[] = [],
+    session?: mongoose.ClientSession,
+    selectedFields: K[] = []
+  ): Promise<Partial<T> | T | null> {
+    let query = this.model
+      .findById(id)
+      .session(session ?? null)
+      .lean();
+
+    if (selectedFields.length > 0) {
+      query = query.select((selectedFields as string[]).join(" "));
+    }
+
+    if (populateFields.length > 0) {
+      query = query.populate(populateFields.join(" "));
+    }
+
+    return (await query.exec()) as T | Partial<T> | null;
+  }
   /** Find multiple documents by an array of IDs */
   async findByIds(
     ids: string[],

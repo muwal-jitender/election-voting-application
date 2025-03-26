@@ -3,24 +3,32 @@ import "./PrivateLayout.css";
 import React, { useEffect, useState } from "react";
 import { IoIosMoon, IoMdSunny } from "react-icons/io";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { logout, me } from "services/voter.service";
 import { getTheme, setTheme } from "../../utils/theme.utils";
 
 import { AiOutlineClose } from "react-icons/ai";
 import { HiOutlineBars3 } from "react-icons/hi2";
-import { logout } from "services/voter.service";
 import { setupAxiosInterceptors } from "../../services/axios.config";
-import { isAdminUser } from "../../utils/auth.utils";
 import Loader from "./Loader";
 
 const PrivateLayout: React.FC = () => {
   const [showNav, setShowNav] = useState(false);
   const [darkTheme, setDarkTheme] = useState(getTheme());
   const [loading, setLoading] = useState(false);
+  const [isAdmin, setIsAdmin] = useState<boolean | undefined>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     setupAxiosInterceptors(setLoading, navigate); // ✅ Ensure Interceptors are Set Up Once
   }, [navigate]);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const user = await me();
+      setIsAdmin(user.data?.isAdmin);
+    };
+    fetchUser();
+  }, []);
 
   // Show or hide nav on page load and window resize
   useEffect(() => {
@@ -71,7 +79,7 @@ const PrivateLayout: React.FC = () => {
           <div>
             {showNav && (
               <menu>
-                {isAdminUser() && (
+                {isAdmin && (
                   <NavLink to="/elections" onClick={toggleTheme}>
                     Elections
                   </NavLink>

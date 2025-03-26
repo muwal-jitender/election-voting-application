@@ -11,3 +11,24 @@ export const validateMongoId = (id: string, fieldName = "ID") => {
     throw new BadRequestError(`Invalid or missing ${fieldName}`);
   }
 };
+
+export function transformMongoId<T extends { _id?: any; __v?: any }>(
+  doc: T | null
+): (Omit<T, "_id" | "__v"> & { id: string }) | null {
+  if (!doc) return null;
+
+  const { _id, __v, ...rest } = doc as any;
+  return {
+    ...rest,
+    id: _id?.toString?.() ?? "",
+  };
+}
+
+export function stripMongoMeta<T extends { _id?: any; __v?: any }>(
+  doc: T | null
+): Omit<T, "_id" | "__v"> | null {
+  if (!doc) return null;
+
+  const { _id, __v, ...rest } = doc;
+  return rest;
+}

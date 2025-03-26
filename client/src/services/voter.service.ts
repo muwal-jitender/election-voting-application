@@ -1,4 +1,9 @@
-import { ILoginModel, ILoginResponse, IRegisterModel } from "../types";
+import {
+  ILoginModel,
+  ILoginResponse,
+  IRegisterModel,
+  IUserDetail,
+} from "../types";
 
 import { API_PATH } from "utils/api-path.utils";
 import { apiRequest } from "./api-request";
@@ -20,4 +25,7 @@ export const login = async (user: ILoginModel) => {
 };
 export const logout = async () => {
   return await apiRequest<null>(API_PATH.VOTER_LOGOUT, "POST");
+};
+export const me = async () => {
+  return await apiRequest<IUserDetail>(API_PATH.LOGIN_USER_DETAIL, "GET");
 };
