@@ -1,9 +1,4 @@
-import {
-  ILoginModel,
-  ILoginResponse,
-  IRegisterModel,
-  IUserDetail,
-} from "../types";
+import { ILoginModel, IRegisterModel, IUserResponse } from "../types";
 
 import { API_PATH } from "utils/api-path.utils";
 import { apiRequest } from "./api-request";
@@ -21,11 +16,11 @@ export const registerVoter = async (voter: IRegisterModel) => {
 };
 /** Login user */
 export const login = async (user: ILoginModel) => {
-  return await apiRequest<ILoginResponse>(API_PATH.VOTER_LOGIN, "POST", user);
+  return await apiRequest<IUserResponse>(API_PATH.VOTER_LOGIN, "POST", user);
 };
 export const logout = async () => {
   return await apiRequest<null>(API_PATH.VOTER_LOGOUT, "POST");
 };
 export const me = async () => {
-  return await apiRequest<IUserDetail>(API_PATH.LOGIN_USER_DETAIL, "GET");
+  return await apiRequest<IUserResponse>(API_PATH.LOGIN_USER_DETAIL, "GET");
 };

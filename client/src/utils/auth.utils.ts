@@ -1,19 +1,14 @@
-import { jwtDecode, JwtPayload } from "jwt-decode";
+import { IUserResponse } from "types";
 
-interface IUser extends JwtPayload {
-  id: string;
-  email: string;
-  isAdmin: boolean;
-}
+const USER = "user";
+
 export const getToken = () => {
-  return localStorage.getItem("token");
+  return localStorage.getItem(USER);
 };
 /**Get the User's detail from the token */
 export const getUser = () => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    return jwtDecode<IUser>(token);
-  }
+  const storage = localStorage.getItem(USER);
+  return storage ? (JSON.parse(storage) as IUserResponse) : undefined;
 };
 
 export const isAdminUser = () => {
@@ -21,26 +16,9 @@ export const isAdminUser = () => {
   return user?.isAdmin === true;
 };
 
-export const isLoggedIn = () => {
-  const token = getToken();
-  if (!token) return false; // ✅ No token means user is NOT logged in
-
-  try {
-    const decoded = jwtDecode<IUser>(token);
-
-    if (!decoded.exp) return true; // ✅ If no expiry, assume valid (not ideal, but safe)
-
-    const currentTime = Date.now() / 1000; // Convert milliseconds to seconds
-
-    return decoded.exp > currentTime; // ✅ Returns true if token is still valid
-  } catch (error) {
-    return false; // ✅ Invalid token means user is NOT logged in
-  }
-};
-
-export const setToken = (token: string) => {
-  localStorage.setItem("token", token);
+export const setUser = (user: IUserResponse) => {
+  localStorage.setItem(USER, JSON.stringify(user));
 };
 export const removeToken = () => {
-  localStorage.removeItem("token");
+  localStorage.removeItem(USER);
 };

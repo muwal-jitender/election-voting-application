@@ -20,7 +20,7 @@ electionRouter.post(
 electionRouter.get("/", async (req, res, next) => {
   await electionController.get(req, res, next);
 });
-electionRouter.get("/:id", async (req, res, next) => {
+electionRouter.get("/:id", isAdmin, async (req, res, next) => {
   await electionController.getById(req, res, next);
 });
 electionRouter.get("/:id/details", async (req, res, next) => {

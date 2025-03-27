@@ -72,7 +72,7 @@ export class VoterService {
     const voter = await this.voterRepository.findOneByFieldWithSelect(
       "email",
       email,
-      ["_id", "email", "password", "isAdmin"]
+      ["_id", "fullName", "email", "password", "isAdmin"]
     );
     // ✅ Verify if voter exists and password also matches
     if (!voter || !(await bcrypt.compare(password, voter.password))) {

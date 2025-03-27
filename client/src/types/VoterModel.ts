@@ -11,10 +11,11 @@ export interface ILoginModel {
   email: string;
   password: string;
 }
-export interface ILoginResponse {
-  token: string;
-  response: IVoterModel;
-}
+export interface IUserResponse
+  extends Omit<
+    IVoterModel,
+    "id" | "password" | "createdAt" | "votedElectionIds"
+  > {}
 
 export interface IRegisterModel
   extends Omit<

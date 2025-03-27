@@ -1,7 +1,6 @@
 import "./Login.css";
 
 import { Link, useNavigate } from "react-router-dom";
-import { getToken } from "utils/auth.utils";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import ApiErrorMessage from "components/ui/ApiErrorMessage";
@@ -10,16 +9,15 @@ import PasswordInput from "components/ui/PasswordInput";
 import TextInput from "components/ui/TextInput";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
 import { login } from "services/voter.service";
-import { voteActions } from "store/vote-slice";
 import { ILoginModel } from "types/index";
 import { IErrorResponse } from "types/ResponseModel";
+import { setUser } from "utils/auth.utils";
 import { loginValidationSchema } from "validations/schemas/voter.validation";
 
 const Login = () => {
   const [serverErrors, setServerErrors] = useState<string[]>([]); // ✅ Server-side errors
-  const dispatch = useDispatch();
+
   const navigate = useNavigate();
 
   // ✅ Initialize React Hook Form with Yup validation
@@ -37,17 +35,10 @@ const Login = () => {
     try {
       const result = await login(formData);
       // Save user in local storage
-      //result.data && setToken(result.data.token);
-      const user = result.data && result.data.response;
+
+      const user = result.data;
       // Save in redux state
-      user &&
-        dispatch(
-          voteActions.changeCurrentVoter({
-            id: user.id,
-            token: getToken(),
-            isAdmin: user.isAdmin,
-          }),
-        );
+      user && setUser(user);
 
       navigate("/results");
     } catch (error: unknown) {

@@ -51,7 +51,11 @@ export class VoterController {
 
       return res.status(StatusCodes.OK).json({
         message: "You are now logged in",
-        data: { email: voter.email, fullName: voter.fullName },
+        data: {
+          email: voter.email,
+          fullName: voter.fullName,
+          isAdmin: voter.isAdmin,
+        },
       });
     } catch (error: unknown) {
       next(error);

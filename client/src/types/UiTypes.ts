@@ -13,8 +13,7 @@ export interface UIState {
 }
 
 export interface Voter {
-  id: string;
-  token: string;
+  fullName: string;
   isAdmin: boolean;
 }
 
