@@ -1,9 +1,11 @@
 import { Navigate, Outlet } from "react-router-dom";
 
-import { isAdminUser } from "utils/auth.utils";
+import { useUser } from "context/UserContext";
 
 const AdminRoute = () => {
-  return isAdminUser() ? <Outlet /> : <Navigate to="/" replace />; // ✅ Replace is preventing Backwards Navigation
+  const { isAdmin, loading } = useUser();
+  if (loading) return <div>...</div>;
+  return isAdmin ? <Outlet /> : <Navigate to="/" replace />; // ✅ Replace is preventing Backwards Navigation
 };
 
 export default AdminRoute;

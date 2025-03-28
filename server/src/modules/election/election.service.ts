@@ -106,6 +106,20 @@ export class ElectionService {
     ]);
     return result;
   }
+  async getElectionResults() {
+    const result = await this.electionRepository.findAll2(
+      {},
+      ["id", "thumbnail", "title"],
+      [
+        {
+          path: "candidates",
+          select: ["fullName", "image", "motto", "voteCount"],
+        },
+        { path: "voters", select: ["fullName", "email", "isAdmin"] },
+      ]
+    );
+    return result;
+  }
   async getAll({
     page = 1,
     limit = 10,

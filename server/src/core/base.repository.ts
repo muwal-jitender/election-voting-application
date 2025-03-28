@@ -1,5 +1,10 @@
 import mongoose, { Document, Model, UpdateQuery } from "mongoose";
 
+type PopulateOption = {
+  path: string;
+  select?: string[];
+};
+
 /**
  * Generic Repository for MongoDB CRUD operations using Mongoose
  */
@@ -19,6 +24,26 @@ export class BaseRepository<T extends Document> {
   /** Find all documents */
   async findAll(filter: object = {}): Promise<T[]> {
     return await this.model.find(filter).exec();
+  }
+
+  /** Find one document by field name and allow selecting specific fields */
+  async findAll2<K extends keyof T>(
+    filter: object = {},
+    selectedFields: K[] = [], // Fields to include explicitly
+    populateFields: PopulateOption[] = []
+  ): Promise<T[] | null> {
+    return await this.model
+      .find(filter)
+      .populate(
+        populateFields.map((e) => {
+          return {
+            path: e.path,
+            select: e.select,
+          };
+        })
+      )
+      .select(selectedFields.join(" "))
+      .exec();
   }
 
   /** Find all documents with pagination, sorting, and filtering */

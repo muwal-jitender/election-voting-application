@@ -1,47 +1,32 @@
 import "./ResultElection.css";
 
 import { useEffect, useState } from "react";
-import { ICandidateModel, IElectionModel } from "types";
+import { ICandidateModel, IElectionDetail } from "types";
 
 import CandidateRating from "components/candidate/CandidateRating";
 import { Link } from "react-router-dom";
-import { getCandidatesByElectionId } from "services/election.service";
 
-const ResultElection = ({ id, thumbnail, title }: IElectionModel) => {
+const ResultElection = (electionDetail: IElectionDetail) => {
   const [totalVotes, setTotalVotes] = useState(0);
   const [electionCandidates, setElectionCandidates] =
     useState<ICandidateModel[]>();
-  const getElectionCandidates = async (id: string) => {
-    try {
-      const result = await getCandidatesByElectionId(id);
-      const candidates: ICandidateModel[] = Array.isArray(result.data)
-        ? result.data
-        : [];
-
-      if (!candidates.length) return; // ✅ Exit early if no candidates
-
-      setElectionCandidates(candidates);
-      const totalVoteCount = candidates.reduce(
-        (acc, candidate) => acc + (candidate.voteCount ?? 0),
-        0,
-      );
-      setTotalVotes(totalVoteCount);
-    } catch (error: unknown) {
-      console.error("Failed to fetch candidates:", error);
-    }
-  };
 
   useEffect(() => {
-    getElectionCandidates(id);
-  }, [id]); // ✅ Ensures this only runs once per election
+    setElectionCandidates(electionDetail.candidates);
+    const totalVoteCount = electionCandidates?.reduce(
+      (acc, candidate) => acc + (candidate.voteCount ?? 0),
+      0,
+    );
+    setTotalVotes(totalVoteCount ?? 0);
+  }, [electionDetail.candidates, electionCandidates]); // ✅ Ensures this only runs once per election
 
   return (
     <article className="result">
       <header className="result__header">
-        <h4>{title}</h4>
+        <h4>{electionDetail.title}</h4>
         {/* <p className="result__date">Date: 2021-01-01</p> */}
         <div className="result_header-image">
-          <img src={thumbnail} alt={title} />
+          <img src={electionDetail.thumbnail} alt={electionDetail.title} />
         </div>
       </header>
       <ul className="result__list">
@@ -54,7 +39,10 @@ const ResultElection = ({ id, thumbnail, title }: IElectionModel) => {
             />
           ))}
       </ul>
-      <Link to={`/elections/${id}/candidates`} className="btn primary full">
+      <Link
+        to={`/elections/${electionDetail.id}/candidates`}
+        className="btn primary full"
+      >
         Enter Election
       </Link>
     </article>

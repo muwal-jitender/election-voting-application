@@ -15,6 +15,7 @@ export const API_PATH = {
   CANDIDATE_VOTE: `${CANDIDATE_CONTROLLER}/:id/elections/:electionId`,
   // Election
   ELECTION: `${ELECTION_CONTROLLER}`,
+  ELECTION_RESULTS: `${ELECTION_CONTROLLER}/elections-result`,
   ELECTION_ID: `${ELECTION_CONTROLLER}/:id`,
   ELECTION_GET_CANDIDATES_BY_ID: `${ELECTION_CONTROLLER}/:id/candidates`,
   /**Get Complete details including the voters and candidates  */

@@ -185,6 +185,21 @@ export class ElectionController {
     }
   }
   /**
+   * Get candidates by election id
+   * @param req
+   * @param res
+   */
+  async getElectionResult(_req: Request, res: Response, next: NextFunction) {
+    try {
+      const elections = await this.electionService.getElectionResults();
+      res
+        .status(StatusCodes.OK)
+        .json({ message: "Found Candidates", data: elections });
+    } catch (error) {
+      next(error);
+    }
+  }
+  /**
    * Get voters by election id
    * @param req
    * @param res

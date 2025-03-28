@@ -3,12 +3,12 @@ import "./PrivateLayout.css";
 import React, { useEffect, useState } from "react";
 import { IoIosMoon, IoMdSunny } from "react-icons/io";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
-import { logout } from "services/voter.service";
 import { getTheme, setTheme } from "../../utils/theme.utils";
 
+import { useUser } from "context/UserContext";
 import { AiOutlineClose } from "react-icons/ai";
 import { HiOutlineBars3 } from "react-icons/hi2";
-import { isAdminUser } from "utils/auth.utils";
+import { logout } from "services/voter.service";
 import { setupAxiosInterceptors } from "../../services/axios.config";
 import Loader from "./Loader";
 
@@ -16,7 +16,7 @@ const PrivateLayout: React.FC = () => {
   const [showNav, setShowNav] = useState(false);
   const [darkTheme, setDarkTheme] = useState(getTheme());
   const [loading, setLoading] = useState(false);
-
+  const { isAdmin, logout: userLogout } = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,6 +49,7 @@ const PrivateLayout: React.FC = () => {
   // Logout user
   const handleLogout = async () => {
     await logout();
+    userLogout();
     showHideNav();
   };
 
@@ -72,7 +73,7 @@ const PrivateLayout: React.FC = () => {
           <div>
             {showNav && (
               <menu>
-                {isAdminUser() && (
+                {isAdmin && (
                   <NavLink to="/elections" onClick={toggleTheme}>
                     Elections
                   </NavLink>

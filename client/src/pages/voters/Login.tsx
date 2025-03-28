@@ -7,17 +7,17 @@ import ApiErrorMessage from "components/ui/ApiErrorMessage";
 import Button from "components/ui/Button";
 import PasswordInput from "components/ui/PasswordInput";
 import TextInput from "components/ui/TextInput";
+import { useUser } from "context/UserContext";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { login } from "services/voter.service";
 import { ILoginModel } from "types/index";
 import { IErrorResponse } from "types/ResponseModel";
-import { setUser } from "utils/auth.utils";
 import { loginValidationSchema } from "validations/schemas/voter.validation";
 
 const Login = () => {
   const [serverErrors, setServerErrors] = useState<string[]>([]); // ✅ Server-side errors
-
+  const { setUser } = useUser();
   const navigate = useNavigate();
 
   // ✅ Initialize React Hook Form with Yup validation
@@ -35,8 +35,8 @@ const Login = () => {
     try {
       const result = await login(formData);
       // Save user in local storage
-
       const user = result.data;
+
       // Save in redux state
       user && setUser(user);
 

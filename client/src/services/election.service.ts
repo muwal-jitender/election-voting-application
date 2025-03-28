@@ -57,7 +57,10 @@ export const updateElection = async (id: string, payload: IEditElection) => {
 };
 /** Get All Elections */
 export const getAllElections = async () => {
-  return await apiRequest<IElectionModel[]>(API_PATH.ELECTION, "GET");
+  return await apiRequest<IElectionDetail[]>(API_PATH.ELECTION, "GET");
+};
+export const geElectionResults = async () => {
+  return await apiRequest<IElectionDetail[]>(API_PATH.ELECTION_RESULTS, "GET");
 };
 /** Get All Candidates by Elections id */
 export const getCandidatesByElectionId = async (id: string) => {

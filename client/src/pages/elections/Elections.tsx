@@ -2,6 +2,7 @@ import "./Elections.css";
 
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { getAllElections } from "services/election.service";
 import { IElectionModel, RootState } from "types";
 
 import Election from "components/election/Election";
@@ -10,7 +11,6 @@ import ConfirmModal from "components/modals/ConfirmModal";
 import UpdateElectionModal from "components/modals/UpdateElectionModal";
 import ApiErrorMessage from "components/ui/ApiErrorMessage";
 import Button from "components/ui/Button";
-import { getAllElections } from "services/election.service";
 import { UiActions } from "store/ui-slice";
 import { IErrorResponse } from "types/ResponseModel";
 

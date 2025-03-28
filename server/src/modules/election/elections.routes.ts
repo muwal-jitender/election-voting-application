@@ -16,14 +16,16 @@ electionRouter.post(
     await electionController.create(req, res, next);
   }
 );
-
-electionRouter.get("/", async (req, res, next) => {
+electionRouter.get("/elections-result", async (req, res, next) => {
+  await electionController.getElectionResult(req, res, next);
+});
+electionRouter.get("/", isAdmin, async (req, res, next) => {
   await electionController.get(req, res, next);
 });
 electionRouter.get("/:id", isAdmin, async (req, res, next) => {
   await electionController.getById(req, res, next);
 });
-electionRouter.get("/:id/details", async (req, res, next) => {
+electionRouter.get("/:id/details", isAdmin, async (req, res, next) => {
   await electionController.getDetailsById(req, res, next);
 });
 electionRouter.delete("/:id", isAdmin, async (req, res, next) => {
@@ -37,6 +39,7 @@ electionRouter.patch(
     await electionController.update(req, res, next);
   }
 );
+
 electionRouter.get("/:id/candidates", async (req, res, next) => {
   await electionController.getCandidatesByElectionId(req, res, next);
 });
