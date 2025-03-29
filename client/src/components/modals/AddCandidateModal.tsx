@@ -63,7 +63,7 @@ const AddCandidateModal: React.FC<AddCandidateModalProp> = ({
             <IoMdClose />
           </button>
         </header>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
           <ApiErrorMessage errors={serverErrors} />
 
           <div>

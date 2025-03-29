@@ -49,7 +49,7 @@ const Register = () => {
     <section className="register">
       <div className="container register__container">
         <h2>Register</h2>
-        <form className="form" onSubmit={handleSubmit(onSubmit)}>
+        <form className="form" onSubmit={handleSubmit(onSubmit)} noValidate>
           {/* ✅ Display Server-Side Validation Error messages */}
           <ApiErrorMessage errors={serverErrors} />
 
