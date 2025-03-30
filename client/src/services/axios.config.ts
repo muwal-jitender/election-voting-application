@@ -1,6 +1,6 @@
 import axios from "axios";
-import { useUser } from "context/UserContext";
 import { useNavigate } from "react-router-dom";
+import { IUserResponse } from "types";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL?.trim();
 
@@ -15,6 +15,8 @@ const api = axios.create({
 export const setupAxiosInterceptors = (
   setLoading: (loading: boolean) => void,
   navigate: ReturnType<typeof useNavigate>,
+  user: IUserResponse | null,
+  setUser: (user: IUserResponse | null) => void,
 ) => {
   api.interceptors.request.use(
     (config) => {
@@ -35,7 +37,7 @@ export const setupAxiosInterceptors = (
     },
     (error) => {
       setLoading(false);
-      const { setUser, user } = useUser();
+
       // ✅ Redirect user to Login page if unauthorized
       if (error.status === 401) {
         navigate("/");

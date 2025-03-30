@@ -5,16 +5,18 @@ import { IoIosMoon, IoMdSunny } from "react-icons/io";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { getTheme, setTheme } from "../../utils/theme.utils";
 
+import { useUser } from "context/UserContext";
 import { setupAxiosInterceptors } from "../../services/axios.config";
 import Loader from "./Loader";
 
 const PublicLayout: React.FC = () => {
   const [darkTheme, setDarkTheme] = useState(getTheme());
   const [loading, setLoading] = useState(false);
+  const { setUser, user } = useUser();
   const navigate = useNavigate();
   useEffect(() => {
-    setupAxiosInterceptors(setLoading, navigate); // ✅ Ensure Interceptors are Set Up Once
-  }, [navigate]);
+    setupAxiosInterceptors(setLoading, navigate, user, setUser); // ✅ Ensure Interceptors are Set Up Once
+  }, [navigate, user, setUser]);
 
   useEffect(() => {
     document.body.className = getTheme();

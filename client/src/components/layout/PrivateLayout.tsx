@@ -3,25 +3,26 @@ import "./PrivateLayout.css";
 import React, { useEffect, useState } from "react";
 import { IoIosMoon, IoMdSunny } from "react-icons/io";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
-import { getTheme, setTheme } from "../../utils/theme.utils";
+import { getTheme, setTheme } from "utils/theme.utils";
 
 import { useUser } from "context/UserContext";
 import { AiOutlineClose } from "react-icons/ai";
 import { HiOutlineBars3 } from "react-icons/hi2";
+import { setupAxiosInterceptors } from "services/axios.config";
 import { logout } from "services/voter.service";
-import { setupAxiosInterceptors } from "../../services/axios.config";
 import Loader from "./Loader";
 
 const PrivateLayout: React.FC = () => {
   const [showNav, setShowNav] = useState(false);
   const [darkTheme, setDarkTheme] = useState(getTheme());
   const [loading, setLoading] = useState(false);
-  const { isAdmin, logout: userLogout } = useUser();
+  const { isAdmin, logout: userLogout, setUser, user } = useUser();
+
   const navigate = useNavigate();
 
   useEffect(() => {
-    setupAxiosInterceptors(setLoading, navigate); // ✅ Ensure Interceptors are Set Up Once
-  }, [navigate]);
+    setupAxiosInterceptors(setLoading, navigate, user, setUser); // ✅ Ensure Interceptors are Set Up Once
+  }, [navigate, user, setUser]);
 
   // Show or hide nav on page load and window resize
   useEffect(() => {
