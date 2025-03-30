@@ -1,5 +1,6 @@
 import "./index.css";
 
+import { ThemeProvider } from "context/ThemeContext";
 import { UserProvider } from "context/UserContext";
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -12,10 +13,12 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <UserProvider>
-        <App />
-      </UserProvider>
-    </Provider>
+    <ThemeProvider>
+      <Provider store={store}>
+        <UserProvider>
+          <App />
+        </UserProvider>
+      </Provider>
+    </ThemeProvider>
   </React.StrictMode>,
 );

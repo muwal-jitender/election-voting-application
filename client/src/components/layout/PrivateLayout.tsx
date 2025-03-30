@@ -3,8 +3,8 @@ import "./PrivateLayout.css";
 import React, { useEffect, useState } from "react";
 import { IoIosMoon, IoMdSunny } from "react-icons/io";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
-import { getTheme, setTheme } from "utils/theme.utils";
 
+import { useTheme } from "context/ThemeContext";
 import { useUser } from "context/UserContext";
 import { AiOutlineClose } from "react-icons/ai";
 import { HiOutlineBars3 } from "react-icons/hi2";
@@ -14,7 +14,7 @@ import Loader from "./Loader";
 
 const PrivateLayout: React.FC = () => {
   const [showNav, setShowNav] = useState(false);
-  const [darkTheme, setDarkTheme] = useState(getTheme());
+  const { name: theme, toggleTheme } = useTheme();
   const [loading, setLoading] = useState(false);
   const { isAdmin, logout: userLogout, setUser, user } = useUser();
 
@@ -43,7 +43,7 @@ const PrivateLayout: React.FC = () => {
   };
 
   // Function to toggle theme
-  const toggleTheme = () => {
+  const handleNavToggle = () => {
     showHideNav();
   };
 
@@ -54,14 +54,6 @@ const PrivateLayout: React.FC = () => {
     showHideNav();
   };
 
-  useEffect(() => {
-    document.body.className = getTheme();
-  }, [darkTheme]);
-
-  // Function to toggle dark theme
-  const changeThemeHandler = () => {
-    setTheme(setDarkTheme);
-  };
   return (
     <>
       {loading && <Loader />}
@@ -75,11 +67,11 @@ const PrivateLayout: React.FC = () => {
             {showNav && (
               <menu>
                 {isAdmin && (
-                  <NavLink to="/elections" onClick={toggleTheme}>
+                  <NavLink to="/elections" onClick={handleNavToggle}>
                     Elections
                   </NavLink>
                 )}
-                <NavLink to="/results" onClick={toggleTheme}>
+                <NavLink to="/results" onClick={handleNavToggle}>
                   Results
                 </NavLink>
                 <NavLink to="/" onClick={handleLogout}>
@@ -87,8 +79,8 @@ const PrivateLayout: React.FC = () => {
                 </NavLink>
               </menu>
             )}
-            <button className="theme__toggle-btn" onClick={changeThemeHandler}>
-              {darkTheme ? <IoMdSunny /> : <IoIosMoon />}
+            <button className="theme__toggle-btn" onClick={toggleTheme}>
+              {theme === "dark" ? <IoMdSunny /> : <IoIosMoon />}
             </button>
             <button
               className="nav__toggle-btn"
