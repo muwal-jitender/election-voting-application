@@ -1,11 +1,11 @@
 import "./Candidates.css";
 
 import { useCallback, useEffect, useState } from "react";
-import { electionService } from "services/election.service";
 
 import Candidate from "components/candidate/Candidate";
 import ConfirmModal from "components/modals/ConfirmModal";
 import { useParams } from "react-router-dom";
+import { electionService } from "services/election.service";
 import { ICandidateModel } from "types";
 
 const Candidates = () => {
@@ -53,8 +53,8 @@ const Candidates = () => {
     if (voted)
       return (
         <>
-          <h1 className="danger">Already Voted</h1>
-          <p className="danger">
+          <h1 className="primary">Already Voted</h1>
+          <p className="primary">
             You have already voted. Each voter is allowed to cast only one vote.
           </p>
         </>
@@ -72,8 +72,8 @@ const Candidates = () => {
       );
     return (
       <>
-        <h1 className="danger">Inactive Election</h1>
-        <p className="danger">
+        <h1 className="primary">Inactive Election</h1>
+        <p className="primary">
           Currently, no candidates have been nominated for this election.
         </p>
       </>

@@ -141,6 +141,9 @@ button {
   color: var(--color-danger);
   font-weight: 600;
 }
+.primary {
+  color: var(--color-primary);
+}
 
 .btn-container {
   display: flex;
