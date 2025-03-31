@@ -13,7 +13,7 @@ import PasswordInput from "components/ui/PasswordInput";
 import TextInput from "components/ui/TextInput";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { registerVoter } from "services/voter.service";
+import { voterService } from "services/voter.service";
 import { IRegisterModel } from "types/index";
 import { IErrorResponse } from "types/ResponseModel";
 
@@ -38,7 +38,7 @@ const Register = () => {
   const onSubmit = async (formData: IRegisterModel) => {
     // Submit form data
     try {
-      await registerVoter(formData);
+      await voterService.register(formData);
       navigate("/");
     } catch (error: unknown) {
       setServerErrors((error as IErrorResponse).errorMessages || []);

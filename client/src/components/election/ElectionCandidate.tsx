@@ -3,7 +3,7 @@ import "./ElectionCandidate.css";
 import { useState } from "react";
 import { IoMdTrash } from "react-icons/io";
 import { useDispatch } from "react-redux";
-import { removeCandidate } from "services/candidate.service";
+import { candidateService } from "services/candidate.service";
 import { UiActions } from "store/ui-slice";
 import { ICandidateModel } from "types";
 import { IErrorResponse } from "types/ResponseModel";
@@ -25,7 +25,7 @@ const ElectionCandidate = ({
         heading: "Are you sure?",
         callback: async () => {
           try {
-            await removeCandidate(candidateId);
+            await candidateService.remove(candidateId);
             onCandidateDeleted(candidateId);
           } catch (error: unknown) {
             setErrors((error as IErrorResponse).errorMessages || []);

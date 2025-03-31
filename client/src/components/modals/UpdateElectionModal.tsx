@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
-import { updateElection } from "../../services/election.service";
+import { electionService } from "../../services/election.service";
 import { UiActions } from "../../store/ui-slice";
 import { IErrorResponse } from "../../types/ResponseModel";
 import { editElectionValidationSchema } from "../../validations/schemas/election.validation";
@@ -51,7 +51,7 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
   // Handle Form Submission
   const onSubmit = async (formData: IEditElection) => {
     try {
-      const response = await updateElection(election?.id, formData);
+      const response = await electionService.update(election?.id, formData);
       onElectionUpdated(response.data as IElectionModel);
       // Close Modal popup
       closeElectionModal();

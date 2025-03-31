@@ -2,6 +2,7 @@ import "./ElectionDetails.css";
 
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { electionService } from "services/election.service";
 import { ICandidateModel, IElectionModel, IVoterModel, RootState } from "types";
 
 import ElectionCandidate from "components/election/ElectionCandidate";
@@ -9,7 +10,6 @@ import AddCandidateModal from "components/modals/AddCandidateModal";
 import ConfirmModal from "components/modals/ConfirmModal";
 import { IoAddOutline } from "react-icons/io5";
 import { useParams } from "react-router-dom";
-import { getFullDetail } from "services/election.service";
 import { UiActions } from "store/ui-slice";
 import { IErrorResponse } from "types/ResponseModel";
 
@@ -33,7 +33,7 @@ const ElectionDetails = () => {
   /** ✅ Fetch Election Details */
   const getElections = useCallback(async () => {
     try {
-      const result = await getFullDetail(id as string);
+      const result = await electionService.getFullDetail(id as string);
       setElection(result.data as IElectionModel);
       setCandidates(result.data?.candidates as ICandidateModel[]);
       setVoters(result.data?.voters as IVoterModel[]);

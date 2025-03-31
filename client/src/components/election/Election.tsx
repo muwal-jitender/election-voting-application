@@ -7,7 +7,7 @@ import Button from "components/ui/Button";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import { deleteElection } from "services/election.service";
+import { electionService } from "services/election.service";
 import { UiActions } from "store/ui-slice";
 
 const Election = ({
@@ -31,7 +31,7 @@ const Election = ({
         heading: "Are you sure?",
         callback: async () => {
           try {
-            await deleteElection(id);
+            await electionService.delete(id);
             onElectionDeleted(id);
           } catch (error: unknown) {
             setServerErrors((error as IErrorResponse).errorMessages || []);

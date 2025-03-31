@@ -9,7 +9,7 @@ import { useUser } from "context/UserContext";
 import { AiOutlineClose } from "react-icons/ai";
 import { HiOutlineBars3 } from "react-icons/hi2";
 import { setupAxiosInterceptors } from "services/axios.config";
-import { logout } from "services/voter.service";
+import { voterService } from "services/voter.service";
 import Loader from "./Loader";
 
 const PrivateLayout: React.FC = () => {
@@ -49,7 +49,7 @@ const PrivateLayout: React.FC = () => {
 
   // Logout user
   const handleLogout = async () => {
-    await logout();
+    await voterService.logout();
     userLogout();
     showHideNav();
   };

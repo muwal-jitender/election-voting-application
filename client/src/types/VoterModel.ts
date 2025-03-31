@@ -1,3 +1,5 @@
+import { IApiResponse } from "./ResponseModel";
+
 export interface IVoterModel {
   id: string;
   fullName: string;
@@ -29,3 +31,10 @@ export interface IUserDetail
     IVoterModel,
     "id" | "password" | "createdAt" | "votedElectionIds"
   > {}
+
+export interface IVoterService {
+  register: (voter: IRegisterModel) => Promise<IApiResponse<IVoterModel>>;
+  login: (user: ILoginModel) => Promise<IApiResponse<IUserResponse>>;
+  logout: () => Promise<IApiResponse<null>>;
+  me: () => Promise<IApiResponse<IUserResponse>>;
+}

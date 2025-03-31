@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 
 import ResultElection from "components/election/ResultElection";
 import ApiErrorMessage from "components/ui/ApiErrorMessage";
-import { geElectionResults } from "services/election.service";
+import { electionService } from "services/election.service";
 import { IElectionDetail } from "types";
 import { IErrorResponse } from "types/ResponseModel";
 
@@ -15,7 +15,7 @@ const Results = () => {
   useEffect(() => {
     const getElections = async () => {
       try {
-        const result = await geElectionResults();
+        const result = await electionService.getResults();
         setElections(result.data as IElectionDetail[]);
       } catch (error: unknown) {
         setErrors((error as IErrorResponse).errorMessages || []);

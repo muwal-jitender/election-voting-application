@@ -10,7 +10,7 @@ import TextInput from "components/ui/TextInput";
 import { useUser } from "context/UserContext";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { login } from "services/voter.service";
+import { voterService } from "services/voter.service";
 import { ILoginModel } from "types/index";
 import { IErrorResponse } from "types/ResponseModel";
 import { loginValidationSchema } from "validations/schemas/voter.validation";
@@ -33,7 +33,7 @@ const Login = () => {
   const onSubmit = async (formData: ILoginModel) => {
     // Submit form data
     try {
-      const result = await login(formData);
+      const result = await voterService.login(formData);
       // Save user in local storage
       const user = result.data;
 

@@ -1,10 +1,7 @@
 import "./Candidates.css";
 
 import { useCallback, useEffect, useState } from "react";
-import {
-  checkIfVoterAlreadyVoted,
-  getCandidatesByElectionId,
-} from "services/election.service";
+import { electionService } from "services/election.service";
 
 import Candidate from "components/candidate/Candidate";
 import ConfirmModal from "components/modals/ConfirmModal";
@@ -24,7 +21,7 @@ const Candidates = () => {
   // Fetch Election Candidates
   const getElections = useCallback(async (id: string) => {
     try {
-      const result = await getCandidatesByElectionId(id);
+      const result = await electionService.getCandidatesByElectionId(id);
       setElectionCandidates(result.data as ICandidateModel[]);
     } catch (error) {
       console.error("Error fetching candidates:", error);
@@ -34,7 +31,7 @@ const Candidates = () => {
   // Check if Voter has Already Voted
   const checkIfVoted = useCallback(async (id: string) => {
     try {
-      const result = await checkIfVoterAlreadyVoted(id);
+      const result = await electionService.checkIfVoterAlreadyVoted(id);
       result.data && setVoted(result.data.voted);
     } catch (error) {
       console.error("Error checking voter status:", error);

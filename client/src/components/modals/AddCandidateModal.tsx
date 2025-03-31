@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
-import { createCandidate } from "../../services/candidate.service";
+import { candidateService } from "../../services/candidate.service";
 import { UiActions } from "../../store/ui-slice";
 import { IErrorResponse } from "../../types/ResponseModel";
 import { addCandidateValidationSchema } from "../../validations/schemas/candidate.validation";
@@ -46,7 +46,7 @@ const AddCandidateModal: React.FC<AddCandidateModalProp> = ({
 
   const onSubmit = async (formData: IAddCandidateModel) => {
     try {
-      const response = await createCandidate(formData, electionId);
+      const response = await candidateService.create(formData, electionId);
       onCandidateAdded(response.data as ICandidateModel);
       closeAddCandidateModal();
     } catch (error: unknown) {

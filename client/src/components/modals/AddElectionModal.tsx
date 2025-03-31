@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
-import { createElection } from "../../services/election.service";
+import { electionService } from "../../services/election.service";
 import { UiActions } from "../../store/ui-slice";
 import { IErrorResponse } from "../../types/ResponseModel";
 import { addElectionValidationSchema } from "../../validations/schemas/election.validation";
@@ -43,7 +43,7 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
   // Handle Form Submission
   const onSubmit = async (formData: IAddElection) => {
     try {
-      const response = await createElection(formData);
+      const response = await electionService.create(formData);
       onElectionAdded(response.data as IElectionModel);
       // Close Modal popup
       closeElectionModal();

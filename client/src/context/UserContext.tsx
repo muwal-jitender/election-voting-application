@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-import { me } from "services/voter.service";
+import { voterService } from "services/voter.service";
 import { IUserResponse } from "types";
 
 type UserContextType = {
@@ -22,7 +22,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   const fetchUser = async () => {
     try {
       setLoading(true);
-      const res = await me(); // HTTP-only cookie sends auth
+      const res = await voterService.me(); // HTTP-only cookie sends auth
       if (res.data) {
         setUserState(res.data);
       } else {

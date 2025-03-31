@@ -4,7 +4,7 @@ import ApiErrorMessage from "components/ui/ApiErrorMessage";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { VoteCandidate } from "services/candidate.service";
+import { candidateService } from "services/candidate.service";
 import { UiActions } from "store/ui-slice";
 import { voteActions } from "store/vote-slice";
 import { ICandidateModel } from "types";
@@ -22,7 +22,7 @@ const Candidate = ({ ...props }: ICandidateModel) => {
         heading: "Please confirm your vote",
         callback: async () => {
           try {
-            await VoteCandidate(props.id, props.electionId);
+            await candidateService.vote(props.id, props.electionId);
             navigate("/congrats");
           } catch (error: unknown) {
             setErrors((error as IErrorResponse).errorMessages || []);

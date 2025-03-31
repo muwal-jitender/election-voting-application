@@ -25,7 +25,7 @@ export const API_PATH = {
 };
 
 /** Utility function to replace ":id" */
-export const getApiPath = (
+export const resolveApiPath = (
   path: string,
   params: Record<string, string | number>,
 ) => {
