@@ -6,12 +6,9 @@ import { VoterDocument } from "./voter.model";
 import jwt from "jsonwebtoken";
 import { env } from "utils/env-config.utils";
 import type { StringValue } from "ms";
-import {
-  ConflictError,
-  NotFoundError,
-  UnauthorizedError,
-} from "utils/exceptions.utils";
+import { AppError } from "utils/exceptions.utils";
 import { stripMongoMeta } from "utils/utils";
+import { StatusCodes } from "http-status-codes";
 // Voter Service
 @singleton()
 export class VoterService {
@@ -23,8 +20,9 @@ export class VoterService {
     // ✅ Checking if email already exists
     const emailExists = await this.findByEmail(data.email);
     if (emailExists) {
-      throw new ConflictError(
-        "This email is already registered. Try signing in instead."
+      throw new AppError(
+        "This email is already registered. Try signing in instead.",
+        StatusCodes.CONFLICT
       );
     }
     // ✅ Explicitly set isAdmin to false, so that no external voter can set itself as Admin
@@ -45,7 +43,7 @@ export class VoterService {
   }
   async getUserDetail(voterId: string | undefined) {
     if (!voterId) {
-      throw new NotFoundError("No logged-in user id found");
+      throw new AppError("No logged-in user id found", StatusCodes.NOT_FOUND);
     }
     // ✅ Fetch only required fields
     const voter = await this.voterRepository.findDocumentById(
@@ -54,7 +52,7 @@ export class VoterService {
       undefined,
       ["fullName", "email", "isAdmin"]
     );
-    if (!voter) throw new NotFoundError("User not found");
+    if (!voter) throw new AppError("User not found", StatusCodes.NOT_FOUND);
     else return stripMongoMeta(voter);
   }
   async findByEmail(email: string) {
@@ -76,7 +74,10 @@ export class VoterService {
     );
     // ✅ Verify if voter exists and password also matches
     if (!voter || !(await bcrypt.compare(password, voter.password))) {
-      throw new UnauthorizedError("Invalid username or password");
+      throw new AppError(
+        "Invalid username or password",
+        StatusCodes.UNAUTHORIZED
+      );
     }
 
     return voter;

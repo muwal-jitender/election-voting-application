@@ -9,7 +9,7 @@ import { ElectionService } from "./election.service";
 
 import { StatusCodes } from "http-status-codes";
 
-import { NotFoundError } from "utils/exceptions.utils";
+import { AppError } from "utils/exceptions.utils";
 import { CandidateService } from "modules/candidate/candidate.service";
 import { VoterService } from "modules/voter/voter.service";
 import { validateMongoId } from "utils/utils";
@@ -91,7 +91,7 @@ export class ElectionController {
 
       const election = await this.electionService.getById(id);
       if (!election) {
-        throw new NotFoundError("Election not found.");
+        throw new AppError("Election not found.", StatusCodes.NOT_FOUND);
       }
 
       return res
@@ -114,7 +114,7 @@ export class ElectionController {
       const election = await electionPromise;
 
       if (!election) {
-        throw new NotFoundError("Election Not Found");
+        throw new AppError("Election Not Found", StatusCodes.NOT_FOUND);
       }
 
       // ✅ Send optimized response
@@ -228,11 +228,11 @@ export class ElectionController {
       let hasVoted = false;
       const voterId = req.user?.id;
       if (!voterId) {
-        throw new NotFoundError("Voter not found");
+        throw new AppError("Voter not found", StatusCodes.NOT_FOUND);
       }
       const election = await this.electionService.getVotersWhoAlreadyVoted(id);
       if (!election) {
-        throw new NotFoundError("Election not found");
+        throw new AppError("Election not found", StatusCodes.NOT_FOUND);
       }
       if (
         election.voters.length > 0 &&

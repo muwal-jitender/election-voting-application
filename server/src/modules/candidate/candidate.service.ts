@@ -4,11 +4,12 @@ import { CandidateDTO } from "./candidate.dto";
 import { CandidateRepository } from "./candidate.repository";
 import mongoose from "mongoose";
 import { ElectionRepository } from "modules/election/election.repository";
-import { BadRequestError, NotFoundError } from "utils/exceptions.utils";
+import { AppError } from "utils/exceptions.utils";
 import { deleteFile, uploadFile } from "utils/file.utils";
 import { VoterRepository } from "modules/voter/voter.repository";
 import { FileArray } from "express-fileupload";
 import { ElectionService } from "modules/election/election.service";
+import { StatusCodes } from "http-status-codes";
 // Voter Service
 @singleton()
 export class CandidateService {
@@ -70,7 +71,7 @@ export class CandidateService {
       const election =
         await this.electionService.getVotersWhoAlreadyVoted(electionId);
       if (!election) {
-        throw new BadRequestError("Election not found");
+        throw new AppError("Election not found", StatusCodes.BAD_REQUEST);
       }
 
       // ✅ Step 2: Ensure voter exists
@@ -78,7 +79,7 @@ export class CandidateService {
         election.voters.length > 0 &&
         election.voters.find((id) => id.toString() === voterId)
       ) {
-        throw new BadRequestError("Voter already voted");
+        throw new AppError("Voter already voted", StatusCodes.BAD_REQUEST);
       }
 
       // ✅ Step 3: Get Candidate and ensure it exists
@@ -88,7 +89,7 @@ export class CandidateService {
         session
       );
       if (!dbCandidate) {
-        throw new NotFoundError("Candidate not found");
+        throw new AppError("Candidate not found", StatusCodes.NOT_FOUND);
       }
 
       // ✅ Step 4: Get Election and ensure it exists
@@ -98,7 +99,7 @@ export class CandidateService {
         session
       );
       if (!dbElection) {
-        throw new NotFoundError("Election not found");
+        throw new AppError("Election not found", StatusCodes.NOT_FOUND);
       }
 
       // ✅ Step 5: Increment Candidate Vote Count (Efficient Update)
@@ -155,7 +156,7 @@ export class CandidateService {
       // ✅ Step 1: Find the candidate to get the `electionId`
       const candidate = await this.candidateRepository.findById(id);
       if (!candidate) {
-        throw new NotFoundError("Candidate not found");
+        throw new AppError("Candidate not found", StatusCodes.NOT_FOUND);
       }
 
       // ✅ Step 2: Remove candidate from `candidates` collection

@@ -3,7 +3,7 @@ import { inject, singleton } from "tsyringe";
 import { ElectionDTO } from "./election.dto";
 import { ElectionRepository } from "./election.repository";
 import mongoose from "mongoose";
-import { NotFoundError } from "utils/exceptions.utils";
+import { AppError } from "utils/exceptions.utils";
 import { CandidateRepository } from "modules/candidate/candidate.repository";
 
 import { deleteFromCloudinary } from "config/cloudinary.config";
@@ -12,6 +12,7 @@ import { FileArray } from "express-fileupload";
 import { deleteFile, uploadFile } from "utils/file.utils";
 
 import { ElectionDocument } from "./election.model";
+import { StatusCodes } from "http-status-codes";
 
 // Voter Service
 @singleton()
@@ -55,7 +56,7 @@ export class ElectionService {
       // ✅ Step 1: Validate election existence
       const existingElection = await this.getById(electionId);
       if (!existingElection) {
-        throw new NotFoundError("Election not found.");
+        throw new AppError("Election not found.", StatusCodes.NOT_FOUND);
       }
 
       // ✅ Step 2: Assign DTO
@@ -76,7 +77,7 @@ export class ElectionService {
         session
       );
       if (!updatedElection) {
-        throw new NotFoundError("Election update failed.");
+        throw new AppError("Election update failed.", StatusCodes.NOT_FOUND);
       }
 
       // ✅ Step 5: Update the DB
@@ -158,14 +159,15 @@ export class ElectionService {
     try {
       // ✅ Check if election exists before proceeding
       const election = await this.electionRepository.findById(id);
-      if (!election) throw new NotFoundError("Election not found");
+      if (!election)
+        throw new AppError("Election not found", StatusCodes.NOT_FOUND);
       // ✅ Delete all related records within a transaction
       await this.candidateRepository.deleteMany({ electionId: id }, session);
 
       // ✅ Delete the election itself
       deletedElection = await this.electionRepository.delete(id, session);
       if (!deletedElection) {
-        throw new NotFoundError("Election deletion failed.");
+        throw new AppError("Election deletion failed.", StatusCodes.NOT_FOUND);
       }
 
       await session.commitTransaction();

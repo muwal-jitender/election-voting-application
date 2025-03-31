@@ -9,7 +9,8 @@ import {
   validateImageFile,
 } from "./file-validate.utils";
 
-import { BadRequestError } from "./exceptions.utils";
+import { AppError } from "./exceptions.utils";
+import { StatusCodes } from "http-status-codes";
 import { UPLOADS_DIR } from "./file-validate.utils";
 import fs from "fs";
 import path from "path";
@@ -65,12 +66,15 @@ export const uploadFile = async (
     return oldImage; // Return old image url to be used
   } else if (!files?.[propertyName]) {
     // ✅ Insert Case
-    throw new BadRequestError(`${propertyName} is missing`);
+    throw new AppError(`${propertyName} is missing`, StatusCodes.BAD_REQUEST);
   }
 
   const file = files[propertyName];
   if (Array.isArray(file)) {
-    throw new BadRequestError("Multiple file uploads are not allowed.");
+    throw new AppError(
+      "Multiple file uploads are not allowed.",
+      StatusCodes.BAD_REQUEST
+    );
   }
 
   validateImageFile(file);
