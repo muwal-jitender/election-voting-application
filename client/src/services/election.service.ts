@@ -19,7 +19,7 @@ export const electionService: IElectionService = {
     const formData = new FormData();
     formData.append("title", payload.title);
     formData.append("description", payload.description);
-    formData.append("thumbnail", payload.thumbnail as File);
+    formData.append("thumbnail", payload.thumbnail);
 
     // ✅ Configure request headers
     const config: AxiosRequestConfig = {
