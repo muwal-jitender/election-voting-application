@@ -1,10 +1,10 @@
-import { IAddCandidateModel, ICandidateModel } from "types";
+import { IAddCandidateModel, ICandidateModel, ICandidateService } from "types";
 import { API_PATH, resolveApiPath } from "utils/api-path.utils";
 
 import { AxiosRequestConfig } from "axios";
 import { apiRequest } from "./api-request";
 
-export const candidateService = {
+export const candidateService: ICandidateService = {
   /** Create Election */
   create: async (payload: IAddCandidateModel, electionId: string) => {
     // ✅ Create FormData for file upload

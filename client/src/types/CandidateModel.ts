@@ -1,3 +1,5 @@
+import { IApiResponse } from "./ResponseModel";
+
 export interface ICandidateModel {
   id: string;
   fullName: string;
@@ -9,4 +11,16 @@ export interface ICandidateModel {
 export interface IAddCandidateModel
   extends Omit<ICandidateModel, "id" | "voteCount" | "image"> {
   image: File;
+}
+
+export interface ICandidateService {
+  create: (
+    payload: IAddCandidateModel,
+    electionId: string,
+  ) => Promise<IApiResponse<ICandidateModel>>;
+  remove: (id: string) => Promise<IApiResponse<ICandidateModel>>;
+  vote: (
+    id: string,
+    electionId: string,
+  ) => Promise<IApiResponse<ICandidateModel>>;
 }

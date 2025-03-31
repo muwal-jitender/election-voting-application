@@ -4,6 +4,7 @@ import {
   IEditElection,
   IElectionDetail,
   IElectionModel,
+  IElectionService,
   IVoterVotedResponse,
 } from "types";
 import { API_PATH, resolveApiPath } from "utils/api-path.utils";
@@ -11,7 +12,7 @@ import { API_PATH, resolveApiPath } from "utils/api-path.utils";
 import { AxiosRequestConfig } from "axios";
 import { apiRequest } from "./api-request";
 
-export const electionService = {
+export const electionService: IElectionService = {
   /** Create Election */
   create: async (payload: IAddElection) => {
     // ✅ Create FormData for file upload
