@@ -1,36 +1,46 @@
 import { NextFunction, Request, Response } from "express";
 
-// ✅ Custom Error Interface
-interface AppError {
-  statusCode: number;
-  message: string;
+import { StatusCodes } from "http-status-codes";
+import logger from "logger"; // ✅ Winston logger
+
+// ✅ Extended Error Interface
+interface AppError extends Error {
+  statusCode?: number;
   details?: any;
 }
 
-// ✅ Error Middleware to Catch All Errors
+// ✅ Global Error Handler Middleware
 export const errorHandler = (
   err: AppError,
   _req: Request,
   res: Response,
   _next: NextFunction
 ) => {
-  console.error("🔥 Error: ", err.message);
+  const statusCode = err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
+  const isProduction = process.env.NODE_ENV === "production";
 
   let errorMessages: string[] = [];
 
   if (Array.isArray(err.details) && err.details.length > 0) {
-    // Case: Validation errors (class-validator)
+    // Handle validation errors
     errorMessages = err.details.map((e) => Object.values(e)[0] as string);
   } else if (err.message) {
-    // Case: Custom thrown errors (e.g., "Email already exists")
     errorMessages = [err.message];
   } else {
-    // Case: Unexpected errors
     errorMessages = ["Something went wrong"];
   }
 
-  res.status(err.statusCode || 500).json({
+  // ✅ Log the error with Winston
+  logger.error(`❌ Error: ${err.message}`, {
+    stack: err.stack,
+    details: err.details || null,
+    statusCode,
+  });
+
+  // ✅ Send response to client
+  res.status(statusCode).json({
     message: err.message || "Internal Server Error",
     errorMessages,
+    ...(isProduction ? {} : { stack: err.stack }), // Show stack trace only in dev
   });
 };

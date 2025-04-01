@@ -9,6 +9,8 @@ import { VoterService } from "./voter.service";
 
 import { StatusCodes } from "http-status-codes";
 import { env } from "utils/env-config.utils";
+import logger from "logger";
+import { validateMongoId } from "utils/utils";
 
 @injectable()
 export class VoterController {
@@ -27,6 +29,7 @@ export class VoterController {
         data: safeNewVoter,
       });
     } catch (error: unknown) {
+      logger.error("❌ Registration failed", { error });
       next(error);
     }
   }
@@ -58,6 +61,7 @@ export class VoterController {
         },
       });
     } catch (error: unknown) {
+      logger.error(`⚠️ Login failed ➔ ${req.body?.email}`, { error });
       next(error);
     }
   }
@@ -65,9 +69,11 @@ export class VoterController {
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
+      validateMongoId(id);
       const voter = await this.voterService.getVoterById(id);
       res.status(StatusCodes.OK).json({ message: "Voter found", data: voter });
     } catch (error) {
+      logger.error(`❌ Error fetching voter ➔ ${req.params.id}`, { error });
       next(error);
     }
   }
@@ -79,15 +85,21 @@ export class VoterController {
       const voter = await this.voterService.getUserDetail(userId);
       res.status(StatusCodes.OK).json({ message: "User found", data: voter });
     } catch (error) {
+      logger.error(`❌ Failed to fetch user profile`, { error });
       next(error);
     }
   }
-  async logout(_req: Request, res: Response, _next: NextFunction) {
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: env.NODE_ENV === "production",
-      sameSite: "strict",
-    });
-    res.status(StatusCodes.OK).json({ message: "Logged out successfully" });
+  async logout(_req: Request, res: Response, next: NextFunction) {
+    try {
+      res.clearCookie("token", {
+        httpOnly: true,
+        secure: env.NODE_ENV === "production",
+        sameSite: "strict",
+      });
+      res.status(StatusCodes.OK).json({ message: "Logged out successfully" });
+    } catch (error) {
+      logger.error(`❌ Logout failed`, { error });
+      next(error);
+    }
   }
 }

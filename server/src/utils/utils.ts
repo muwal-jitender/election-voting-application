@@ -1,5 +1,6 @@
 import { AppError } from "./exceptions.utils";
 import { StatusCodes } from "http-status-codes";
+import logger from "logger";
 import mongoose from "mongoose";
 
 /**
@@ -9,6 +10,7 @@ import mongoose from "mongoose";
  */
 export const validateMongoId = (id: string, fieldName = "ID") => {
   if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    logger.warn(`⚠️ Invalid or missing ${fieldName} ➔ ${id}`);
     throw new AppError(
       `Invalid or missing ${fieldName}`,
       StatusCodes.BAD_REQUEST

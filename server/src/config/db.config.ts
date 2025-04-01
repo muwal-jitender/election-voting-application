@@ -1,4 +1,5 @@
 import { env } from "utils/env-config.utils"; // Import environment configs
+import logger from "logger";
 import mongoose from "mongoose";
 
 // ✅ MongoDB Connection Options for Stability
@@ -11,18 +12,18 @@ const mongoOptions = {
 export const connectDB = async () => {
   try {
     await mongoose.connect(env.DB_URI, mongoOptions);
-    console.log("✅ MongoDB Connected!");
+    logger.info("✅ MongoDB Connected!");
   } catch (error: unknown) {
-    console.error("❌ MongoDB Connection Failed:", (error as Error).stack);
+    logger.error("❌ MongoDB Connection Failed:", (error as Error).stack);
     process.exit(1);
   }
 };
 
 mongoose.connection.on("disconnected", () => {
-  console.warn("⚠️ MongoDB Disconnected! Retrying...");
+  logger.warn("⚠️ MongoDB Disconnected! Retrying...");
   connectDB();
 });
 
 mongoose.connection.on("error", (err) => {
-  console.error("❌ MongoDB Error:", err);
+  logger.error("❌ MongoDB Error:", err);
 });

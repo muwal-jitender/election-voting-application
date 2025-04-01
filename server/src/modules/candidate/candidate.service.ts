@@ -1,5 +1,4 @@
 import { inject, singleton } from "tsyringe";
-
 import { CandidateDTO } from "./candidate.dto";
 import { CandidateRepository } from "./candidate.repository";
 import mongoose from "mongoose";
@@ -10,7 +9,8 @@ import { VoterRepository } from "modules/voter/voter.repository";
 import { FileArray } from "express-fileupload";
 import { ElectionService } from "modules/election/election.service";
 import { StatusCodes } from "http-status-codes";
-// Voter Service
+import logger from "logger"; // ✅ Your Winston logger
+
 @singleton()
 export class CandidateService {
   constructor(
@@ -27,10 +27,10 @@ export class CandidateService {
     session.startTransaction();
     let newImageUrl: string | null = null;
     try {
-      // ✅ Step 1: Upload image on Cloud as well on Local Storage
+      logger.info(`🧾 Creating candidate ➔ ${data.fullName}`);
+
       newImageUrl = await uploadFile(files, "image", data.image);
 
-      // ✅ Step 1: Create the new candidate
       const newCandidate = await this.candidateRepository.create(
         {
           ...data,
@@ -38,100 +38,102 @@ export class CandidateService {
         },
         session
       );
-      // ✅ Step 2: Push the new candidate into the election's `candidates` array
+
       await this.electionRepository.update(
         data.electionId,
-        {
-          $push: { candidates: newCandidate.id },
-        },
+        { $push: { candidates: newCandidate.id } },
         session
       );
-      // ✅ Step 3: Commit the transaction if both operations succeed
+
       await session.commitTransaction();
       session.endSession();
 
+      logger.info(`✅ Candidate created successfully ➔ ${newCandidate.id}`);
       return newCandidate;
     } catch (error) {
-      // ❌ Remove the image in case of an exception
       if (newImageUrl) {
         await deleteFile(newImageUrl);
       }
-      // ❌ If any operation fails, rollback the transaction
+
       await session.abortTransaction();
       session.endSession();
+
+      logger.error(`❌ Failed to create candidate ➔ ${data.fullName}`, {
+        error,
+      });
       throw error;
     }
   }
-  /** Update Candidate, Voter, and Election collections once a user has voted */
+
   async voteCandidate(id: string, voterId: string, electionId: string) {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      // ✅ Step 1: Ensure election exists
+      logger.info(
+        `🗳️ Voting ➔ candidate: ${id}, voter: ${voterId}, election: ${electionId}`
+      );
+
       const election =
         await this.electionService.getVotersWhoAlreadyVoted(electionId);
       if (!election) {
+        logger.warn(`⚠️ Election not found ➔ ${electionId}`);
         throw new AppError("Election not found", StatusCodes.BAD_REQUEST);
       }
 
-      // ✅ Step 2: Ensure voter exists
-      if (
-        election.voters.length > 0 &&
-        election.voters.find((id) => id.toString() === voterId)
-      ) {
+      if (election.voters.find((id) => id.toString() === voterId)) {
+        logger.warn(
+          `⚠️ Voter already voted ➔ voter: ${voterId}, election: ${electionId}`
+        );
         throw new AppError("Voter already voted", StatusCodes.BAD_REQUEST);
       }
 
-      // ✅ Step 3: Get Candidate and ensure it exists
       const dbCandidate = await this.candidateRepository.findById(
         id,
         [],
         session
       );
       if (!dbCandidate) {
+        logger.warn(`⚠️ Candidate not found ➔ ${id}`);
         throw new AppError("Candidate not found", StatusCodes.NOT_FOUND);
       }
 
-      // ✅ Step 4: Get Election and ensure it exists
       const dbElection = await this.electionRepository.findById(
         electionId,
         [],
         session
       );
       if (!dbElection) {
+        logger.warn(`⚠️ Election not found ➔ ${electionId}`);
         throw new AppError("Election not found", StatusCodes.NOT_FOUND);
       }
 
-      // ✅ Step 5: Increment Candidate Vote Count (Efficient Update)
-      const result = await this.candidateRepository.update(
+      await this.candidateRepository.update(
         id,
-        { $inc: { voteCount: 1 } }, // ✅ Efficient increment without fetching full document
+        { $inc: { voteCount: 1 } },
         session
       );
-
-      // ✅ Step 6: Update Election with Voter ID
       await this.electionRepository.update(
         electionId,
-        { $push: { voters: voterId } }, // ✅ Use `_id` not `id`
+        { $push: { voters: voterId } },
         session
       );
-
-      // ✅ Step 7: Update Voter with Election ID
       await this.voterRepository.update(
         voterId,
-        { $push: { votedElectionIds: dbElection._id } }, // ✅ Use `_id` not `id`
+        { $push: { votedElectionIds: dbElection._id } },
         session
       );
 
-      // ✅ Step 8: Commit transaction before returning
       await session.commitTransaction();
       session.endSession();
 
-      return result;
+      logger.info(
+        `✅ Vote cast successfully ➔ voter: ${voterId}, candidate: ${id}`
+      );
+      return dbCandidate;
     } catch (error) {
-      // ❌ Rollback the transaction if anything fails
       await session.abortTransaction();
       session.endSession();
+      logger.error("❌ Vote operation failed", { error });
       throw error;
     }
   }
@@ -139,12 +141,15 @@ export class CandidateService {
   async getAll() {
     return await this.candidateRepository.findAll();
   }
+
   async getById(id: string) {
     return await this.candidateRepository.findById(id, ["electionId"]);
   }
+
   async findByIds(ids: string[]) {
     return await this.candidateRepository.findByIds(ids);
   }
+
   async getAllByElectionId(id: string) {
     return await this.candidateRepository.findAll({ electionId: id });
   }
@@ -153,46 +158,38 @@ export class CandidateService {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-      // ✅ Step 1: Find the candidate to get the `electionId`
+      logger.info(`🗑️ Deleting candidate ➔ ${id}`);
       const candidate = await this.candidateRepository.findById(id);
       if (!candidate) {
+        logger.warn(`⚠️ Candidate not found ➔ ${id}`);
         throw new AppError("Candidate not found", StatusCodes.NOT_FOUND);
       }
 
-      // ✅ Step 2: Remove candidate from `candidates` collection
       await this.candidateRepository.delete(id, session);
-
-      // ✅ Step 3: Remove candidate from the `election.candidates` array
       await this.electionRepository.update(
         candidate.electionId,
-        {
-          $pull: { candidates: id }, // ✅ Removes the candidate ID from the array
-        },
+        { $pull: { candidates: id } },
         session
       );
 
-      // ✅ Step 4: Remove candidate image from cloudinary and locally
       if (candidate.image) {
         await deleteFile(candidate.image);
       }
 
-      // ✅ Step 4: Commit the transaction
       await session.commitTransaction();
       session.endSession();
+
+      logger.info(`✅ Candidate deleted successfully ➔ ${id}`);
     } catch (error) {
-      // ❌ Rollback the transaction if anything fails
       await session.abortTransaction();
       session.endSession();
+      logger.error(`❌ Failed to delete candidate ➔ ${id}`, { error });
       throw error;
     }
   }
 
-  /**
-   * Delete candidates based on Election-Id
-   * @param electionId
-   * @returns
-   */
   async deleteMany(electionId: string) {
+    logger.info(`🧹 Deleting candidates for election ➔ ${electionId}`);
     return await this.candidateRepository.deleteMany({ electionId });
   }
 }

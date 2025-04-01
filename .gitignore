@@ -44,3 +44,6 @@ Thumbs.db
 .env
 dist
 uploads
+
+# Ignore winston log files
+logs/
