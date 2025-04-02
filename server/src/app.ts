@@ -10,11 +10,13 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import { env } from "utils/env-config.utils";
 import { errorHandler } from "middleware/error.middleware";
+import { requestLogger } from "middleware/logger.middleware";
 import router from "core/base.routes";
 
 dotenv.config();
 
 const app = express();
+app.use(requestLogger); // ✅ All incoming requests logged to Winston
 const PORT = env.PORT || 5000;
 
 // 1️⃣ CORS first — allows cookies to be accepted from frontend

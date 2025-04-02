@@ -63,7 +63,7 @@ if (env.NODE_ENV !== "production") {
 export default logger;
 
 // Optional: Stream for morgan integration
-export const loggerStream = {
+export const morganStream = {
   write: (message: string) => {
     logger.info(message.trim());
   },
