@@ -4,9 +4,12 @@ import React, { useEffect, useState } from "react";
 import { IoIosMoon, IoMdSunny } from "react-icons/io";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 
+import logoSmall from "assets/images/logo/logo-small.png";
+import logo from "assets/images/logo/logo.png";
 import { useTheme } from "context/ThemeContext";
 import { useUser } from "context/UserContext";
 import { AiOutlineClose } from "react-icons/ai";
+import { FaUser } from "react-icons/fa";
 import { HiOutlineBars3 } from "react-icons/hi2";
 import { setupAxiosInterceptors } from "services/axios.config";
 import { voterService } from "services/voter.service";
@@ -68,7 +71,10 @@ const PrivateLayout: React.FC = () => {
               <menu>
                 {isAdmin && (
                   <NavLink to="/elections" onClick={handleNavToggle}>
-                    Elections
+                    <picture>
+                      <source media="(max-width: 600px)" srcSet={logoSmall} />
+                      <img src={logo} alt="Votely Logo" className="nav__logo" />
+                    </picture>
                   </NavLink>
                 )}
                 <NavLink to="/results" onClick={handleNavToggle}>
@@ -82,6 +88,11 @@ const PrivateLayout: React.FC = () => {
             <button className="theme__toggle-btn" onClick={toggleTheme}>
               {theme === "dark" ? <IoMdSunny /> : <IoIosMoon />}
             </button>
+            <div>
+              <p>
+                <FaUser /> {user?.fullName}{" "}
+              </p>
+            </div>
             <button
               className="nav__toggle-btn"
               onClick={() => setShowNav(!showNav)}
