@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="12.8 18.4 212 71.2" style="max-height: 500px" width="212" height="71.2">
+  <style>
+    .title { font-family: Inter, sans-serif; fill: #fff; font-size: 32px; font-weight: bold; }
+    .tagline { font-family: Inter, sans-serif; fill: #fff; font-size: 14px; }
+  </style>
+  <rect fill="rgb(15, 89, 193)" height="100%" width="100%"/>
+  <g transform="translate(20, 25)">
+    <rect fill="#fff" height="30" width="30" y="0" x="0"/>
+    <polyline stroke-width="3" stroke="rgb(15, 89, 193)" fill="none" points="6,15 12,21 24,9"/>
+    <text class="title" y="20" x="45">Votely</text>
+    <text class="tagline" y="40" x="45">where every vote count</text>
+  </g>
+</svg>

@@ -5,7 +5,7 @@ import { IoIosMoon, IoMdSunny } from "react-icons/io";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 
 import logoSmall from "assets/images/logo/logo-small.png";
-import logo from "assets/images/logo/logo.png";
+import logo from "assets/images/logo/logo.svg";
 import { useTheme } from "context/ThemeContext";
 import { useUser } from "context/UserContext";
 import { AiOutlineClose } from "react-icons/ai";
@@ -23,18 +23,16 @@ const PrivateLayout: React.FC = () => {
 
   const navigate = useNavigate();
 
+  // ✅ Set up Axios interceptors on first render
   useEffect(() => {
-    setupAxiosInterceptors(setLoading, navigate, user, setUser); // ✅ Ensure Interceptors are Set Up Once
+    setupAxiosInterceptors(setLoading, navigate, user, setUser);
   }, [navigate, user, setUser]);
 
-  // Show or hide nav on page load and window resize
+  // ✅ Show/hide navigation menu on window resize
   useEffect(() => {
     showHideNav();
     window.addEventListener("resize", showHideNav);
-
-    return () => {
-      window.removeEventListener("resize", showHideNav);
-    };
+    return () => window.removeEventListener("resize", showHideNav);
   }, []);
 
   const showHideNav = () => {
@@ -45,12 +43,10 @@ const PrivateLayout: React.FC = () => {
     }
   };
 
-  // Function to toggle theme
   const handleNavToggle = () => {
     showHideNav();
   };
 
-  // Logout user
   const handleLogout = async () => {
     await voterService.logout();
     userLogout();
@@ -59,22 +55,28 @@ const PrivateLayout: React.FC = () => {
 
   return (
     <>
+      {/* 🌀 Show loader when loading */}
       {loading && <Loader />}
+
+      {/* 🧭 Navigation Bar */}
       <nav className="nav">
         <div className="container nav__container">
+          {/* 🗳️ Logo (responsive via <picture>) */}
           <Link to="/results" className="nav__logo">
-            Election Voting App
+            <picture>
+              <source media="(max-width: 600px)" srcSet={logoSmall} />
+              <img src={logo} alt="Votely Logo" />
+            </picture>
           </Link>
 
+          {/* 📋 Navigation Links, Theme Toggle, User Info, and Menu Button */}
           <div>
+            {/* 📁 Navigation Menu */}
             {showNav && (
               <menu>
                 {isAdmin && (
                   <NavLink to="/elections" onClick={handleNavToggle}>
-                    <picture>
-                      <source media="(max-width: 600px)" srcSet={logoSmall} />
-                      <img src={logo} alt="Votely Logo" className="nav__logo" />
-                    </picture>
+                    Elections
                   </NavLink>
                 )}
                 <NavLink to="/results" onClick={handleNavToggle}>
@@ -85,14 +87,19 @@ const PrivateLayout: React.FC = () => {
                 </NavLink>
               </menu>
             )}
+
+            {/* 🌗 Theme Toggle Button */}
             <button className="theme__toggle-btn" onClick={toggleTheme}>
               {theme === "dark" ? <IoMdSunny /> : <IoIosMoon />}
             </button>
-            <div>
-              <p>
-                <FaUser /> {user?.fullName}{" "}
-              </p>
-            </div>
+
+            {/* 👤 User Info */}
+            <address className="nav__user">
+              <FaUser className="user__icon" />
+              <span>{user?.fullName} </span>
+            </address>
+
+            {/* 📱 Navigation Toggle Button (Mobile) */}
             <button
               className="nav__toggle-btn"
               onClick={() => setShowNav(!showNav)}
@@ -102,6 +109,8 @@ const PrivateLayout: React.FC = () => {
           </div>
         </div>
       </nav>
+
+      {/* 📄 Main Page Content */}
       <Outlet />
     </>
   );
