@@ -15,14 +15,18 @@ import { UiActions } from "store/ui-slice";
 import { IErrorResponse } from "types/ResponseModel";
 
 const Elections = () => {
+  // 🗳️ State to hold list of elections and server errors
   const [elections, setElections] = useState<IElectionModel[]>();
-  const [errors, setErrors] = useState<string[]>([]); // Empty array
+  const [errors, setErrors] = useState<string[]>([]);
 
   const dispatch = useDispatch();
+
+  // ➕ Open the 'Add Election' modal
   const openElectionModal = () => {
     dispatch(UiActions.openAddElectionModal());
   };
 
+  // 🔁 Fetch all elections from API
   const getElections = useCallback(async () => {
     try {
       const result = await electionService.getAll();
@@ -30,28 +34,32 @@ const Elections = () => {
     } catch (error: unknown) {
       setErrors((error as IErrorResponse).errorMessages || []);
     }
-  }, []); // No dependencies -> Won't be recreated on each render
+  }, []);
 
+  // 📥 Load elections when component mounts
   useEffect(() => {
     getElections();
-  }, [getElections]); // Now safe to include
+  }, [getElections]);
 
-  // ✅ Show add new election Modal popup
+  // 🔘 Redux selectors for modal state
   const addElectionModalShow = useSelector(
     (state: RootState) => state.ui.electionModalShowing,
   );
-  // ✅ Show edit election Modal popup
+
   const updateElectionModalShow = useSelector(
     (state: RootState) => state.ui.updateElectionModalShowing,
   );
+
   const selectedElection = useSelector(
     (state: RootState) => state.ui.selectedElection,
   );
-  // ✅ Callback function to update elections when a new election is added
+
+  // ✅ Add new election to local list
   const handleElectionAdded = (newElection: IElectionModel) => {
     setElections((prevElections) => [newElection, ...(prevElections || [])]);
   };
-  // ✅ Callback function to update election in the list
+
+  // ✅ Update election in the local list
   const handleElectionUpdated = (updatedElection: IElectionModel) => {
     setElections((prevElections) =>
       prevElections?.map((e) =>
@@ -59,16 +67,23 @@ const Elections = () => {
       ),
     );
   };
+
+  // ✅ Remove deleted election from local list
   const handleElectionDeletion = (deletedElectionId: string) => {
     setElections((prevElections) =>
       prevElections?.filter((election) => election.id !== deletedElectionId),
     );
   };
+
   return (
     <>
+      {/* 🧾 Elections Overview Section */}
       <section className="elections">
         <div className="container elections__container">
+          {/* ⚠️ Display any server errors */}
           <ApiErrorMessage errors={errors} />
+
+          {/* 🧭 Header with title and 'Create Election' button */}
           <header className="elections__header">
             <h1>
               {elections && elections.length > 0
@@ -79,6 +94,8 @@ const Elections = () => {
               Create New Election
             </Button>
           </header>
+
+          {/* 📋 Render each election */}
           <menu className="elections__menu">
             {elections &&
               elections.length > 0 &&
@@ -92,15 +109,21 @@ const Elections = () => {
           </menu>
         </div>
       </section>
+
+      {/* ➕ Add Election Modal */}
       {addElectionModalShow && (
         <AddElectionModal onElectionAdded={handleElectionAdded} />
       )}
+
+      {/* ✏️ Update Election Modal */}
       {updateElectionModalShow && selectedElection && (
         <UpdateElectionModal
           election={selectedElection}
           onElectionUpdated={handleElectionUpdated}
         />
       )}
+
+      {/* ❗ Global Confirm Modal */}
       <ConfirmModal />
     </>
   );

@@ -5,6 +5,8 @@ import { IoIosMoon, IoMdSunny } from "react-icons/io";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { getTheme, setTheme } from "../../utils/theme.utils";
 
+import logoSmall from "assets/images/logo/logo-small.png";
+import logo from "assets/images/logo/logo.svg";
 import { useUser } from "context/UserContext";
 import { setupAxiosInterceptors } from "../../services/axios.config";
 import Loader from "./Loader";
@@ -14,27 +16,39 @@ const PublicLayout: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const { setUser, user } = useUser();
   const navigate = useNavigate();
+
+  // ✅ Set up Axios interceptors on mount
   useEffect(() => {
-    setupAxiosInterceptors(setLoading, navigate, user, setUser); // ✅ Ensure Interceptors are Set Up Once
+    setupAxiosInterceptors(setLoading, navigate, user, setUser);
   }, [navigate, user, setUser]);
 
+  // ✅ Update document body class when theme changes
   useEffect(() => {
     document.body.className = getTheme();
   }, [darkTheme]);
 
-  // Function to toggle dark theme
+  // 🌗 Toggle theme handler
   const changeThemeHandler = () => {
     setTheme(setDarkTheme);
   };
+
   return (
     <>
+      {/* 🌀 Show loader while loading */}
       {loading && <Loader />}
+
+      {/* 🧭 Public Navigation Bar */}
       <nav className="nav">
         <div className="container nav__container">
+          {/* 🗳️ Logo (responsive) */}
           <Link to="/" className="nav__logo">
-            Election Voting App
+            <picture>
+              <source media="(max-width: 600px)" srcSet={logoSmall} />
+              <img src={logo} alt="Votely Logo" />
+            </picture>
           </Link>
 
+          {/* 🌗 Theme Toggle Button */}
           <div>
             <button className="theme__toggle-btn" onClick={changeThemeHandler}>
               {darkTheme ? <IoMdSunny /> : <IoIosMoon />}
@@ -42,6 +56,8 @@ const PublicLayout: React.FC = () => {
           </div>
         </div>
       </nav>
+
+      {/* 📄 Main Content for Public Routes */}
       <Outlet />
     </>
   );

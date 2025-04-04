@@ -18,28 +18,29 @@ import { IRegisterModel } from "types/index";
 import { IErrorResponse } from "types/ResponseModel";
 
 const Register = () => {
-  const [serverErrors, setServerErrors] = useState<string[]>([]); // Empty array
+  // ❗Server-side error messages from failed registration
+  const [serverErrors, setServerErrors] = useState<string[]>([]);
 
   const navigate = useNavigate();
 
-  // ✅ Initialize React Hook Form with Yup validation
+  // 🧾 Setup react-hook-form with Yup schema validation
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    watch, // ✅ Add watch to track live changes in password input
+    watch, // 👁️ Used to track live password input value
   } = useForm<IRegisterModel>({
     resolver: yupResolver(registerValidationSchema),
   });
-  // ✅ Watch password input value for live validation feedback
+
+  // 🔍 Get current password value for rule validation feedback
   const passwordValue = watch("password", "");
 
-  // Handle form submission
+  // ✅ Handle form submit
   const onSubmit = async (formData: IRegisterModel) => {
-    // Submit form data
     try {
-      await voterService.register(formData);
-      navigate("/");
+      await voterService.register(formData); // 🔐 API call
+      navigate("/"); // ➡️ Redirect to login on success
     } catch (error: unknown) {
       setServerErrors((error as IErrorResponse).errorMessages || []);
     }
@@ -49,10 +50,13 @@ const Register = () => {
     <section className="register">
       <div className="container register__container">
         <h2>Register</h2>
+
+        {/* 📝 Registration Form */}
         <form className="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-          {/* ✅ Display Server-Side Validation Error messages */}
+          {/* ⚠️ Server-side error display */}
           <ApiErrorMessage errors={serverErrors} />
 
+          {/* 👤 Full Name */}
           <div>
             <TextInput
               error={errors.fullName}
@@ -63,6 +67,8 @@ const Register = () => {
               autoFocus={true}
             />
           </div>
+
+          {/* 📧 Email Address */}
           <div>
             <TextInput
               error={errors.email}
@@ -72,6 +78,8 @@ const Register = () => {
               type="email"
             />
           </div>
+
+          {/* 🔒 Password + Rule Validation */}
           <div>
             <PasswordInput
               id="password"
@@ -80,6 +88,8 @@ const Register = () => {
               placeholder="password"
               type="password"
             />
+
+            {/* 📋 Live Password Rule Validation */}
             <ul className="password-validation">
               {passwordRules.map(({ rule, message }, index) => (
                 <li
@@ -91,6 +101,8 @@ const Register = () => {
               ))}
             </ul>
           </div>
+
+          {/* 🔁 Confirm Password */}
           <div>
             <PasswordInput
               id="confirmPassword"
@@ -100,9 +112,13 @@ const Register = () => {
               type="password"
             />
           </div>
+
+          {/* 🔗 Navigation to login */}
           <p>
             Already have an account? <Link to="/">Sign In</Link>
           </p>
+
+          {/* 🚀 Register Submit Button */}
           <Button variant="primary" type="submit" isLoading={isSubmitting}>
             Register
           </Button>

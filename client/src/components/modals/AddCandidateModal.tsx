@@ -1,34 +1,39 @@
 import { useEffect, useState } from "react";
-import { IAddCandidateModel, ICandidateModel } from "../../types";
+import { IAddCandidateModel, ICandidateModel } from "types";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
-import { candidateService } from "../../services/candidate.service";
-import { UiActions } from "../../store/ui-slice";
-import { IErrorResponse } from "../../types/ResponseModel";
-import { addCandidateValidationSchema } from "../../validations/schemas/candidate.validation";
+import { candidateService } from "services/candidate.service";
+import { UiActions } from "store/ui-slice";
+import { IErrorResponse } from "types/ResponseModel";
+import { addCandidateValidationSchema } from "validations/schemas/candidate.validation";
 import ApiErrorMessage from "../ui/ApiErrorMessage";
 import Button from "../ui/Button";
 import FileInput from "../ui/FileInput";
 import TextareaInput from "../ui/TextareaInput";
 import TextInput from "../ui/TextInput";
 
+// 📦 Props for AddCandidateModal
 interface AddCandidateModalProp {
-  onCandidateAdded: (newElection: ICandidateModel) => void;
+  onCandidateAdded: (newCandidate: ICandidateModel) => void;
   electionId: string;
 }
+
 const AddCandidateModal: React.FC<AddCandidateModalProp> = ({
   onCandidateAdded,
   electionId,
 }) => {
-  const [serverErrors, setServerErrors] = useState<string[]>([]); // Empty array
+  const [serverErrors, setServerErrors] = useState<string[]>([]);
   const dispatch = useDispatch();
+
+  // ❌ Close modal
   const closeAddCandidateModal = () => {
     dispatch(UiActions.closeAddCandidateModal());
   };
 
+  // 📋 Setup react-hook-form with Yup validation
   const {
     register,
     handleSubmit,
@@ -39,33 +44,40 @@ const AddCandidateModal: React.FC<AddCandidateModalProp> = ({
     resolver: yupResolver(addCandidateValidationSchema),
   });
 
-  // ✅ Automatically set `electionId` when the component mounts
+  // 🔗 Set electionId in form when component mounts
   useEffect(() => {
     setValue("electionId", electionId);
   }, [electionId, setValue]);
 
+  // ✅ Submit handler for adding a candidate
   const onSubmit = async (formData: IAddCandidateModel) => {
     try {
       const response = await candidateService.create(formData, electionId);
-      onCandidateAdded(response.data as ICandidateModel);
-      closeAddCandidateModal();
+      onCandidateAdded(response.data as ICandidateModel); // Notify parent
+      closeAddCandidateModal(); // Close modal on success
     } catch (error: unknown) {
-      setServerErrors((error as IErrorResponse).errorMessages || []);
+      setServerErrors((error as IErrorResponse).errorMessages || []); // Handle server errors
     }
   };
 
   return (
+    // 🧩 Modal Wrapper
     <section className="modal">
       <div className="modal__content">
+        {/* 🧭 Modal Header */}
         <header className="modal__header">
           <h4>Add Candidate</h4>
           <button className="modal__close" onClick={closeAddCandidateModal}>
             <IoMdClose />
           </button>
         </header>
+
+        {/* 📝 Form for new candidate */}
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          {/* ⚠️ Server-side validation errors */}
           <ApiErrorMessage errors={serverErrors} />
 
+          {/* 👤 Full Name Input */}
           <div>
             <label htmlFor="fullName">Full Name</label>
             <TextInput
@@ -77,6 +89,8 @@ const AddCandidateModal: React.FC<AddCandidateModalProp> = ({
               autoFocus={true}
             />
           </div>
+
+          {/* 🗯️ Motto Input */}
           <div>
             <label htmlFor="motto">Motto</label>
             <TextareaInput
@@ -86,6 +100,8 @@ const AddCandidateModal: React.FC<AddCandidateModalProp> = ({
               register={register}
             />
           </div>
+
+          {/* 🖼️ Image Upload */}
           <div>
             <label htmlFor="image">Photo</label>
             <FileInput
@@ -95,6 +111,8 @@ const AddCandidateModal: React.FC<AddCandidateModalProp> = ({
               setValue={setValue}
             />
           </div>
+
+          {/* ➕ Submit Button */}
           <Button type="submit" variant="primary" isLoading={isSubmitting}>
             Add
           </Button>

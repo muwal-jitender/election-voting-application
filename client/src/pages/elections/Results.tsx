@@ -1,6 +1,6 @@
 import "./Results.css";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import ResultElection from "components/election/ResultElection";
 import ApiErrorMessage from "components/ui/ApiErrorMessage";
@@ -9,9 +9,11 @@ import { IElectionDetail } from "types";
 import { IErrorResponse } from "types/ResponseModel";
 
 const Results = () => {
-  const [elections, setElections] = React.useState<IElectionDetail[]>();
-  const [errors, setErrors] = useState<string[]>([]); // Empty array
+  // 📦 State for fetched election results
+  const [elections, setElections] = useState<IElectionDetail[]>();
+  const [errors, setErrors] = useState<string[]>([]); // 🔴 Server-side errors
 
+  // 📥 Fetch election results on component mount
   useEffect(() => {
     const getElections = async () => {
       try {
@@ -21,13 +23,17 @@ const Results = () => {
         setErrors((error as IErrorResponse).errorMessages || []);
       }
     };
+
     getElections();
   }, []);
 
   return (
     <section className="results">
       <div className="container results__container">
+        {/* ⚠️ Display error messages if API call fails */}
         <ApiErrorMessage errors={errors} />
+
+        {/* 🗳️ Render each election result */}
         {elections &&
           elections.map((election) => (
             <ResultElection key={election.id} {...election} />

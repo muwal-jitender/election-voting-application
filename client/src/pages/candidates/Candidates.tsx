@@ -9,16 +9,16 @@ import { electionService } from "services/election.service";
 import { ICandidateModel } from "types";
 
 const Candidates = () => {
-  // Election Id
+  // 🆔 Get Election ID from URL
   const { id } = useParams<{ id: string }>();
 
-  // Candidates and Voting State
+  // 📦 State: Candidates list and voting status
   const [electionCandidates, setElectionCandidates] = useState<
     ICandidateModel[]
   >([]);
   const [voted, setVoted] = useState(false);
 
-  // Fetch Election Candidates
+  // 🧠 Fetch candidates for the election
   const getElections = useCallback(async (id: string) => {
     try {
       const result = await electionService.getCandidatesByElectionId(id);
@@ -28,7 +28,7 @@ const Candidates = () => {
     }
   }, []);
 
-  // Check if Voter has Already Voted
+  // 🧠 Check if the current voter has already voted
   const checkIfVoted = useCallback(async (id: string) => {
     try {
       const result = await electionService.checkIfVoterAlreadyVoted(id);
@@ -38,7 +38,7 @@ const Candidates = () => {
     }
   }, []);
 
-  // Fetch Data on Component Mount
+  // 🔁 Load election data on component mount or when voting state changes
   useEffect(() => {
     if (id) {
       checkIfVoted(id);
@@ -48,7 +48,7 @@ const Candidates = () => {
     }
   }, [getElections, checkIfVoted, voted, id]);
 
-  // ✅ Extracted JSX Logic for Readability
+  // 🎨 Render dynamic header content based on vote/candidate status
   const renderHeaderMessage = () => {
     if (voted)
       return (
@@ -59,6 +59,7 @@ const Candidates = () => {
           </p>
         </>
       );
+
     if (electionCandidates.length > 0)
       return (
         <>
@@ -70,6 +71,7 @@ const Candidates = () => {
           </p>
         </>
       );
+
     return (
       <>
         <h1 className="primary">Inactive Election</h1>
@@ -82,9 +84,11 @@ const Candidates = () => {
 
   return (
     <>
+      {/* 🗳️ Candidates Section */}
       <section className="candidates">
         <header className="candidates__header">{renderHeaderMessage()}</header>
 
+        {/* 📥 Display candidate list if user hasn't voted */}
         {!voted && electionCandidates.length > 0 && (
           <div className="container candidates__container">
             {electionCandidates.map((candidate) => (
@@ -94,6 +98,7 @@ const Candidates = () => {
         )}
       </section>
 
+      {/* ✅ Global confirmation modal */}
       <ConfirmModal />
     </>
   );

@@ -11,36 +11,34 @@ import { useUser } from "context/UserContext";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { voterService } from "services/voter.service";
-import { ILoginModel } from "types/index";
+import { ILoginModel } from "types";
 import { IErrorResponse } from "types/ResponseModel";
 import { loginValidationSchema } from "validations/schemas/voter.validation";
 
 const Login = () => {
-  const [serverErrors, setServerErrors] = useState<string[]>([]); // ✅ Server-side errors
-  const { setUser } = useUser();
-  const navigate = useNavigate();
+  const [serverErrors, setServerErrors] = useState<string[]>([]); // 🔴 Server-side error messages
+  const { setUser } = useUser(); // 🔗 Access user context
+  const navigate = useNavigate(); // 🚀 Navigate after login
 
-  // ✅ Initialize React Hook Form with Yup validation
+  // 🧾 Initialize React Hook Form with Yup schema
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ILoginModel>({
-    resolver: yupResolver(loginValidationSchema), // Uses Yup for validation
+    resolver: yupResolver(loginValidationSchema),
   });
 
-  // Handle form submission
+  // ✅ Handle form submission
   const onSubmit = async (formData: ILoginModel) => {
-    // Submit form data
     try {
-      const result = await voterService.login(formData);
-      // Save user in local storage
+      const result = await voterService.login(formData); // 🔐 Call login API
       const user = result.data;
 
-      // Save in redux state
-      user && setUser(user);
-
-      navigate("/results");
+      if (user) {
+        setUser(user); // ✅ Set user in context
+        navigate("/results"); // ➡️ Redirect to results page
+      }
     } catch (error: unknown) {
       setServerErrors((error as IErrorResponse).errorMessages || []);
     }
@@ -50,10 +48,13 @@ const Login = () => {
     <section className="login">
       <div className="container login__container">
         <h2>Log In</h2>
+
+        {/* 📝 Login Form */}
         <form className="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-          {/* ✅ Display Server-Side Validation Error messages */}
+          {/* ⚠️ Server-side error display */}
           <ApiErrorMessage errors={serverErrors} />
 
+          {/* 📧 Email Input */}
           <div>
             <TextInput
               error={errors.email}
@@ -64,6 +65,8 @@ const Login = () => {
               autoFocus={true}
             />
           </div>
+
+          {/* 🔒 Password Input with toggle */}
           <div>
             <PasswordInput
               id="password"
@@ -73,9 +76,13 @@ const Login = () => {
               type="password"
             />
           </div>
+
+          {/* 🔗 Navigation to registration */}
           <p>
             Don't have an account? <Link to="/register">Register</Link>
           </p>
+
+          {/* 🚀 Submit Button */}
           <div>
             <Button type="submit" variant="primary" isLoading={isSubmitting}>
               Login

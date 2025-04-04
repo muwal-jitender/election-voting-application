@@ -7,33 +7,38 @@ const FileInput = <T extends FieldValues>({
   id,
   error,
   setValue,
-  clearErrors, // ✅ Added to clear the error when a file is selected
+  clearErrors, // ✅ Function to clear field-level validation errors
 }: IFileProps<T>) => {
-  // ✅ Reference to the file input
+  // 📌 Reference to the file input (used to reset it if needed)
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   return (
     <div>
+      {/* 📁 File input element */}
       <input
         type="file"
         id={id}
-        ref={fileInputRef} // ✅ Attach ref to input
+        ref={fileInputRef}
         className={error ? "input-error" : ""}
+        accept=".png, .jpg, .jpeg, .webp, .avif"
         onChange={(e) => {
           const file = e.target.files?.[0] as PathValue<T, Path<T>>;
+
           if (file) {
-            clearErrors(id); // ✅ Clear error message when file is selected
+            // ✅ A file was selected, set the value and clear any errors
+            clearErrors(id);
             setValue(id, file);
           } else {
-            // ✅ If user cancels a previously selected file, reset the file input manually
+            // ❌ User canceled file selection, reset input manually
             if (fileInputRef.current) {
               fileInputRef.current.value = "";
             }
             setValue(id, null as PathValue<T, Path<T>>);
           }
         }}
-        accept=".png, .jpg, .jpeg, .webp, .avif"
       />
 
+      {/* ⚠️ Validation error display */}
       {error && (
         <p className="form__client-error-message">* {String(error.message)}</p>
       )}

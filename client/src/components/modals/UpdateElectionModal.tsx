@@ -1,21 +1,21 @@
-import { IEditElection, IElectionModel } from "../../types";
+import { IEditElection, IElectionModel } from "types";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
-import { electionService } from "../../services/election.service";
-import { UiActions } from "../../store/ui-slice";
-import { IErrorResponse } from "../../types/ResponseModel";
-import { editElectionValidationSchema } from "../../validations/schemas/election.validation";
+import { electionService } from "services/election.service";
+import { UiActions } from "store/ui-slice";
+import { IErrorResponse } from "types/ResponseModel";
+import { editElectionValidationSchema } from "validations/schemas/election.validation";
 import ApiErrorMessage from "../ui/ApiErrorMessage";
 import Button from "../ui/Button";
 import FileInput from "../ui/FileInput";
 import TextareaInput from "../ui/TextareaInput";
 import TextInput from "../ui/TextInput";
 
-// ✅ Define Props Interface
+// 📦 Props interface for update modal
 interface UpdateElectionModalProps {
   election: IElectionModel;
   onElectionUpdated: (updatedElection: IElectionModel) => void;
@@ -25,6 +25,10 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
   election,
   onElectionUpdated,
 }) => {
+  const [serverErrors, setServerErrors] = useState<string[]>([]);
+  const dispatch = useDispatch();
+
+  // 📋 Setup form with validation and default values
   const {
     register,
     handleSubmit,
@@ -40,38 +44,40 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
     },
   });
 
-  const [serverErrors, setServerErrors] = useState<string[]>([]);
-  const dispatch = useDispatch();
-
-  // Close add election modal
+  // ❌ Close the update election modal
   const closeElectionModal = () => {
     dispatch(UiActions.closeUpdateElectionModal());
   };
 
-  // Handle Form Submission
+  // ✅ Submit updated election details
   const onSubmit = async (formData: IEditElection) => {
     try {
       const response = await electionService.update(election?.id, formData);
-      onElectionUpdated(response.data as IElectionModel);
-      // Close Modal popup
-      closeElectionModal();
+      onElectionUpdated(response.data as IElectionModel); // Notify parent
+      closeElectionModal(); // Close modal on success
     } catch (error: unknown) {
       setServerErrors((error as IErrorResponse).errorMessages || []);
     }
   };
+
   return (
+    // 🧩 Modal container
     <section className="modal">
       <div className="modal__content">
+        {/* 🧭 Modal header */}
         <header className="modal__header">
           <h4>Update Election</h4>
           <button className="modal__close" onClick={closeElectionModal}>
             <IoMdClose />
           </button>
         </header>
+
+        {/* 📝 Update Election Form */}
         <form onSubmit={handleSubmit(onSubmit)}>
-          {/* ✅ Display Server-Side Validation Error messages */}
+          {/* ⚠️ Display server-side error messages if any */}
           <ApiErrorMessage errors={serverErrors} />
 
+          {/* 🏷️ Title Input */}
           <div>
             <label htmlFor="title">Title</label>
             <TextInput
@@ -83,6 +89,8 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
               autoFocus={true}
             />
           </div>
+
+          {/* 📝 Description Input */}
           <div>
             <label htmlFor="description">Description</label>
             <TextareaInput
@@ -92,6 +100,8 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
               register={register}
             />
           </div>
+
+          {/* 🖼️ Thumbnail File Input */}
           <div>
             <label htmlFor="thumbnail">Thumbnail</label>
             <FileInput
@@ -101,6 +111,8 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
               setValue={setValue}
             />
           </div>
+
+          {/* 📨 Submit Button */}
           <Button type="submit" variant="primary" isLoading={isSubmitting}>
             Update
           </Button>

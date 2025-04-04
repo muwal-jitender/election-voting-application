@@ -2,13 +2,13 @@ import "./ConfirmModal.css";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { RootState } from "../../store/store";
-import { UiActions } from "../../store/ui-slice";
+import { RootState } from "store/store";
+import { UiActions } from "store/ui-slice";
 
 const ConfirmModal = () => {
   const dispatch = useDispatch();
 
-  // ✅  Get modal state from Redux
+  // ✅ Retrieve modal state and data from Redux store
   const isOpen = useSelector((state: RootState) => state.ui.openConfirmModal);
   const heading = useSelector(
     (state: RootState) => state.ui.confirmModalHeading,
@@ -16,28 +16,35 @@ const ConfirmModal = () => {
   const onConfirm = useSelector(
     (state: RootState) => state.ui.confirmModalCallback,
   );
-  // ✅ Close the confirm modal dialog
+
+  // ❌ Close the modal
   const closeCandidateModal = () => {
     dispatch(UiActions.closeConfirmModalDialog());
   };
 
-  // If modal is closed, return null (no render)
+  // 🚫 Don't render modal if it's closed
   if (!isOpen) return null;
 
   return (
+    // 🧩 Modal Wrapper
     <section className="modal">
       <div className="modal__content confirm__vote-content">
+        {/* 🧭 Modal Heading */}
         <h5>{heading}</h5>
 
+        {/* 🟢 Confirm / 🔴 Cancel Buttons */}
         <div className="confirm__vote-cta">
+          {/* Cancel Button */}
           <button className="btn danger" onClick={closeCandidateModal}>
             Cancel
           </button>
+
+          {/* Confirm Button */}
           <button
             className="btn primary"
             onClick={() => {
-              if (onConfirm) onConfirm();
-              closeCandidateModal();
+              if (onConfirm) onConfirm(); // Call the confirm callback if available
+              closeCandidateModal(); // Then close the modal
             }}
           >
             Confirm

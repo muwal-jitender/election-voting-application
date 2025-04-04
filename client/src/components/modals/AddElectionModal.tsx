@@ -15,8 +15,8 @@ import FileInput from "../ui/FileInput";
 import TextareaInput from "../ui/TextareaInput";
 import TextInput from "../ui/TextInput";
 
+// 📦 Props for AddElectionModal
 interface AddElectionModalProp {
-  // ✅ Accept callback prop
   onElectionAdded: (newElection: IElectionModel) => void;
 }
 
@@ -26,11 +26,12 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
   const [serverErrors, setServerErrors] = useState<string[]>([]);
   const dispatch = useDispatch();
 
-  // Close add election modal
+  // ❌ Closes the modal
   const closeElectionModal = () => {
     dispatch(UiActions.closeAddElectionModal());
   };
 
+  // 🧾 Form setup with validation schema
   const {
     register,
     handleSubmit,
@@ -40,30 +41,36 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
   } = useForm<IAddElection>({
     resolver: yupResolver(addElectionValidationSchema),
   });
-  // Handle Form Submission
+
+  // ✅ Form submission logic
   const onSubmit = async (formData: IAddElection) => {
     try {
       const response = await electionService.create(formData);
-      onElectionAdded(response.data as IElectionModel);
-      // Close Modal popup
-      closeElectionModal();
+      onElectionAdded(response.data as IElectionModel); // Notify parent
+      closeElectionModal(); // Close modal on success
     } catch (error: unknown) {
       setServerErrors((error as IErrorResponse).errorMessages || []);
     }
   };
+
   return (
+    // 🧩 Modal container
     <section className="modal">
       <div className="modal__content">
+        {/* 🧭 Modal header with title and close button */}
         <header className="modal__header">
           <h4>Create New Election</h4>
           <button className="modal__close" onClick={closeElectionModal}>
             <IoMdClose />
           </button>
         </header>
+
+        {/* 📝 Election creation form */}
         <form onSubmit={handleSubmit(onSubmit)}>
-          {/* ✅ Display Server-Side Validation Error messages */}
+          {/* ⚠️ Server-side error messages */}
           <ApiErrorMessage errors={serverErrors} />
 
+          {/* 🏷️ Title input */}
           <div>
             <label htmlFor="title">Title</label>
             <TextInput
@@ -75,6 +82,8 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
               autoFocus={true}
             />
           </div>
+
+          {/* 📝 Description input */}
           <div>
             <label htmlFor="description">Description</label>
             <TextareaInput
@@ -84,6 +93,8 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
               register={register}
             />
           </div>
+
+          {/* 🖼️ Thumbnail image input */}
           <div>
             <label htmlFor="thumbnail">Thumbnail</label>
             <FileInput
@@ -93,6 +104,8 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
               clearErrors={clearErrors}
             />
           </div>
+
+          {/* ➕ Submit button */}
           <Button type="submit" variant="primary" isLoading={isSubmitting}>
             Add
           </Button>

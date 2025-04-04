@@ -12,18 +12,22 @@ const PasswordInput = <T extends FieldValues>({
   error,
   placeholder,
 }: IInputProps<T>) => {
+  // 🔁 Toggle password visibility
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="password-input-container">
+      {/* 🧩 Password input and toggle icon wrapper */}
       <div className="password-wrapper">
         <input
-          type={showPassword ? "text" : "password"}
+          type={showPassword ? "text" : "password"} // 👁️ Toggle input type
           id={id}
-          {...register(id)}
+          {...register(id)} // 🔗 Connect to react-hook-form
           className={`password-input ${error ? "input-error" : ""}`}
           placeholder={`Enter ${placeholder}`}
         />
+
+        {/* 👁️ Toggle password visibility button */}
         <button
           type="button"
           className="toggle-password"
@@ -33,6 +37,8 @@ const PasswordInput = <T extends FieldValues>({
           {showPassword ? <FaEyeSlash /> : <FaEye />}
         </button>
       </div>
+
+      {/* ⚠️ Show error message if validation fails */}
       {error && (
         <p className="form__client-error-message">* {String(error.message)}</p>
       )}

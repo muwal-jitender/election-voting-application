@@ -11,24 +11,32 @@ const ResultElection = (electionDetail: IElectionDetail) => {
   const [electionCandidates, setElectionCandidates] =
     useState<ICandidateModel[]>();
 
+  // 🧮 Set candidates and compute total votes for the election
   useEffect(() => {
     setElectionCandidates(electionDetail.candidates);
-    const totalVoteCount = electionCandidates?.reduce(
+
+    const totalVoteCount = electionDetail.candidates?.reduce(
       (acc, candidate) => acc + (candidate.voteCount ?? 0),
       0,
     );
+
     setTotalVotes(totalVoteCount ?? 0);
-  }, [electionDetail.candidates, electionCandidates]); // ✅ Ensures this only runs once per election
+  }, [electionDetail.candidates]);
 
   return (
+    // 🧾 Election Result Card
     <article className="result">
+      {/* 🏷️ Header with election title and thumbnail */}
       <header className="result__header">
         <h4>{electionDetail.title}</h4>
-        {/* <p className="result__date">Date: 2021-01-01</p> */}
+
+        {/* 🖼️ Election Thumbnail */}
         <div className="result_header-image">
           <img src={electionDetail.thumbnail} alt={electionDetail.title} />
         </div>
       </header>
+
+      {/* 🗳️ Candidate Rating List */}
       <ul className="result__list">
         {electionCandidates &&
           electionCandidates.map((candidate) => (
@@ -39,6 +47,8 @@ const ResultElection = (electionDetail: IElectionDetail) => {
             />
           ))}
       </ul>
+
+      {/* 🚪 Link to view or participate in election */}
       <Link
         to={`/elections/${electionDetail.id}/candidates`}
         className="btn primary full"
