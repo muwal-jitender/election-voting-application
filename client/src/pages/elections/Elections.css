@@ -1,5 +1,7 @@
 .elections {
   margin: 5rem 0;
+  width: 64rem;
+  margin-inline: auto;
 }
 .elections__header {
   display: flex;
@@ -15,6 +17,9 @@
 }
 
 @media screen and (max-width: 600px) {
+  .elections {
+    width: var(--container-w-sm);
+  }
   .elections__header h1 {
     font-size: 1.2rem;
   }

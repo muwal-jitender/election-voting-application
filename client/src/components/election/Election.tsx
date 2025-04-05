@@ -1,3 +1,4 @@
+import "react-tooltip/dist/react-tooltip.css";
 import "./Election.css";
 
 import { IElectionModel, IErrorResponse } from "types";
@@ -7,8 +8,10 @@ import Button from "components/ui/Button";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { Tooltip } from "react-tooltip";
 import { electionService } from "services/election.service";
 import { UiActions } from "store/ui-slice";
+import { tooltipStyles } from "utils/utils";
 
 const Election = ({
   id,
@@ -59,12 +62,15 @@ const Election = ({
         </Link>
 
         {/* ✏️ Truncated description if too long */}
-        <p>
+        <p
+          data-tooltip-id="description-tooltip"
+          data-tooltip-content={description}
+        >
           {description.length > 255
             ? description.substring(0, 255) + "..."
             : description}
         </p>
-
+        <Tooltip id="description-tooltip" place="left" style={tooltipStyles} />
         {/* 🔘 Action buttons: View, Delete, Edit */}
         <div className="election__cta">
           <Link to={`/elections/${id}`} className="btn sm primary">

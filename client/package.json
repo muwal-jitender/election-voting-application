@@ -16,6 +16,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.1.3",
     "react-scripts": "5.0.1",
+    "react-tooltip": "^5.28.0",
     "yup": "^1.6.1",
     "yup-password": "^0.4.0"
   },

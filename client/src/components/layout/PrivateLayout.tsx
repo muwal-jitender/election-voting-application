@@ -1,3 +1,4 @@
+import "react-tooltip/dist/react-tooltip.css";
 import "./PrivateLayout.css";
 
 import React, { useEffect, useState } from "react";
@@ -74,14 +75,33 @@ const PrivateLayout: React.FC = () => {
             {/* 📁 Navigation Menu */}
             {showNav && (
               <menu>
+                {/* ✅ Show "Elections" link only for admin users */}
                 {isAdmin && (
-                  <NavLink to="/elections" onClick={handleNavToggle}>
+                  <NavLink
+                    to="/elections"
+                    onClick={handleNavToggle}
+                    // 🔽 Highlight link with white underline when it's active (for admin)
+                    className={({ isActive }) =>
+                      isActive ? "active-admin" : undefined
+                    }
+                  >
                     Elections
                   </NavLink>
                 )}
-                <NavLink to="/results" onClick={handleNavToggle}>
+
+                {/* 🗳️ "Results" link is always visible 
+                 ✅ Highlight only if user is admin and link is active */}
+                <NavLink
+                  to="/results"
+                  onClick={handleNavToggle}
+                  className={({ isActive }) =>
+                    isActive && isAdmin ? "active-admin" : undefined
+                  }
+                >
                   Results
                 </NavLink>
+
+                {/* 🚪 "Logout" link – no active styling, simply logs user out */}
                 <NavLink to="/" onClick={handleLogout}>
                   Logout
                 </NavLink>
