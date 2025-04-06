@@ -63,6 +63,7 @@ const Login = () => {
               register={register}
               type="email"
               autoFocus={true}
+              aria-label="email address"
             />
           </div>
 
@@ -74,6 +75,7 @@ const Login = () => {
               error={errors.password}
               placeholder="password"
               type="password"
+              aria-label="password"
             />
           </div>
 
@@ -84,7 +86,12 @@ const Login = () => {
 
           {/* 🚀 Submit Button */}
           <div>
-            <Button type="submit" variant="primary" isLoading={isSubmitting}>
+            <Button
+              type="submit"
+              variant="primary"
+              isLoading={isSubmitting}
+              aria-label="login button"
+            >
               Login
             </Button>
           </div>

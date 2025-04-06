@@ -3,7 +3,7 @@ const ApiErrorMessage = ({ errors }: { errors: string[] }) => {
   return (
     <div className="form__error-message">
       {errors.map((msg, index) => (
-        <p key={index}>{`* ${msg}`}</p>
+        <p aria-live="polite" key={index}>{`* ${msg}`}</p>
       ))}
     </div>
   );
