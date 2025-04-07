@@ -80,10 +80,16 @@ const Election = ({
             variant="danger"
             size="sm"
             onClick={() => handleDeleteElection(id)}
+            assistiveText="Election"
           >
             Delete
           </Button>
-          <Button variant="primary" size="sm" onClick={openUpdateElectionModal}>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={openUpdateElectionModal}
+            assistiveText="Election"
+          >
             Edit
           </Button>
         </div>

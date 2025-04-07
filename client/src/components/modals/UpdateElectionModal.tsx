@@ -113,7 +113,12 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
           </div>
 
           {/* 📨 Submit Button */}
-          <Button type="submit" variant="primary" isLoading={isSubmitting}>
+          <Button
+            type="submit"
+            variant="primary"
+            isLoading={isSubmitting}
+            assistiveText="election"
+          >
             Update
           </Button>
         </form>

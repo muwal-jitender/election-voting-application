@@ -106,7 +106,12 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
           </div>
 
           {/* ➕ Submit button */}
-          <Button type="submit" variant="primary" isLoading={isSubmitting}>
+          <Button
+            type="submit"
+            variant="primary"
+            isLoading={isSubmitting}
+            assistiveText="election"
+          >
             Add
           </Button>
         </form>

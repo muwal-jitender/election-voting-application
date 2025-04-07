@@ -86,12 +86,7 @@ const Login = () => {
 
           {/* 🚀 Submit Button */}
           <div>
-            <Button
-              type="submit"
-              variant="primary"
-              isLoading={isSubmitting}
-              aria-label="login button"
-            >
+            <Button type="submit" variant="primary" isLoading={isSubmitting}>
               Login
             </Button>
           </div>

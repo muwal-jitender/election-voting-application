@@ -11,6 +11,9 @@ const TextInput = <T extends FieldValues>({
 }: IInputProps<T>) => {
   return (
     <div>
+      <label htmlFor={id} className="visually-hidden">
+        {placeholder}
+      </label>
       <input
         type={type}
         id={id}
@@ -21,7 +24,13 @@ const TextInput = <T extends FieldValues>({
         className={error ? "input-error" : ""}
       />
       {error && (
-        <p className="form__client-error-message">* {String(error.message)}</p>
+        <p
+          id={`${id}-error`}
+          className="form__client-error-message"
+          role="alert"
+        >
+          * {String(error.message)}
+        </p>
       )}
     </div>
   );

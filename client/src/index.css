@@ -266,6 +266,17 @@ textarea {
   color: var(--color-gray-900);
   border-radius: var(--radius-1);
 }
+
+/* ---------- CSS to hide label but keep for screen readers ---------- */
+.visually-hidden {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 /* ---------- MEDIA QUERIES (Mobile) ---------- */
 @media screen and (max-width: 600px) {
   .container {

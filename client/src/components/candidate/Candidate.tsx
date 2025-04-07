@@ -48,7 +48,12 @@ const Candidate = ({ ...props }: ICandidateModel) => {
           ? props.motto.substring(0, 25) + "..."
           : props.motto}
       </small>
-      <Button variant="primary" align="center" onClick={handleCastingVote}>
+      <Button
+        variant="primary"
+        align="center"
+        onClick={handleCastingVote}
+        assistiveText={`Cast your Vote for ${props.fullName}`}
+      >
         Vote
       </Button>
       {errors.length > 0 && (

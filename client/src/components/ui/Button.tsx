@@ -5,6 +5,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   size?: "sm" | "lg"; // ✅ Small & Large button support
   isLoading?: boolean; // ✅ Show loading text
   align?: "left" | "center" | "right"; // ✅ New alignment prop
+  assistiveText?: string; // 🔹 For visually hidden screen reader context
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -14,6 +15,7 @@ const Button: React.FC<ButtonProps> = ({
   isLoading = false,
   align = "right",
   type = "button",
+  assistiveText,
   ...props
 }) => {
   return (
@@ -23,7 +25,16 @@ const Button: React.FC<ButtonProps> = ({
         type={type}
         {...props}
       >
-        {isLoading ? "Processing..." : children}
+        {isLoading ? (
+          "Processing..."
+        ) : (
+          <>
+            {children}
+            {assistiveText && (
+              <span className="visually-hidden"> {assistiveText}</span>
+            )}
+          </>
+        )}
       </button>
     </div>
   );

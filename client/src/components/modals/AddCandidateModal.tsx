@@ -113,7 +113,12 @@ const AddCandidateModal: React.FC<AddCandidateModalProp> = ({
           </div>
 
           {/* ➕ Submit Button */}
-          <Button type="submit" variant="primary" isLoading={isSubmitting}>
+          <Button
+            type="submit"
+            variant="primary"
+            isLoading={isSubmitting}
+            assistiveText="candidate"
+          >
             Add
           </Button>
         </form>
