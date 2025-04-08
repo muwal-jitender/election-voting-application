@@ -60,7 +60,11 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
         {/* 🧭 Modal header with title and close button */}
         <header className="modal__header">
           <h4>Create New Election</h4>
-          <button className="modal__close" onClick={closeElectionModal}>
+          <button
+            className="modal__close"
+            onClick={closeElectionModal}
+            aria-label="Close modal popup"
+          >
             <IoMdClose />
           </button>
         </header>

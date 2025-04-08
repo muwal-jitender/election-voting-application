@@ -109,7 +109,16 @@ const PrivateLayout: React.FC = () => {
             )}
 
             {/* 🌗 Theme Toggle Button */}
-            <button className="theme__toggle-btn" onClick={toggleTheme}>
+            <button
+              className="theme__toggle-btn"
+              onClick={toggleTheme}
+              title="Toggle theme"
+              aria-label={
+                theme === "dark"
+                  ? "Switch to light mode"
+                  : "Switch to dark mode"
+              }
+            >
               {theme === "dark" ? <IoMdSunny /> : <IoIosMoon />}
             </button>
 
@@ -123,6 +132,10 @@ const PrivateLayout: React.FC = () => {
             <button
               className="nav__toggle-btn"
               onClick={() => setShowNav(!showNav)}
+              title={showNav ? "Close menu" : "Open menu"}
+              aria-label={
+                showNav ? "Close navigation menu" : "Open navigation menu"
+              }
             >
               {showNav ? <AiOutlineClose /> : <HiOutlineBars3 />}
             </button>

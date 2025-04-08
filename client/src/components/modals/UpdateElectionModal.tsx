@@ -67,7 +67,11 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
         {/* 🧭 Modal header */}
         <header className="modal__header">
           <h4>Update Election</h4>
-          <button className="modal__close" onClick={closeElectionModal}>
+          <button
+            className="modal__close"
+            onClick={closeElectionModal}
+            aria-label="Close modal popup"
+          >
             <IoMdClose />
           </button>
         </header>

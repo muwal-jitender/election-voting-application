@@ -50,7 +50,14 @@ const PublicLayout: React.FC = () => {
 
           {/* 🌗 Theme Toggle Button */}
           <div>
-            <button className="theme__toggle-btn" onClick={changeThemeHandler}>
+            <button
+              className="theme__toggle-btn"
+              onClick={changeThemeHandler}
+              title="Toggle theme"
+              aria-label={
+                darkTheme ? "Switch to light mode" : "Switch to dark mode"
+              }
+            >
               {darkTheme ? <IoMdSunny /> : <IoIosMoon />}
             </button>
           </div>
