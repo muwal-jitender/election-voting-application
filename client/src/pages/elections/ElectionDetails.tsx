@@ -7,6 +7,7 @@ import { ICandidateModel, IElectionModel, IVoterModel, RootState } from "types";
 import ElectionCandidate from "components/election/ElectionCandidate";
 import AddCandidateModal from "components/modals/AddCandidateModal";
 import ConfirmModal from "components/modals/ConfirmModal";
+import ApiErrorMessage from "components/ui/ApiErrorMessage";
 import { IoAddOutline } from "react-icons/io5";
 import { useParams } from "react-router-dom";
 import { electionService } from "services/election.service";
@@ -80,6 +81,7 @@ const ElectionDetails = () => {
     <>
       {/* 📦 Election Detail Section */}
       <section className="election-details">
+        <ApiErrorMessage errors={errors} />
         <div className="container election-details__container">
           {/* 🧭 Title, description, and thumbnail */}
           <h2>{election?.title}</h2>
@@ -89,7 +91,7 @@ const ElectionDetails = () => {
           </div>
 
           {/* 🗳️ List of candidates with delete and add buttons */}
-          <menu className="election-details__candidates">
+          <ul className="election-details__candidates">
             {candidates &&
               candidates.map((candidate) => (
                 <ElectionCandidate
@@ -102,15 +104,16 @@ const ElectionDetails = () => {
               className="add__candidate-btn"
               onClick={openAddCandidateModal}
               title="Add new candidate"
+              aria-label="Add new candidate"
             >
               <IoAddOutline />
             </button>
-          </menu>
+          </ul>
 
           {/* 👥 Voter List Table */}
-          <menu className="voters">
+          <section className="voters">
             {voters && voters.length === 0 ? (
-              <h2>No Voter has voted so far</h2>
+              <h3>No Voter has voted so far</h3>
             ) : (
               <>
                 <h2>Voters</h2>
@@ -136,7 +139,7 @@ const ElectionDetails = () => {
                 </table>
               </>
             )}
-          </menu>
+          </section>
         </div>
       </section>
 

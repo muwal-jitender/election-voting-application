@@ -104,6 +104,11 @@ img {
 button {
   cursor: pointer;
 }
+button:focus-visible {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+}
+
 .btn {
   width: fit-content;
   background: var(--color-gray-100);
