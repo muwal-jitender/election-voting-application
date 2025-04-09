@@ -32,8 +32,10 @@
   --color-gray-800: #111;
   --color-gray-900: #000;
 
-  --color-danger: rgb(246, 67, 67);
-  --color-success: rgb(6, 164, 101);
+  /* --color-danger: rgb(246, 67, 67); */
+  --color-danger: #a12c2c;
+  /* --color-success: rgb(6, 164, 101); */
+  --color-success: #035d39;
 
   --radius-1: 0.4rem;
   --radius-2: 0.8rem;
