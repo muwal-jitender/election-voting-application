@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 import { IoIosMoon, IoMdSunny } from "react-icons/io";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 
-import logoSmall from "assets/images/logo/logo-small.png";
 import logo from "assets/images/logo/logo.svg";
 import { useTheme } from "context/ThemeContext";
 import { useUser } from "context/UserContext";
@@ -62,12 +61,8 @@ const PrivateLayout: React.FC = () => {
       {/* 🧭 Navigation Bar */}
       <nav className="nav">
         <div className="container nav__container">
-          {/* 🗳️ Logo (responsive via <picture>) */}
           <Link to="/results" className="nav__logo">
-            <picture>
-              <source media="(max-width: 600px)" srcSet={logoSmall} />
-              <img src={logo} alt="Votely Logo" />
-            </picture>
+            <img src={logo} alt="Votely - Where every vote count" />
           </Link>
 
           {/* 📋 Navigation Links, Theme Toggle, User Info, and Menu Button */}

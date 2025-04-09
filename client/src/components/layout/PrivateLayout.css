@@ -2,7 +2,7 @@
   background: var(--color-primary);
   display: grid;
   place-items: center;
-  height: 3.8rem;
+  height: 3rem;
   position: fixed;
   top: 0;
   left: 0;
@@ -20,19 +20,16 @@
 .nav__logo {
   display: flex;
   align-items: center;
-  height: inherit;
-}
-.nav__logo picture {
-  display: flex;
-  align-items: center;
-  margin-top: 0.4rem;
+  height: 100%;
 }
 
-.nav__logo picture img {
+.nav__logo img {
+  height: auto;
+  max-height: 3rem;
+  object-fit: contain;
   display: block;
-  width: auto;
-  height: 4rem;
 }
+
 .nav__container div {
   display: flex;
   align-items: center;

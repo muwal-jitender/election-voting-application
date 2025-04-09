@@ -5,7 +5,6 @@ import { IoIosMoon, IoMdSunny } from "react-icons/io";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { getTheme, setTheme } from "../../utils/theme.utils";
 
-import logoSmall from "assets/images/logo/logo-small.png";
 import logo from "assets/images/logo/logo.svg";
 import { useUser } from "context/UserContext";
 import { setupAxiosInterceptors } from "../../services/axios.config";
@@ -42,10 +41,7 @@ const PublicLayout: React.FC = () => {
         <div className="container nav__container">
           {/* 🗳️ Logo (responsive) */}
           <Link to="/" className="nav__logo">
-            <picture>
-              <source media="(max-width: 600px)" srcSet={logoSmall} />
-              <img src={logo} alt="Votely Logo" />
-            </picture>
+            <img src={logo} alt="Votely - Where every vote count" />
           </Link>
 
           {/* 🌗 Theme Toggle Button */}

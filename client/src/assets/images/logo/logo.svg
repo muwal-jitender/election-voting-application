@@ -1,13 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="12.8 18.4 212 71.2" style="max-height: 500px" width="212" height="71.2">
-  <style>
-    .title { font-family: Inter, sans-serif; fill: #fff; font-size: 32px; font-weight: bold; }
-    .tagline { font-family: Inter, sans-serif; fill: #fff; font-size: 14px; }
-  </style>
-  <rect fill="rgb(15, 89, 193)" height="100%" width="100%"/>
-  <g transform="translate(20, 25)">
-    <rect fill="#fff" height="30" width="30" y="0" x="0"/>
-    <polyline stroke-width="3" stroke="rgb(15, 89, 193)" fill="none" points="6,15 12,21 24,9"/>
-    <text class="title" y="20" x="45">Votely</text>
-    <text class="tagline" y="40" x="45">where every vote count</text>
+<svg width="200" height="50" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Votely logo">
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="rgb(15, 89, 193)" />
+
+  <!-- Improved Ballot box icon -->
+  <g transform="translate(10, 4)">
+    <!-- Box base -->
+    <rect x="0" y="10" width="32" height="30" rx="5" ry="5" fill="white" />
+    <!-- Slot -->
+    <rect x="8" y="12" width="16" height="4" rx="1" fill="rgb(15, 89, 193)" />
+    <!-- Paper with shadow -->
+    <path d="M11 0 h10 a1 1 0 0 1 1 1 v8 h-12 v-8 a1 1 0 0 1 1 -1 z" fill="white" />
+    <rect x="11" y="0" width="10" height="2" fill="rgba(0,0,0,0.1)" />
   </g>
+
+  <!-- Votely text aligned with box top -->
+  <text x="50" y="21" font-family="Arial, sans-serif" font-size="22" fill="white" font-weight="bold">Votely</text>
+
+  <!-- Larger tagline text for readability -->
+  <text x="50" y="39" font-family="Arial, sans-serif" font-size="13" fill="white">Where every vote count</text>
 </svg>
