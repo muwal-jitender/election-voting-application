@@ -59,7 +59,7 @@ const AddElectionModal: React.FC<AddElectionModalProp> = ({
       <div className="modal__content">
         {/* 🧭 Modal header with title and close button */}
         <header className="modal__header">
-          <h4>Create New Election</h4>
+          <h2>Create New Election</h2>
           <button
             className="modal__close"
             onClick={closeElectionModal}

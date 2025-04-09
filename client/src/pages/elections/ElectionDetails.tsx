@@ -100,14 +100,16 @@ const ElectionDetails = () => {
                   onCandidateDeleted={handleDeletedCandidate}
                 />
               ))}
-            <button
-              className="add__candidate-btn"
-              onClick={openAddCandidateModal}
-              title="Add new candidate"
-              aria-label="Add new candidate"
-            >
-              <IoAddOutline />
-            </button>
+            <li className="li_add-candidate-btn">
+              <button
+                className="add__candidate-btn"
+                onClick={openAddCandidateModal}
+                title="Add new candidate"
+                aria-label="Add new candidate"
+              >
+                <IoAddOutline />
+              </button>
+            </li>
           </ul>
 
           {/* 👥 Voter List Table */}

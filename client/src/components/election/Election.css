@@ -17,9 +17,11 @@
 .election__info {
   padding: 1rem 2rem;
 }
-.election__info h4 {
+
+.election__info h2 {
   margin-bottom: 0.7rem;
   color: var(--color-primary);
+  font-size: 0.9rem;
 }
 .election__cta {
   display: flex;

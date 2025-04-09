@@ -66,7 +66,7 @@ const AddCandidateModal: React.FC<AddCandidateModalProp> = ({
       <div className="modal__content">
         {/* 🧭 Modal Header */}
         <header className="modal__header">
-          <h4>Add Candidate</h4>
+          <h2>Add Candidate</h2>
           <button className="modal__close" onClick={closeAddCandidateModal}>
             <IoMdClose />
           </button>

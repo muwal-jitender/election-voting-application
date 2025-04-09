@@ -236,8 +236,9 @@ body {
   display: grid;
   place-items: center;
 }
-.modal h4 {
+.modal h2 {
   color: var(--color-gray-0);
+  font-size: 0.9rem;
 }
 
 .modal__header {

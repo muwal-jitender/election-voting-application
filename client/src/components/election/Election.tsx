@@ -58,7 +58,7 @@ const Election = ({
       {/* 📋 Election title, description, and actions */}
       <div className="election__info">
         <Link to={`/elections/${id}`}>
-          <h4>{title}</h4>
+          <h2>{title}</h2>
         </Link>
 
         {/* ✏️ Truncated description if too long */}

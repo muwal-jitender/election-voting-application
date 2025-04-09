@@ -14,16 +14,19 @@
   gap: 3rem;
   border-top: 2px solid var(--color-gray-200);
 }
-.add__candidate-btn {
+.li_add-candidate-btn {
   background: var(--color-gray-100);
   border: 2px solid var(--color-primary);
   border-radius: var(--radius-4);
-  font-size: 5rem;
-  color: var(--color-primary);
-  box-shadow: 0 0.8rem 0.8rem rgba(0, 0, 0, 0.1);
-  transition: var(--transform);
   display: grid;
   place-items: center;
+  box-shadow: 0 0.8rem 0.8rem rgba(0, 0, 0, 0.1);
+  max-width: 17rem;
+}
+.add__candidate-btn {
+  font-size: 5rem;
+  color: var(--color-primary);
+  transition: var(--transform);
   min-height: 15rem;
   max-width: 17rem;
 }
