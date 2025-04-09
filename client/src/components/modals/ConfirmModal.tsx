@@ -30,7 +30,7 @@ const ConfirmModal = () => {
     <section className="modal">
       <div className="modal__content confirm__vote-content">
         {/* 🧭 Modal Heading */}
-        <h5>{heading}</h5>
+        <h2>{heading}</h2>
 
         {/* 🟢 Confirm / 🔴 Cancel Buttons */}
         <div className="confirm__vote-cta">

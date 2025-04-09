@@ -66,7 +66,7 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
       <div className="modal__content">
         {/* 🧭 Modal header */}
         <header className="modal__header">
-          <h4>Update Election</h4>
+          <h2>Update Election</h2>
           <button
             className="modal__close"
             onClick={closeElectionModal}

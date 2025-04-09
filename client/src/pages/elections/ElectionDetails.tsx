@@ -115,7 +115,7 @@ const ElectionDetails = () => {
           {/* 👥 Voter List Table */}
           <section className="voters">
             {voters && voters.length === 0 ? (
-              <h3>No Voter has voted so far</h3>
+              <h2>No Voter has voted so far</h2>
             ) : (
               <>
                 <h2>Voters</h2>
@@ -131,7 +131,7 @@ const ElectionDetails = () => {
                     {voters?.map((voter) => (
                       <tr key={voter.id}>
                         <td>
-                          <h5>{voter.fullName}</h5>
+                          <h3>{voter.fullName}</h3>
                         </td>
                         <td>{voter.email}</td>
                         <td>{formatDate(voter.createdAt)}</td>

@@ -4,7 +4,7 @@
   width: 20rem;
 }
 
-.confirm__vote-content h5 {
+.confirm__vote-content h2 {
   margin: 2rem 0;
   color: var(--color-primary);
 }

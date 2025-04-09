@@ -11,7 +11,7 @@
   height: 14rem;
   overflow: hidden;
 }
-.election-candidate h5 {
+.election-candidate h3 {
   margin: 0.5rem 0 0.3rem;
 }
 .election-candidate > div:nth-child(2) {

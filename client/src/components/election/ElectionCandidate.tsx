@@ -46,7 +46,7 @@ const ElectionCandidate = ({
 
       {/* 📋 Candidate Info and Delete Action */}
       <div>
-        <h5>{fullName}</h5>
+        <h3>{fullName}</h3>
 
         {/* 🗯️ Truncated motto if too long */}
         <small>
