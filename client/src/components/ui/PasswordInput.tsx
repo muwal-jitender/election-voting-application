@@ -34,7 +34,11 @@ const PasswordInput = <T extends FieldValues>({
           onClick={() => setShowPassword((prev) => !prev)}
           aria-label={showPassword ? "Hide password" : "Show password"}
         >
-          {showPassword ? <FaEyeSlash /> : <FaEye />}
+          {showPassword ? (
+            <FaEyeSlash className="eye-icon" />
+          ) : (
+            <FaEye className="eye-icon" />
+          )}
         </button>
       </div>
 
