@@ -8,9 +8,12 @@
     <rect x="0" y="10" width="32" height="30" rx="5" ry="5" fill="white" />
     <!-- Slot -->
     <rect x="8" y="12" width="16" height="4" rx="1" fill="rgb(15, 89, 193)" />
-    <!-- Paper with shadow -->
-    <path d="M11 0 h10 a1 1 0 0 1 1 1 v8 h-12 v-8 a1 1 0 0 1 1 -1 z" fill="white" />
-    <rect x="11" y="0" width="10" height="2" fill="rgba(0,0,0,0.1)" />
+
+    <!-- Tilted paper with checkmark -->
+    <g transform="rotate(-30, 16, 2)">
+      <rect x="10" y="0" width="14" height="10" rx="1" ry="1" fill="white" />
+     
+    </g>
   </g>
 
   <!-- Votely text aligned with box top -->
