@@ -1,19 +1,19 @@
 import "react-tooltip/dist/react-tooltip.css";
 import "./PrivateLayout.css";
 
-import React, { useEffect, useState } from "react";
 import { IoIosMoon, IoMdSunny } from "react-icons/io";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 
-import logo from "assets/images/logo/logo.svg";
-import { useTheme } from "context/ThemeContext";
-import { useUser } from "context/UserContext";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaUser } from "react-icons/fa";
 import { HiOutlineBars3 } from "react-icons/hi2";
-import { setupAxiosInterceptors } from "services/axios.config";
-import { voterService } from "services/voter.service";
 import Loader from "./Loader";
+import LogoIcon from "components/ui/LogoIcon";
+import { setupAxiosInterceptors } from "services/axios.config";
+import { useTheme } from "context/ThemeContext";
+import { useUser } from "context/UserContext";
+import { voterService } from "services/voter.service";
 
 const PrivateLayout: React.FC = () => {
   const [showNav, setShowNav] = useState(false);
@@ -62,7 +62,7 @@ const PrivateLayout: React.FC = () => {
       <nav className="nav">
         <div className="container nav__container">
           <Link to="/results" className="nav__logo">
-            <img src={logo} alt="Votely - Where every vote count" />
+            <LogoIcon />
           </Link>
 
           {/* 📋 Navigation Links, Theme Toggle, User Info, and Menu Button */}

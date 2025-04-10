@@ -1,14 +1,14 @@
 import "./PrivateLayout";
 
-import React, { useEffect, useState } from "react";
 import { IoIosMoon, IoMdSunny } from "react-icons/io";
 import { Link, Outlet, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import { getTheme, setTheme } from "../../utils/theme.utils";
 
-import logo from "assets/images/logo/logo.svg";
-import { useUser } from "context/UserContext";
-import { setupAxiosInterceptors } from "../../services/axios.config";
 import Loader from "./Loader";
+import LogoIcon from "components/ui/LogoIcon";
+import { setupAxiosInterceptors } from "../../services/axios.config";
+import { useUser } from "context/UserContext";
 
 const PublicLayout: React.FC = () => {
   const [darkTheme, setDarkTheme] = useState(getTheme());
@@ -41,7 +41,7 @@ const PublicLayout: React.FC = () => {
         <div className="container nav__container">
           {/* 🗳️ Logo (responsive) */}
           <Link to="/" className="nav__logo">
-            <img src={logo} alt="Votely - Where every vote count" />
+            <LogoIcon />
           </Link>
 
           {/* 🌗 Theme Toggle Button */}
