@@ -26,6 +26,10 @@
   color: var(--color-gray-900);
   width: 100%;
 }
+.login__container .form p {
+  font-size: 0.8rem;
+  margin-top: -0.5rem;
+}
 .login__container .form p > a {
   color: var(--color-primary);
   font-weight: 500;

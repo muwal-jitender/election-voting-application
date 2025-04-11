@@ -95,3 +95,5 @@ my-react-app/
 ├── package.json
 └── README.md
 ```
+
+# npx serve -s build
