@@ -13,6 +13,7 @@ import { useParams } from "react-router-dom";
 import { electionService } from "services/election.service";
 import { UiActions } from "store/ui-slice";
 import { IErrorResponse } from "types/ResponseModel";
+import { getOptimizedImageUrl } from "utils/cloudinary.utils";
 
 const ElectionDetails = () => {
   // 🆔 Get election ID from URL params
@@ -76,6 +77,9 @@ const ElectionDetails = () => {
           timeZone: "UTC",
         })
       : "...";
+  const width = 1277;
+  const height = 240;
+  const mobileWidth = 458;
 
   return (
     <>
@@ -87,7 +91,22 @@ const ElectionDetails = () => {
           <h2>{election?.title}</h2>
           <p>{election?.description}</p>
           <div className="election-details__image">
-            <img src={election?.thumbnail} alt={election?.title} />
+            {election && (
+              <img
+                src={getOptimizedImageUrl(
+                  election.thumbnail,
+                  height,
+                  width,
+                  "fit",
+                )}
+                alt={election?.title}
+                srcSet={`
+                          ${getOptimizedImageUrl(election.thumbnail, height, width, "fit")} ${width}w,
+                        ${getOptimizedImageUrl(election.thumbnail, height, mobileWidth, "fit")} ${mobileWidth}w
+                           `}
+                sizes={`(max-width: 600px) ${mobileWidth}px, ${width}px`}
+              />
+            )}
           </div>
 
           {/* 🗳️ List of candidates with delete and add buttons */}

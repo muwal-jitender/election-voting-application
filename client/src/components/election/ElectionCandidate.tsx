@@ -1,5 +1,6 @@
 import "./ElectionCandidate.css";
 
+import ApiErrorMessage from "components/ui/ApiErrorMessage";
 import { useState } from "react";
 import { IoMdTrash } from "react-icons/io";
 import { useDispatch } from "react-redux";
@@ -7,6 +8,7 @@ import { candidateService } from "services/candidate.service";
 import { UiActions } from "store/ui-slice";
 import { ICandidateModel } from "types";
 import { IErrorResponse } from "types/ResponseModel";
+import { getOptimizedImageUrl } from "utils/cloudinary.utils";
 
 const ElectionCandidate = ({
   fullName,
@@ -29,36 +31,52 @@ const ElectionCandidate = ({
             onCandidateDeleted(candidateId); // Notify parent on successful deletion
           } catch (error: unknown) {
             setErrors((error as IErrorResponse).errorMessages || []);
-            console.log(errors); // Debug log for error details
           }
         },
       }),
     );
   };
 
+  const width = 248;
+  const height = 224;
+  const mobileWidth = 272;
+
   return (
-    // 👤 Candidate Card
-    <li className="election-candidate">
-      {/* 🖼️ Candidate Image */}
-      <div className="election-candidate__image">
-        <img src={image} alt={fullName} />
-      </div>
+    <>
+      <ApiErrorMessage errors={errors} />
+      {/* 👤 Candidate Card */}
+      <li className="election-candidate">
+        {/* 🖼️ Candidate Image */}
+        <div className="election-candidate__image">
+          {/* <img src={image} alt={fullName} /> */}
 
-      {/* 📋 Candidate Info and Delete Action */}
-      <div>
-        <h3>{fullName}</h3>
+          <img
+            src={getOptimizedImageUrl(image, height, width, "fill")}
+            alt={fullName}
+            srcSet={`
+                    ${getOptimizedImageUrl(image, height, width, "fill")} ${width}w,
+                    ${getOptimizedImageUrl(image, height, mobileWidth, "fill")} ${mobileWidth}w
+                    `}
+            sizes={`(max-width: 600px) ${mobileWidth}px, ${width}px`}
+          />
+        </div>
 
-        {/* 🗯️ Truncated motto if too long */}
-        <small>
-          {motto.length > 70 ? motto.substring(0, 70) + "..." : motto}
-        </small>
+        {/* 📋 Candidate Info and Delete Action */}
+        <div>
+          <h3>{fullName}</h3>
 
-        {/* ❌ Delete Button with Trash Icon */}
-        <button className="election-candidate__btn" title="Delete candidate">
-          <IoMdTrash onClick={() => handleDeleteCandidate(id)} />
-        </button>
-      </div>
-    </li>
+          {/* 🗯️ Truncated motto if too long */}
+          <small>
+            {motto.length > 70 ? motto.substring(0, 70) + "..." : motto}
+          </small>
+
+          {/* ❌ Delete Button with Trash Icon */}
+          <button className="election-candidate__btn" title="Delete candidate">
+            <IoMdTrash onClick={() => handleDeleteCandidate(id)} />
+          </button>
+        </div>
+      </li>
+    </>
   );
 };
 

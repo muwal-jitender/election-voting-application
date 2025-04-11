@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import { Tooltip } from "react-tooltip";
 import { electionService } from "services/election.service";
 import { UiActions } from "store/ui-slice";
+import { getOptimizedImageUrl } from "utils/cloudinary.utils";
 import { tooltipStyles } from "utils/utils";
 
 const Election = ({
@@ -46,13 +47,23 @@ const Election = ({
       }),
     );
   };
-
+  const width = 272;
+  const height = 160;
+  const mobileWidth = 414;
   return (
     // 🧾 Election card container
     <article className="election">
       {/* 🖼 Election thumbnail */}
       <div className="election__image">
-        <img src={thumbnail} alt={title} />
+        <img
+          src={getOptimizedImageUrl(thumbnail, height, width)}
+          alt={title}
+          srcSet={`
+              ${getOptimizedImageUrl(thumbnail, height, width)} ${width}w,
+            ${getOptimizedImageUrl(thumbnail, height, mobileWidth)} ${mobileWidth}w
+               `}
+          sizes={`(max-width: 600px) ${mobileWidth}px, ${width}px`}
+        />
       </div>
 
       {/* 📋 Election title, description, and actions */}
