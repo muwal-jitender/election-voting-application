@@ -11,7 +11,7 @@ import { Link } from "react-router-dom";
 import { Tooltip } from "react-tooltip";
 import { electionService } from "services/election.service";
 import { UiActions } from "store/ui-slice";
-import { getOptimizedImageUrl } from "utils/cloudinary.utils";
+import { cloudinaryService } from "utils/cloudinary.utils";
 import { tooltipStyles } from "utils/utils";
 
 const Election = ({
@@ -56,11 +56,11 @@ const Election = ({
       {/* 🖼 Election thumbnail */}
       <div className="election__image">
         <img
-          src={getOptimizedImageUrl(thumbnail, height, width)}
+          src={cloudinaryService.getOptimizedImageUrl(thumbnail, height, width)}
           alt={title}
           srcSet={`
-              ${getOptimizedImageUrl(thumbnail, height, width)} ${width}w,
-            ${getOptimizedImageUrl(thumbnail, height, mobileWidth)} ${mobileWidth}w
+              ${cloudinaryService.getOptimizedImageUrl(thumbnail, height, width)} ${width}w,
+            ${cloudinaryService.getOptimizedImageUrl(thumbnail, height, mobileWidth)} ${mobileWidth}w
                `}
           sizes={`(max-width: 600px) ${mobileWidth}px, ${width}px`}
         />

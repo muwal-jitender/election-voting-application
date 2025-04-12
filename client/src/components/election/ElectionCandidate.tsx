@@ -8,7 +8,7 @@ import { candidateService } from "services/candidate.service";
 import { UiActions } from "store/ui-slice";
 import { ICandidateModel } from "types";
 import { IErrorResponse } from "types/ResponseModel";
-import { getOptimizedImageUrl } from "utils/cloudinary.utils";
+import { cloudinaryService } from "utils/cloudinary.utils";
 
 const ElectionCandidate = ({
   fullName,
@@ -51,11 +51,16 @@ const ElectionCandidate = ({
           {/* <img src={image} alt={fullName} /> */}
 
           <img
-            src={getOptimizedImageUrl(image, height, width, "fill")}
+            src={cloudinaryService.getOptimizedImageUrl(
+              image,
+              height,
+              width,
+              "fill",
+            )}
             alt={fullName}
             srcSet={`
-                    ${getOptimizedImageUrl(image, height, width, "fill")} ${width}w,
-                    ${getOptimizedImageUrl(image, height, mobileWidth, "fill")} ${mobileWidth}w
+                    ${cloudinaryService.getOptimizedImageUrl(image, height, width, "fill")} ${width}w,
+                    ${cloudinaryService.getOptimizedImageUrl(image, height, mobileWidth, "fill")} ${mobileWidth}w
                     `}
             sizes={`(max-width: 600px) ${mobileWidth}px, ${width}px`}
           />

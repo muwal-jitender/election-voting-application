@@ -1,6 +1,6 @@
 import "./CandidateRating.css";
 
-import { getOptimizedImageUrl } from "utils/cloudinary.utils";
+import { cloudinaryService } from "utils/cloudinary.utils";
 import { calculateVoteCount } from "utils/utils";
 
 interface CandidateRatingProps {
@@ -21,7 +21,10 @@ const CandidateRating = ({
     <li className="result__Candidate">
       {/* 🖼️ Candidate Image */}
       <div className="result__candidate-image">
-        <img src={getOptimizedImageUrl(image, 56, 50)} alt={fullName} />
+        <img
+          src={cloudinaryService.getOptimizedImageUrl(image, 56, 50)}
+          alt={fullName}
+        />
         {/* <img src={image} alt={fullName} /> */}
       </div>
 

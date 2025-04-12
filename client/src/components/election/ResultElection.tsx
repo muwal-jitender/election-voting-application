@@ -5,7 +5,7 @@ import { ICandidateModel, IElectionDetail } from "types";
 
 import CandidateRating from "components/candidate/CandidateRating";
 import { Link } from "react-router-dom";
-import { getOptimizedImageUrl } from "utils/cloudinary.utils";
+import { cloudinaryService } from "utils/cloudinary.utils";
 
 const ResultElection = (electionDetail: IElectionDetail) => {
   const [totalVotes, setTotalVotes] = useState(0);
@@ -34,7 +34,11 @@ const ResultElection = (electionDetail: IElectionDetail) => {
         {/* 🖼️ Election Thumbnail */}
         <div className="result_header-image">
           <img
-            src={getOptimizedImageUrl(electionDetail.thumbnail, 48, 48)}
+            src={cloudinaryService.getOptimizedImageUrl(
+              electionDetail.thumbnail,
+              48,
+              48,
+            )}
             alt={electionDetail.title}
           />
         </div>
