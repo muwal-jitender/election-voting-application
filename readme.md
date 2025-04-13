@@ -20,8 +20,8 @@ A full-stack web application for organizing and participating in digital electio
 
 ```
 election-voting-app/
-├── client/     # React frontend
-├── server/     # Node.js + Express backend
+├── [client/](./client/README.md)     # React frontend
+├── [server/](./server/readme.md)     # Node.js + Express backend
 └── README.md   # Root-level overview (this file)
 ```
 
@@ -29,11 +29,8 @@ election-voting-app/
 ### Frontend
 
 - React (TypeScript)
-
 - Redux Toolkit
-
 - Axios
-
 - Tailwind CSS
 
 ### Backend
