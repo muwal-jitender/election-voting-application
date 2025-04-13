@@ -18,12 +18,12 @@ A full-stack web application for organizing and participating in digital electio
 
 ## 📁 Project Structure
 
-```
-election-voting-app/
-├── [client/](./client/README.md)     # React frontend
-├── [server/](./server/readme.md)     # Node.js + Express backend
-└── README.md   # Root-level overview (this file)
-```
+
+### election-voting-app/
+- [client/](./client/README.md)     # React frontend
+- [server/](./server/readme.md)     # Node.js + Express backend
+- README.md   # Root-level overview (this file)
+
 
 ## 🧰 Tech Stack
 ### Frontend
