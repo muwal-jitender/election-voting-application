@@ -1,6 +1,7 @@
 import "./ElectionCandidate.css";
 
 import ApiErrorMessage from "components/ui/ApiErrorMessage";
+import CloudinaryImage from "components/ui/CloudinaryImage";
 import { useState } from "react";
 import { IoMdTrash } from "react-icons/io";
 import { useDispatch } from "react-redux";
@@ -8,7 +9,6 @@ import { candidateService } from "services/candidate.service";
 import { UiActions } from "store/ui-slice";
 import { ICandidateModel } from "types";
 import { IErrorResponse } from "types/ResponseModel";
-import { cloudinaryService } from "utils/cloudinary.utils";
 
 const ElectionCandidate = ({
   fullName,
@@ -37,10 +37,6 @@ const ElectionCandidate = ({
     );
   };
 
-  const width = 248;
-  const height = 224;
-  const mobileWidth = 272;
-
   return (
     <>
       <ApiErrorMessage errors={errors} />
@@ -48,21 +44,14 @@ const ElectionCandidate = ({
       <li className="election-candidate">
         {/* 🖼️ Candidate Image */}
         <div className="election-candidate__image">
-          {/* <img src={image} alt={fullName} /> */}
-
-          <img
-            src={cloudinaryService.getOptimizedImageUrl(
-              image,
-              height,
-              width,
-              "fill",
-            )}
+          <CloudinaryImage
             alt={fullName}
-            srcSet={`
-                    ${cloudinaryService.getOptimizedImageUrl(image, height, width, "fill")} ${width}w,
-                    ${cloudinaryService.getOptimizedImageUrl(image, height, mobileWidth, "fill")} ${mobileWidth}w
-                    `}
-            sizes={`(max-width: 600px) ${mobileWidth}px, ${width}px`}
+            cloudinaryUrl={image}
+            gravity="face"
+            height={224}
+            mobileWidth={272}
+            mode="thumb"
+            width={248}
           />
         </div>
 

@@ -1,6 +1,9 @@
 .election-details {
   margin: 5rem 0;
 }
+.election-details__container {
+  width: 64rem;
+}
 .election-details__image {
   height: 15rem;
   margin: 1.2rem 0 0.8rem;

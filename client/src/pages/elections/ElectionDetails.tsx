@@ -8,12 +8,12 @@ import ElectionCandidate from "components/election/ElectionCandidate";
 import AddCandidateModal from "components/modals/AddCandidateModal";
 import ConfirmModal from "components/modals/ConfirmModal";
 import ApiErrorMessage from "components/ui/ApiErrorMessage";
+import CloudinaryImage from "components/ui/CloudinaryImage";
 import { IoAddOutline } from "react-icons/io5";
 import { useParams } from "react-router-dom";
 import { electionService } from "services/election.service";
 import { UiActions } from "store/ui-slice";
 import { IErrorResponse } from "types/ResponseModel";
-import { cloudinaryService } from "utils/cloudinary.utils";
 
 const ElectionDetails = () => {
   // 🆔 Get election ID from URL params
@@ -77,9 +77,6 @@ const ElectionDetails = () => {
           timeZone: "UTC",
         })
       : "...";
-  const width = 1277;
-  const height = 240;
-  const mobileWidth = 458;
 
   return (
     <>
@@ -92,19 +89,14 @@ const ElectionDetails = () => {
           <p>{election?.description}</p>
           <div className="election-details__image">
             {election && (
-              <img
-                src={cloudinaryService.getOptimizedImageUrl(
-                  election.thumbnail,
-                  height,
-                  width,
-                  "fit",
-                )}
-                alt={election?.title}
-                srcSet={`
-                          ${cloudinaryService.getOptimizedImageUrl(election.thumbnail, height, width, "fit")} ${width}w,
-                        ${cloudinaryService.getOptimizedImageUrl(election.thumbnail, height, mobileWidth, "fit")} ${mobileWidth}w
-                           `}
-                sizes={`(max-width: 600px) ${mobileWidth}px, ${width}px`}
+              <CloudinaryImage
+                alt={election.title}
+                cloudinaryUrl={election.thumbnail}
+                gravity="center"
+                height={240}
+                mobileWidth={458}
+                mode="fit"
+                width={1277}
               />
             )}
           </div>
