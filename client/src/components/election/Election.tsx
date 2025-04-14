@@ -56,6 +56,7 @@ const Election = ({
       {/* 🖼 Election thumbnail */}
       <div className="election__image">
         <img
+          loading="lazy"
           src={cloudinaryService.getOptimizedImageUrl(thumbnail, height, width)}
           alt={title}
           srcSet={`

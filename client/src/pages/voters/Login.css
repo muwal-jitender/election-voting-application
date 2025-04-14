@@ -28,7 +28,7 @@
 }
 .login__container .form p {
   font-size: 0.8rem;
-  margin-top: -0.5rem;
+  margin-top: 0.2rem;
 }
 .login__container .form p > a {
   color: var(--color-primary);
