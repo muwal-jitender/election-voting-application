@@ -54,14 +54,13 @@ const Election = ({
       {/* 🖼 Election thumbnail */}
       <div className="election__image">
         <CloudinaryImage
-          alt={thumbnail}
-          cloudinaryUrl={title}
-          gravity="face"
+          alt={title}
+          cloudinaryUrl={thumbnail}
+          gravity="center"
           height={160}
           mobileWidth={414}
-          mode="thumb"
+          mode="fit"
           width={272}
-          loading="lazy"
         />
       </div>
 
