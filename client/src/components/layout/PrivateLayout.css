@@ -1,7 +1,7 @@
 .nav {
   background: var(--color-primary);
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
   height: 3rem;
   position: fixed;
   top: 0;
@@ -51,8 +51,9 @@
 }
 .theme__toggle-btn {
   background: transparent;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   transition: var(--transform);
+  margin-top: 0.5rem;
 }
 .theme__toggle-btn:hover {
   opacity: 0.75;
@@ -69,7 +70,7 @@
   text-transform: capitalize;
 }
 .nav__user .user__icon {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
 }
 .nav__toggle-btn {
   background: transparent;
@@ -84,7 +85,10 @@
     height: 3.5rem;
   }
   .nav__container div {
-    gap: 3rem;
+    gap: 2rem;
+  }
+  .nav__user span {
+    font-size: 0.7rem;
   }
   .nav__logo picture {
     margin-top: 0;

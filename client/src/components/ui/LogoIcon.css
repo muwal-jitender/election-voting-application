@@ -1,0 +1,10 @@
+.logo-icon {
+  width: 200px;
+  height: 48px;
+}
+
+@media screen and (max-width: 600px) {
+  .logo-icon {
+    width: 155px;
+  }
+}
