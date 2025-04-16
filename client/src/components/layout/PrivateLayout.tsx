@@ -1,22 +1,25 @@
 import "react-tooltip/dist/react-tooltip.css";
 import "./PrivateLayout.css";
 
+import React, { useEffect, useState } from "react";
 import { IoIosMoon, IoMdSunny } from "react-icons/io";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
-import React, { useEffect, useState } from "react";
 
+import LogoIcon from "components/ui/LogoIcon";
+import { useTheme } from "context/ThemeContext";
+import { useUser } from "context/UserContext";
+import { useWindowWidth } from "hooks/useWindowWidth";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaUser } from "react-icons/fa";
 import { HiOutlineBars3 } from "react-icons/hi2";
-import Loader from "./Loader";
-import LogoIcon from "components/ui/LogoIcon";
 import { setupAxiosInterceptors } from "services/axios.config";
-import { useTheme } from "context/ThemeContext";
-import { useUser } from "context/UserContext";
 import { voterService } from "services/voter.service";
+import Loader from "./Loader";
 
 const PrivateLayout: React.FC = () => {
-  const [showNav, setShowNav] = useState(false);
+  const windowWidth = useWindowWidth();
+  const isMobile = windowWidth < 600;
+  const [showNav, setShowNav] = useState(!isMobile);
   const { name: theme, toggleTheme } = useTheme();
   const [loading, setLoading] = useState(false);
   const { isAdmin, logout: userLogout, setUser, user } = useUser();
@@ -28,15 +31,13 @@ const PrivateLayout: React.FC = () => {
     setupAxiosInterceptors(setLoading, navigate, user, setUser);
   }, [navigate, user, setUser]);
 
-  // ✅ Show/hide navigation menu on window resize
+  // ✅ Update showNav reactively on screen size change
   useEffect(() => {
-    showHideNav();
-    window.addEventListener("resize", showHideNav);
-    return () => window.removeEventListener("resize", showHideNav);
-  }, []);
+    setShowNav(!isMobile);
+  }, [isMobile]);
 
   const showHideNav = () => {
-    if (window.innerWidth < 600) {
+    if (isMobile) {
       setShowNav(false);
     } else {
       setShowNav(true);
@@ -53,13 +54,18 @@ const PrivateLayout: React.FC = () => {
     showHideNav();
   };
 
+  const applyActiveClass = (isActive: boolean) => {
+    if (!isActive) return undefined;
+    return windowWidth > 600 ? "active-link" : undefined;
+  };
+
   return (
     <>
       {/* 🌀 Show loader when loading */}
       {loading && <Loader />}
 
       {/* 🧭 Navigation Bar */}
-      <nav className="nav">
+      <nav className="nav" role="navigation">
         <div className="container nav__container">
           <Link to="/results" className="nav__logo">
             <LogoIcon />
@@ -76,9 +82,7 @@ const PrivateLayout: React.FC = () => {
                     to="/elections"
                     onClick={handleNavToggle}
                     // 🔽 Highlight link with white underline when it's active (for admin)
-                    className={({ isActive }) =>
-                      isActive ? "active-admin" : undefined
-                    }
+                    className={({ isActive }) => applyActiveClass(isActive)}
                   >
                     Elections
                   </NavLink>
@@ -90,7 +94,7 @@ const PrivateLayout: React.FC = () => {
                   to="/results"
                   onClick={handleNavToggle}
                   className={({ isActive }) =>
-                    isActive && isAdmin ? "active-admin" : undefined
+                    isAdmin ? applyActiveClass(isActive) : undefined
                   }
                 >
                   Results

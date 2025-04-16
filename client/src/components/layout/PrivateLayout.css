@@ -46,7 +46,7 @@
 .nav__container a:hover {
   color: var(--color-primary-variant);
 }
-.nav__container menu a.active-admin {
+.nav__container menu a.active-link {
   border-bottom: 1.5px solid var(--color-gray-0);
 }
 .theme__toggle-btn {
@@ -87,6 +87,7 @@
   .nav__container div {
     gap: 2rem;
   }
+
   .nav__user span {
     font-size: 0.7rem;
   }
@@ -100,7 +101,7 @@
   .nav__container menu {
     position: fixed;
     flex-direction: column;
-    top: 4rem;
+    top: 3.5rem;
     right: 0;
     gap: 0;
     width: 12rem;
