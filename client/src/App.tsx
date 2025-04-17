@@ -11,7 +11,9 @@ import {
   Results,
 } from "./pages/general/index";
 
+import { useWindowWidth } from "hooks/useWindowWidth";
 import React from "react";
+import { ToastContainer } from "react-toastify";
 import PrivateLayout from "./components/layout/PrivateLayout";
 import AdminRoute from "./components/layout/ProtectedRoute";
 import PublicLayout from "./components/layout/PublicLayout";
@@ -45,7 +47,23 @@ const router = createBrowserRouter([
 ]);
 
 const App: React.FC = () => {
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+      <ToastContainer
+        position={useWindowWidth() < 600 ? "bottom-center" : "top-center"}
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+    </>
+  );
 };
 
 export default App;

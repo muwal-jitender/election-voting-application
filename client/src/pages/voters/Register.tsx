@@ -13,6 +13,7 @@ import PasswordInput from "components/ui/PasswordInput";
 import TextInput from "components/ui/TextInput";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import { voterService } from "services/voter.service";
 import { IRegisterModel } from "types/index";
 import { IErrorResponse } from "types/ResponseModel";
@@ -40,6 +41,7 @@ const Register = () => {
   const onSubmit = async (formData: IRegisterModel) => {
     try {
       await voterService.register(formData); // 🔐 API call
+      toast.success("Registration successful! Please log in.");
       navigate("/"); // ➡️ Redirect to login on success
     } catch (error: unknown) {
       setServerErrors((error as IErrorResponse).errorMessages || []);
