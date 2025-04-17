@@ -88,6 +88,8 @@ Please visit them to explore:
 ![Admin Login Page](./screenshots/voter-login.gif)
 ### Register Page
 ![Register Page](./screenshots/register.gif)
+### Elections Page
+![Register Page](./screenshots/elections.gif)
 
 ## 🧰 Tech Stack
 ### Frontend
