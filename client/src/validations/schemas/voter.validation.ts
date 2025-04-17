@@ -19,10 +19,10 @@ export const registerValidationSchema = Yup.object().shape({
     .email("Invalid email format")
     .required("Email is required"),
   password: Yup.string()
-    .min(8, "")
-    .minUppercase(1, "")
-    .minNumbers(1, "")
-    .minSymbols(1, "")
+    .minUppercase(1, "Password is required")
+    .minNumbers(1, "At least one number")
+    .minSymbols(1, "At least one special character")
+    .min(8, "At least one uppercase letter")
     .required("Password is required"),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Password do not match")

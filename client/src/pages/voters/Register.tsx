@@ -47,7 +47,9 @@ const Register = () => {
   };
 
   return (
-    <section className="register">
+    <section
+      className={`register ${Object.keys(errors).length ? "register--has-error" : ""}`}
+    >
       <div className="container register__container">
         <h2>Register</h2>
 
