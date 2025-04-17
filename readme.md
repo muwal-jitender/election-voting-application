@@ -82,8 +82,10 @@ Please visit them to explore:
 - 🛠️ Feature implementation details
 
 ## 📸 Screenshots
-### Login Page
-![Login Page](./screenshots/login.gif)
+### Admin Login Page
+![Admin Login Page](./screenshots/admin-login.gif)
+### Voter Login Page
+![Admin Login Page](./screenshots/voter-login.gif)
 ### Register Page
 ![Register Page](./screenshots/register.gif)
 

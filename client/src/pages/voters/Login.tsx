@@ -10,6 +10,7 @@ import TextInput from "components/ui/TextInput";
 import { useUser } from "context/UserContext";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 import { voterService } from "services/voter.service";
 import { ILoginModel } from "types";
 import { IErrorResponse } from "types/ResponseModel";
@@ -37,6 +38,9 @@ const Login = () => {
 
       if (user) {
         setUser(user); // ✅ Set user in context
+        if (user.isAdmin) {
+          toast.success("You’ve been logged in as Admin");
+        }
         navigate("/results"); // ➡️ Redirect to results page
       }
     } catch (error: unknown) {
