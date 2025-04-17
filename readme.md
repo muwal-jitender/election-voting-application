@@ -81,6 +81,10 @@ Please visit them to explore:
 - 🛡️ Technologies and tools used
 - 🛠️ Feature implementation details
 
+## 📸 Screenshots
+### Login Page
+![Login Page](./screenshots/login.gif)
+
 ## 🧰 Tech Stack
 ### Frontend
 
