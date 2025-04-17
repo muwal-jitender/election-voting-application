@@ -84,6 +84,8 @@ Please visit them to explore:
 ## 📸 Screenshots
 ### Login Page
 ![Login Page](./screenshots/login.gif)
+### Register Page
+![Register Page](./screenshots/register.gif)
 
 ## 🧰 Tech Stack
 ### Frontend
