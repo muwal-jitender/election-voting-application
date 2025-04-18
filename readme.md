@@ -141,7 +141,7 @@ Please visit them to explore:
 ## 🛠️ Setup
 ### Clone the project:
 ```
-- git clone https://github.com/your-username/election-voting-app.git
+- git clone https://github.com/muwal-jitender/election-voting-application.git
 - cd election-voting-app
 ```
 ### Install dependencies:
