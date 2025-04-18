@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
 import { electionService } from "services/election.service";
 import { UiActions } from "store/ui-slice";
 import { IErrorResponse } from "types/ResponseModel";
@@ -53,6 +54,7 @@ const UpdateElectionModal: React.FC<UpdateElectionModalProps> = ({
   const onSubmit = async (formData: IEditElection) => {
     try {
       const response = await electionService.update(election?.id, formData);
+      toast.success("Election updated successfully!");
       onElectionUpdated(response.data as IElectionModel); // Notify parent
       closeElectionModal(); // Close modal on success
     } catch (error: unknown) {

@@ -5,6 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
 import { candidateService } from "services/candidate.service";
 import { UiActions } from "store/ui-slice";
 import { IErrorResponse } from "types/ResponseModel";
@@ -53,6 +54,7 @@ const AddCandidateModal: React.FC<AddCandidateModalProp> = ({
   const onSubmit = async (formData: IAddCandidateModel) => {
     try {
       const response = await candidateService.create(formData, electionId);
+      toast.success("Candidate added successfully!");
       onCandidateAdded(response.data as ICandidateModel); // Notify parent
       closeAddCandidateModal(); // Close modal on success
     } catch (error: unknown) {

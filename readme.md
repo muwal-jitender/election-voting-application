@@ -82,14 +82,29 @@ Please visit them to explore:
 - 🛠️ Feature implementation details
 
 ## 📸 Screenshots
-### Admin Login Page
+### Login Page
 ![Admin Login Page](./screenshots/admin-login.gif)
-### Voter Login Page
-![Admin Login Page](./screenshots/voter-login.gif)
 ### Register Page
 ![Register Page](./screenshots/register.gif)
-### Elections Page
-![Register Page](./screenshots/elections.gif)
+### Election List (Admin Only)
+![Election Listing](./screenshots/elections.png)
+### Add Election
+![Election Add Page](./screenshots/add-election.png)
+### Edit Election
+![Election Edit Page](./screenshots/edit-election.png)
+
+### Election Management Panel
+![Election Management Panel](./screenshots/election-detail.png)
+### Add Candidate to an Election
+![Add Candidate to an Election](./screenshots/add-candidate.png)
+### Delete Candidate from Election
+![Delete Candidate from Election](./screenshots/delete-candidate.png)
+### 🏆Show Election Results
+![Show Results](./screenshots/show-results.png)
+### Cast Your Vote
+![Cast Your Vote](./screenshots/cast-vote.png)
+### Confirm Your Vote
+![Cast Your Vote](./screenshots/confirm-vote.png)
 
 ## 🧰 Tech Stack
 ### Frontend
