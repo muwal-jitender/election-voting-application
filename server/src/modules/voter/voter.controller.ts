@@ -46,9 +46,9 @@ export class VoterController {
       const token = this.voterService.generateToken(voter);
 
       res.cookie("token", token, {
-        httpOnly: true,
+        httpOnly: true, // Protects against XSS attacks
         secure: env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "strict", // Protects against CSRF attacks
         maxAge: 24 * 60 * 60 * 1000, // 1 day
       });
 
@@ -100,6 +100,86 @@ export class VoterController {
     } catch (error) {
       logger.error(`❌ Logout failed`, { error });
       next(error);
+    }
+  }
+
+  async refreshToken(req: Request, res: Response, next: NextFunction) {
+    try {
+      const refreshToken = req.cookies?.refresh_token;
+
+      if (!refreshToken) {
+        return res
+          .status(StatusCodes.UNAUTHORIZED)
+          .json({ message: "No refresh token provided." });
+      }
+
+      // Verify refresh token
+      jwt.verify(
+        refreshToken,
+        env.JWT_REFRESH_SECRET,
+        async (err, decoded: any) => {
+          if (err || !decoded?.userId) {
+            return res
+              .status(StatusCodes.UNAUTHORIZED)
+              .json({ message: "Invalid or expired refresh token." });
+          }
+
+          // (Optional) Verify if refresh token is still valid in DB
+          // const storedToken = await tokenService.findValidRefreshToken(decoded.userId, refreshToken);
+          // if (!storedToken) return res.status(401).json({ message: "Token no longer valid." });
+
+          const user = await getUserById(decoded.userId);
+          if (!user) {
+            return res
+              .status(StatusCodes.UNAUTHORIZED)
+              .json({ message: "User no longer exists." });
+          }
+
+          // Generate new tokens
+          const newAccessToken = jwt.sign(
+            { userId: user.id, isAdmin: user.isAdmin },
+            env.JWT_SECRET,
+            {
+              expiresIn: "15m",
+            }
+          );
+
+          const newRefreshToken = jwt.sign(
+            { userId: user.id },
+            env.JWT_REFRESH_SECRET,
+            {
+              expiresIn: "7d",
+            }
+          );
+
+          // (Optional) Replace old refresh token in DB
+          // await tokenService.updateRefreshToken(user.id, newRefreshToken);
+
+          // Set new cookies
+          res.cookie("access_token", newAccessToken, {
+            httpOnly: true,
+            secure: env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 15 * 60 * 1000, // 15 minutes
+          });
+
+          res.cookie("refresh_token", newRefreshToken, {
+            httpOnly: true,
+            secure: env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+          });
+
+          return res
+            .status(StatusCodes.OK)
+            .json({ message: "Token refreshed successfully." });
+        }
+      );
+    } catch (error) {
+      logger.error("⚠️ Error refreshing token", { error });
+      return res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ message: "Something went wrong." });
     }
   }
 }
