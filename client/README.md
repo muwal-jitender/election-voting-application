@@ -1,6 +1,6 @@
-# Getting Started with Create React App
+# 🗳️ Election Voting App – Client
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is the **client-side** of the Election Voting App, built using **React 19**, **TypeScript**, **Redux Toolkit**, and **React Router v7**. It provides both admin and voter interfaces to manage and participate in elections.
 
 ## Available Scripts
 
