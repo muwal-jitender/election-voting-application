@@ -52,6 +52,13 @@ export class VoterController {
         maxAge: 24 * 60 * 60 * 1000, // 1 day
       });
 
+      res.cookie("refresh_token", token, {
+        httpOnly: true,
+        secure: env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      });
+
       return res.status(StatusCodes.OK).json({
         message: "You are now logged in",
         data: {
@@ -177,9 +184,7 @@ export class VoterController {
       );
     } catch (error) {
       logger.error("⚠️ Error refreshing token", { error });
-      return res
-        .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ message: "Something went wrong." });
+      next(error);
     }
   }
 }
