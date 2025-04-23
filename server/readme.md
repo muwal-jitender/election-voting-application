@@ -10,6 +10,7 @@ This is the **backend API** for the Election Voting App, built with **Node.js**,
 - 🗳️ **Election & Candidate Management** (CRUD)
 - 📊 **Vote Casting & Results Tracking**
 - ☁️ **Cloudinary** integration for image uploads (e.g., flags, candidate photos)
+- 💾 **MongoDB Transactions** for consistent multi-document operations
 - 🧩 **Dependency Injection** with `tsyringe`
 - 📋 **Request Validation** with `class-validator`
 - 🗄️ **MongoDB** with `mongoose` for data storage
@@ -33,6 +34,12 @@ This is the **backend API** for the Election Voting App, built with **Node.js**,
 | **class-validator** | DTO validation for requests          |
 
 ---
+
+## 🗄️ Database Consistency
+
+- This app uses **MongoDB Transactions** to ensure data consistency across multiple collections.
+- Example: When casting a vote, both the candidate's vote count and voter's status are updated atomically.
+- Transactions are implemented using `mongoose` sessions to handle complex operations safely.
 
 ## 🛠️ Setup Instructions
 
