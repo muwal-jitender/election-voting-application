@@ -11,7 +11,8 @@ import { AppError } from "utils/exceptions.utils";
 import { stripMongoMeta } from "utils/utils";
 import type { StringValue } from "ms";
 import logger from "logger";
-
+import { v4 as uuidv4 } from "uuid";
+import { jwtService } from "utils/jwt.utils";
 @singleton()
 export class VoterService {
   constructor(
@@ -112,16 +113,42 @@ export class VoterService {
     return voter;
   }
 
-  generateToken(voter: VoterDocument): string {
-    logger.info(`🎟️ Generating JWT token for ➔ ${voter.email}`);
+  generateAccessToken(voter: VoterDocument): string {
+    logger.info(`🎟️ Generating Access token for ➔ ${voter.email}`);
     const payload = {
       id: voter.id,
       email: voter.email,
       isAdmin: voter.isAdmin,
     };
-    const options = { expiresIn: env.JWT_EXPIRES_IN as StringValue };
-    const token = jwt.sign(payload, env.JWT_SECRET, options);
-    logger.debug(`✅ Token generated for ➔ ${voter.email}`);
-    return token;
+
+    const accessToken = jwtService.signin(
+      payload,
+      env.JWT_ACCESS_SECRET,
+      "AccessToken"
+    );
+    logger.debug(`✅ Access token generated for ➔ ${voter.email}`);
+    return accessToken;
+  }
+  generateRefreshToken(
+    userId: number,
+    email: string,
+    ipAddress?: string,
+    userAgent?: string
+  ): string {
+    logger.info(`🎟️ Generating Refresh token for ➔ ${email}`);
+    const payload = {
+      id: userId,
+      tokenId: uuidv4(),
+      ipAddress,
+      userAgent,
+    };
+
+    const refreshToken = jwtService.signin(
+      payload,
+      env.JWT_REFRESH_SECRET,
+      "RefreshToken"
+    );
+    logger.debug(`✅ Refresh token generated for ➔ ${email}`);
+    return refreshToken;
   }
 }

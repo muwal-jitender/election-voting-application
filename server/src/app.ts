@@ -36,6 +36,13 @@ app.use(cookieParser());
 app.use(express.json()); // For JSON payloads
 app.use(express.urlencoded({ extended: true })); // For form submissions
 
+/**
+ * Only trust X-Forwarded-For headers if the request comes from these IPs
+ * Useful when your app is behind a reverse proxy (like Nginx or AWS ELB).
+ * Ignore forwarded headers from any other untrusted sources.
+ */
+app.set("trust proxy", ["127.0.0.1", "10.0.0.1"]);
+
 // ✅ Configure Express-fileupload Middleware
 configureFileUpload(app);
 

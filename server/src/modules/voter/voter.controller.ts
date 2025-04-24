@@ -1,7 +1,7 @@
 // Voter Controller
 import "reflect-metadata";
 
-import { NextFunction, Request, Response } from "express";
+import { CookieOptions, NextFunction, Request, Response } from "express";
 import { inject, injectable } from "tsyringe";
 
 import { RegisterVoterDTO, SignInDTO } from "./voter.dto";
@@ -11,6 +11,7 @@ import { StatusCodes } from "http-status-codes";
 import { env } from "utils/env-config.utils";
 import logger from "logger";
 import { validateMongoId } from "utils/utils";
+import { jwtService } from "utils/jwt.utils";
 
 @injectable()
 export class VoterController {
@@ -42,22 +43,27 @@ export class VoterController {
         signInDTO.email.toLowerCase(),
         signInDTO.password
       );
+      const ipAddress = req.ip || req.socket.remoteAddress;
+      const userAgent = req.headers["user-agent"];
+      const accessToken = this.voterService.generateAccessToken(voter);
 
-      const token = this.voterService.generateToken(voter);
+      res.cookie(
+        "access-token",
+        accessToken,
+        jwtService.cookieOptions("AccessToken")
+      );
 
-      res.cookie("token", token, {
-        httpOnly: true, // Protects against XSS attacks
-        secure: env.NODE_ENV === "production",
-        sameSite: "strict", // Protects against CSRF attacks
-        maxAge: 24 * 60 * 60 * 1000, // 1 day
-      });
-
-      res.cookie("refresh_token", token, {
-        httpOnly: true,
-        secure: env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      });
+      const refreshToken = this.voterService.generateRefreshToken(
+        voter.id,
+        voter.email,
+        ipAddress,
+        userAgent
+      );
+      res.cookie(
+        "refresh-token",
+        refreshToken,
+        jwtService.cookieOptions("RefreshToken")
+      );
 
       return res.status(StatusCodes.OK).json({
         message: "You are now logged in",
@@ -121,67 +127,51 @@ export class VoterController {
       }
 
       // Verify refresh token
-      jwt.verify(
-        refreshToken,
-        env.JWT_REFRESH_SECRET,
-        async (err, decoded: any) => {
-          if (err || !decoded?.userId) {
-            return res
-              .status(StatusCodes.UNAUTHORIZED)
-              .json({ message: "Invalid or expired refresh token." });
-          }
+      jwtService.verify(refreshToken, env.JWT_REFRESH_SECRET);
 
-          // (Optional) Verify if refresh token is still valid in DB
-          // const storedToken = await tokenService.findValidRefreshToken(decoded.userId, refreshToken);
-          // if (!storedToken) return res.status(401).json({ message: "Token no longer valid." });
+      // (Optional) Verify if refresh token is still valid in DB
+      // const storedToken = await tokenService.findValidRefreshToken(decoded.userId, refreshToken);
+      // if (!storedToken) return res.status(401).json({ message: "Token no longer valid." });
 
-          const user = await getUserById(decoded.userId);
-          if (!user) {
-            return res
-              .status(StatusCodes.UNAUTHORIZED)
-              .json({ message: "User no longer exists." });
-          }
+      const user = await this.voterService.getVoterById("decoded.userId");
+      if (!user) {
+        return res
+          .status(StatusCodes.UNAUTHORIZED)
+          .json({ message: "User no longer exists." });
+      }
 
-          // Generate new tokens
-          const newAccessToken = jwt.sign(
-            { userId: user.id, isAdmin: user.isAdmin },
-            env.JWT_SECRET,
-            {
-              expiresIn: "15m",
-            }
-          );
-
-          const newRefreshToken = jwt.sign(
-            { userId: user.id },
-            env.JWT_REFRESH_SECRET,
-            {
-              expiresIn: "7d",
-            }
-          );
-
-          // (Optional) Replace old refresh token in DB
-          // await tokenService.updateRefreshToken(user.id, newRefreshToken);
-
-          // Set new cookies
-          res.cookie("access_token", newAccessToken, {
-            httpOnly: true,
-            secure: env.NODE_ENV === "production",
-            sameSite: "strict",
-            maxAge: 15 * 60 * 1000, // 15 minutes
-          });
-
-          res.cookie("refresh_token", newRefreshToken, {
-            httpOnly: true,
-            secure: env.NODE_ENV === "production",
-            sameSite: "strict",
-            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-          });
-
-          return res
-            .status(StatusCodes.OK)
-            .json({ message: "Token refreshed successfully." });
-        }
+      // Generate new tokens
+      const newAccessToken = jwtService.signin(
+        { userId: user.id, isAdmin: user.isAdmin },
+        env.JWT_ACCESS_SECRET,
+        "AccessToken"
       );
+
+      const newRefreshToken = jwtService.signin(
+        { userId: user.id },
+        env.JWT_REFRESH_SECRET,
+        "RefreshToken"
+      );
+
+      // (Optional) Replace old refresh token in DB
+      // await tokenService.updateRefreshToken(user.id, newRefreshToken);
+
+      // Set new cookies
+      res.cookie(
+        "access_token",
+        newAccessToken,
+        jwtService.cookieOptions("AccessToken")
+      );
+
+      res.cookie(
+        "refresh_token",
+        newRefreshToken,
+        jwtService.cookieOptions("RefreshToken")
+      );
+
+      return res
+        .status(StatusCodes.OK)
+        .json({ message: "Token refreshed successfully." });
     } catch (error) {
       logger.error("⚠️ Error refreshing token", { error });
       next(error);
