@@ -1,7 +1,7 @@
 // Voter Controller
 import "reflect-metadata";
 
-import { CookieOptions, NextFunction, Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { inject, injectable } from "tsyringe";
 
 import { RegisterVoterDTO, SignInDTO } from "./voter.dto";
@@ -12,6 +12,7 @@ import { env } from "utils/env-config.utils";
 import logger from "logger";
 import { validateMongoId } from "utils/utils";
 import { jwtService } from "utils/jwt.utils";
+import { AppError } from "utils/exceptions.utils";
 
 @injectable()
 export class VoterController {
@@ -121,23 +122,25 @@ export class VoterController {
       const refreshToken = req.cookies?.refresh_token;
 
       if (!refreshToken) {
-        return res
-          .status(StatusCodes.UNAUTHORIZED)
-          .json({ message: "No refresh token provided." });
+        throw new AppError(
+          "No refresh token provided.",
+          StatusCodes.UNAUTHORIZED
+        );
       }
 
       // Verify refresh token
-      jwtService.verify(refreshToken, env.JWT_REFRESH_SECRET);
+      const jwtPayload = jwtService.verify(
+        refreshToken,
+        env.JWT_REFRESH_SECRET
+      );
 
       // (Optional) Verify if refresh token is still valid in DB
       // const storedToken = await tokenService.findValidRefreshToken(decoded.userId, refreshToken);
       // if (!storedToken) return res.status(401).json({ message: "Token no longer valid." });
 
-      const user = await this.voterService.getVoterById("decoded.userId");
+      const user = await this.voterService.getVoterById(jwtPayload.id);
       if (!user) {
-        return res
-          .status(StatusCodes.UNAUTHORIZED)
-          .json({ message: "User no longer exists." });
+        throw new AppError("User no longer exists.", StatusCodes.UNAUTHORIZED);
       }
 
       // Generate new tokens

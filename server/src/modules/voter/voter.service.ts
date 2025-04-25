@@ -1,6 +1,6 @@
 import { inject, singleton } from "tsyringe";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+
 import { StatusCodes } from "http-status-codes";
 
 import { RegisterVoterDTO } from "./voter.dto";
@@ -9,7 +9,7 @@ import { VoterDocument } from "./voter.model";
 import { env } from "utils/env-config.utils";
 import { AppError } from "utils/exceptions.utils";
 import { stripMongoMeta } from "utils/utils";
-import type { StringValue } from "ms";
+
 import logger from "logger";
 import { v4 as uuidv4 } from "uuid";
 import { jwtService } from "utils/jwt.utils";

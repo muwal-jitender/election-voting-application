@@ -1,7 +1,7 @@
 import { AppError } from "./exceptions.utils";
 import { CookieOptions } from "express";
 import { StatusCodes } from "http-status-codes";
-import type { StringValue } from "ms";
+import { TokenPayload } from "./extend-express-request.utils";
 import { env } from "./env-config.utils";
 import jwt from "jsonwebtoken";
 import logger from "logger";
@@ -9,17 +9,17 @@ import logger from "logger";
 type TokenType = "AccessToken" | "RefreshToken";
 export const jwtService = {
   accessTokenExpiresIn: "1d",
-  refreshTokenExpiresIn: "1d",
+  refreshTokenExpiresIn: "7d",
   verify: (token: string, tokenSecret: string) => {
-    jwt.verify(token, tokenSecret, (err, decoded: any) => {
-      if (err || !decoded?.id) {
-        logger.error("❌ Invalid or expired token during authentication", err);
-        throw new AppError(
-          "Invalid or expired refresh token.",
-          StatusCodes.UNAUTHORIZED
-        );
-      }
-    });
+    const decoded = jwt.verify(token, tokenSecret) as TokenPayload;
+    if (!decoded) {
+      logger.error("❌ Invalid token", { token });
+      throw new AppError(
+        "Invalid or expired refresh token.",
+        StatusCodes.UNAUTHORIZED
+      );
+    }
+    return decoded;
   },
   signin: (payload: object, tokenSecret: string, tokenType: TokenType) => {
     return jwt.sign(payload, tokenSecret, {

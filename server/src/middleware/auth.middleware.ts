@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 
 import { AppError } from "utils/exceptions.utils";
 import { StatusCodes } from "http-status-codes";
+import { TokenPayload } from "utils/extend-express-request.utils";
 import { env } from "utils/env-config.utils";
 import { jwtService } from "utils/jwt.utils";
 import logger from "logger"; // ✅ Winston logger
@@ -27,11 +28,7 @@ export const authenticateJWT = (
   const decoded = jwtService.verify(
     token,
     env.JWT_ACCESS_SECRET
-  ) as unknown as {
-    id: string;
-    email: string;
-    isAdmin: boolean;
-  };
+  ) as TokenPayload;
 
   req.user = decoded;
   logger.info(`🔓 Authenticated user ➜ ${decoded.email}`);
