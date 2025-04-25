@@ -5,6 +5,7 @@ import { TokenPayload } from "./extend-express-request.utils";
 import { env } from "./env-config.utils";
 import jwt from "jsonwebtoken";
 import logger from "logger";
+import { parseDurationToMs } from "./duration-parser.utils";
 
 type TokenType = "AccessToken" | "RefreshToken";
 export const jwtService = {
@@ -30,12 +31,16 @@ export const jwtService = {
     });
   },
   cookieOptions: (tokenType: TokenType) => {
-    const day = tokenType === "AccessToken" ? 1 : 7; // 1 day or 7 days in milliseconds
+    const expiresIn =
+      tokenType === "AccessToken"
+        ? env.JWT_ACCESS_EXPIRES_IN
+        : env.JWT_REFRESH_EXPIRES_IN;
+    const maxAge = parseDurationToMs(expiresIn);
     return {
       httpOnly: true, // Protects against XSS attacks
       secure: env.NODE_ENV === "production",
       sameSite: "strict", // Protects against CSRF attacks
-      maxAge: day * 24 * 60 * 60 * 1000, // Max age in milliseconds
+      maxAge,
     } as CookieOptions;
   },
 };
