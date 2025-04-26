@@ -42,9 +42,9 @@ export class AuthService {
   }
   async saveRefreshToken(data: RefreshTokenDTO) {
     logger.info(`📩 Saving Refresh Token ➔ ${data.userId}`);
-    const voter = await this.refreshTokenRepository.create(data);
+    const refreshTokenDetail = await this.refreshTokenRepository.create(data);
     logger.info(`✅ Refresh Token Saved Successfully ➔ ${data.userId}`);
-    return voter;
+    return refreshTokenDetail;
   }
 
   async findByEmail(email: string) {

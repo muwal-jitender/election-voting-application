@@ -9,8 +9,8 @@ import { parseDurationToMs } from "./duration-parser.utils";
 
 type TokenType = "AccessToken" | "RefreshToken";
 export const jwtService = {
-  accessTokenExpiresIn: "1d",
-  refreshTokenExpiresIn: "7d",
+  accessTokenName: "access_token",
+  refreshTokenName: "refresh_token",
   verify: (token: string, tokenSecret: string) => {
     const decoded = jwt.verify(token, tokenSecret) as TokenPayload;
     if (!decoded) {
@@ -42,5 +42,12 @@ export const jwtService = {
       sameSite: "strict", // Protects against CSRF attacks
       maxAge,
     } as CookieOptions;
+  },
+  /**
+   * The date to be saved in the database for the refresh-token expiry date.
+   * @returns
+   */
+  getRefreshTokenExpiryDate: () => {
+    return new Date(Date.now() + parseDurationToMs(env.JWT_REFRESH_EXPIRES_IN));
   },
 };

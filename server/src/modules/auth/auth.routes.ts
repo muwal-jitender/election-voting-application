@@ -1,4 +1,4 @@
-import { RegisterVoterDTO, SignInDTO } from "./auth.dto";
+import { RegisterVoterDTO, SignInDTO } from "modules/voter/voter.dto";
 
 import { AuthController } from "./auth.controller";
 import { Router } from "express";

@@ -1,5 +1,4 @@
-import { RegisterVoterDTO, SignInDTO } from "./voter.dto";
-
+import { RegisterVoterDTO } from "./voter.dto";
 import { Router } from "express";
 import { VoterController } from "./voter.controller";
 import { authenticateJWT } from "middleware/auth.middleware";
@@ -16,22 +15,12 @@ voterRouter.post(
     await voterController.register(req, res, next);
   }
 );
-voterRouter.post(
-  "/login",
-  validateRequest(SignInDTO),
-  async (req, res, next) => {
-    await voterController.login(req, res, next);
-  }
-);
 
 voterRouter.get("/me", authenticateJWT, async (req, res, next) => {
   await voterController.me(req, res, next);
 });
 voterRouter.get("/:id", authenticateJWT, async (req, res, next) => {
   await voterController.getById(req, res, next);
-});
-voterRouter.post("/logout", authenticateJWT, async (req, res, next) => {
-  await voterController.logout(req, res, next);
 });
 
 export default voterRouter;

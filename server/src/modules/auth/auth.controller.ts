@@ -44,35 +44,54 @@ export class AuthController {
     try {
       const signInDTO: SignInDTO = req.body;
 
+      logger.info(`🔑 Login attempt ➔ ${signInDTO.email}`);
+
+      // 1. Validate credentials
       const voter = await this.authService.checkCredentials(
         signInDTO.email.toLowerCase(),
         signInDTO.password
       );
+      logger.info(`✅ Credentials valid ➔ ${voter.email}`);
 
+      // 2. Generate and set access token cookie
       const accessToken = this.authService.generateAccessToken(voter);
-
       res.cookie(
-        "access-token",
+        jwtService.accessTokenName,
         accessToken,
         jwtService.cookieOptions("AccessToken")
       );
+      logger.info(`🔐 Access token issued ➔ ${voter.email}`);
 
-      // Generate refresh token and set it in the cookie
+      // 3. Generate refresh token
       const ipAddress = req.ip || req.socket.remoteAddress;
       const userAgent = req.headers["user-agent"];
-      //this.authService.saveRefreshToken({
       const refreshToken = this.authService.generateRefreshToken(
         voter.id,
         voter.email,
         ipAddress,
         userAgent
       );
+
+      // 4. Save refresh token to DB
+      await this.authService.saveRefreshToken({
+        userId: voter.id,
+        refreshToken,
+        ipAddress,
+        userAgent,
+        isRevoked: false,
+        expiresAt: jwtService.getRefreshTokenExpiryDate(),
+      });
+      logger.info(`💾 Refresh token saved ➔ ${voter.email}`);
+
+      // 5. Set refresh token cookie
       res.cookie(
-        "refresh-token",
+        jwtService.refreshTokenName,
         refreshToken,
         jwtService.cookieOptions("RefreshToken")
       );
+      logger.info(`🔁 Refresh token issued ➔ ${voter.email}`);
 
+      // 6. Respond with user data
       return res.status(StatusCodes.OK).json({
         message: "You are now logged in",
         data: {
@@ -89,10 +108,13 @@ export class AuthController {
 
   async logout(_req: Request, res: Response, next: NextFunction) {
     try {
-      res.clearCookie("token", {
-        httpOnly: true,
-        secure: env.NODE_ENV === "production",
-        sameSite: "strict",
+      res.clearCookie(jwtService.accessTokenName, {
+        ...jwtService.cookieOptions("AccessToken"),
+        maxAge: 0,
+      });
+      res.clearCookie(jwtService.refreshTokenName, {
+        ...jwtService.cookieOptions("RefreshToken"),
+        maxAge: 0,
       });
       res.status(StatusCodes.OK).json({ message: "Logged out successfully" });
     } catch (error) {

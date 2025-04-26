@@ -4,7 +4,7 @@ import "reflect-metadata";
 import { NextFunction, Request, Response } from "express";
 import { inject, injectable } from "tsyringe";
 
-import { RegisterVoterDTO, SignInDTO } from "./voter.dto";
+import { RegisterVoterDTO } from "./voter.dto";
 import { VoterService } from "./voter.service";
 
 import { StatusCodes } from "http-status-codes";
@@ -36,50 +36,6 @@ export class VoterController {
     }
   }
 
-  async login(req: Request, res: Response, next: NextFunction) {
-    try {
-      const signInDTO: SignInDTO = req.body;
-
-      const voter = await this.voterService.checkCredentials(
-        signInDTO.email.toLowerCase(),
-        signInDTO.password
-      );
-      const ipAddress = req.ip || req.socket.remoteAddress;
-      const userAgent = req.headers["user-agent"];
-      const accessToken = this.voterService.generateAccessToken(voter);
-
-      res.cookie(
-        "access-token",
-        accessToken,
-        jwtService.cookieOptions("AccessToken")
-      );
-
-      const refreshToken = this.voterService.generateRefreshToken(
-        voter.id,
-        voter.email,
-        ipAddress,
-        userAgent
-      );
-      res.cookie(
-        "refresh-token",
-        refreshToken,
-        jwtService.cookieOptions("RefreshToken")
-      );
-
-      return res.status(StatusCodes.OK).json({
-        message: "You are now logged in",
-        data: {
-          email: voter.email,
-          fullName: voter.fullName,
-          isAdmin: voter.isAdmin,
-        },
-      });
-    } catch (error: unknown) {
-      logger.error(`⚠️ Login failed ➔ ${req.body?.email}`, { error });
-      next(error);
-    }
-  }
-
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
@@ -100,19 +56,6 @@ export class VoterController {
       res.status(StatusCodes.OK).json({ message: "User found", data: voter });
     } catch (error) {
       logger.error(`❌ Failed to fetch user profile`, { error });
-      next(error);
-    }
-  }
-  async logout(_req: Request, res: Response, next: NextFunction) {
-    try {
-      res.clearCookie("token", {
-        httpOnly: true,
-        secure: env.NODE_ENV === "production",
-        sameSite: "strict",
-      });
-      res.status(StatusCodes.OK).json({ message: "Logged out successfully" });
-    } catch (error) {
-      logger.error(`❌ Logout failed`, { error });
       next(error);
     }
   }
