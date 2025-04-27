@@ -11,9 +11,11 @@ import { env } from "utils/env-config.utils";
 import { AppError } from "utils/exceptions.utils";
 
 import logger from "logger";
-import { v4 as uuidv4 } from "uuid";
+
 import { jwtService } from "utils/jwt.utils";
 import { VoterRepository } from "modules/voter/voter.repository";
+import { RefreshTokenPayload } from "utils/extend-express-request.utils";
+import { mongo } from "mongoose";
 @singleton()
 export class AuthService {
   constructor(
@@ -98,15 +100,16 @@ export class AuthService {
     return accessToken;
   }
   generateRefreshToken(
-    userId: number,
+    id: mongo.ObjectId,
+    userId: string,
     email: string,
     ipAddress?: string,
     userAgent?: string
   ): string {
     logger.info(`🎟️ Generating Refresh token for ➔ ${email}`);
-    const payload = {
-      id: userId,
-      tokenId: uuidv4(),
+    const payload: RefreshTokenPayload = {
+      userId,
+      id,
       ipAddress,
       userAgent,
     };

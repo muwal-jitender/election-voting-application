@@ -50,7 +50,7 @@ export class VoterController {
   /** Get Logged-in user's detail */
   async me(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = req.user?.id;
+      const userId = req.user?.userId;
 
       const voter = await this.voterService.getUserDetail(userId);
       res.status(StatusCodes.OK).json({ message: "User found", data: voter });
@@ -81,7 +81,7 @@ export class VoterController {
       // const storedToken = await tokenService.findValidRefreshToken(decoded.userId, refreshToken);
       // if (!storedToken) return res.status(401).json({ message: "Token no longer valid." });
 
-      const user = await this.voterService.getVoterById(jwtPayload.id);
+      const user = await this.voterService.getVoterById(jwtPayload.userId);
       if (!user) {
         throw new AppError("User no longer exists.", StatusCodes.UNAUTHORIZED);
       }

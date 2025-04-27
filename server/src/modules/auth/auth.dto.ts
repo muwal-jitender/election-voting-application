@@ -6,4 +6,6 @@ export class RefreshTokenDTO {
   userAgent?: string;
   isRevoked!: boolean;
   expiresAt!: Date;
+  issuedAt!: Date;
+  lastUsedAt?: Date;
 }

@@ -44,14 +44,16 @@ export class AuthController {
     try {
       const signInDTO: SignInDTO = req.body;
 
-      logger.info(`🔑 Login attempt ➔ ${signInDTO.email}`);
+      logger.info(`🔑 Login attempt initiated ➔ Email: ${signInDTO.email}`);
 
-      // 1. Validate credentials
+      // 1. Validate user credentials
       const voter = await this.authService.checkCredentials(
         signInDTO.email.toLowerCase(),
         signInDTO.password
       );
-      logger.info(`✅ Credentials valid ➔ ${voter.email}`);
+      logger.info(
+        `✅ Credentials validated ➔ UserID: ${voter.id}, Email: ${voter.email}`
+      );
 
       // 2. Generate and set access token cookie
       const accessToken = this.authService.generateAccessToken(voter);
@@ -60,38 +62,52 @@ export class AuthController {
         accessToken,
         jwtService.cookieOptions("AccessToken")
       );
-      logger.info(`🔐 Access token issued ➔ ${voter.email}`);
+      logger.info(`🔐 Access token issued ➔ UserID: ${voter.id}`);
 
-      // 3. Generate refresh token
+      // 3. Capture IP and User-Agent for security tracking
       const ipAddress = req.ip || req.socket.remoteAddress;
       const userAgent = req.headers["user-agent"];
+      logger.info(`🌍 IP & Device ➔ IP: ${ipAddress}, UA: ${userAgent}`);
+
+      // 4. Save refresh token placeholder to DB to get _id
+      const dbRefreshToken = await this.authService.saveRefreshToken({
+        userId: voter.id,
+        refreshToken: "placeholder", // Will update after generating token
+        ipAddress,
+        userAgent,
+        isRevoked: false,
+        expiresAt: jwtService.getRefreshTokenExpiryDate(),
+        issuedAt: new Date(),
+      });
+      logger.info(
+        `💾 Refresh token placeholder saved ➔ TokenID: ${dbRefreshToken.id}`
+      );
+
+      // 5. Generate refresh token using DB token ID
       const refreshToken = this.authService.generateRefreshToken(
+        dbRefreshToken.id,
         voter.id,
         voter.email,
         ipAddress,
         userAgent
       );
 
-      // 4. Save refresh token to DB
-      await this.authService.saveRefreshToken({
-        userId: voter.id,
-        refreshToken,
-        ipAddress,
-        userAgent,
-        isRevoked: false,
-        expiresAt: jwtService.getRefreshTokenExpiryDate(),
-      });
-      logger.info(`💾 Refresh token saved ➔ ${voter.email}`);
+      // 6. Update the DB with the actual refresh token
+      dbRefreshToken.refreshToken = refreshToken;
+      await dbRefreshToken.save();
+      logger.info(
+        `🔁 Refresh token finalized and saved ➔ TokenID: ${dbRefreshToken.id}`
+      );
 
-      // 5. Set refresh token cookie
+      // 7. Set refresh token cookie
       res.cookie(
         jwtService.refreshTokenName,
         refreshToken,
         jwtService.cookieOptions("RefreshToken")
       );
-      logger.info(`🔁 Refresh token issued ➔ ${voter.email}`);
+      logger.info(`🍪 Refresh token cookie set ➔ UserID: ${voter.id}`);
 
-      // 6. Respond with user data
+      // 8. Respond with user data (No token in response body for security)
       return res.status(StatusCodes.OK).json({
         message: "You are now logged in",
         data: {
@@ -101,7 +117,7 @@ export class AuthController {
         },
       });
     } catch (error: unknown) {
-      logger.error(`⚠️ Login failed ➔ ${req.body?.email}`, { error });
+      logger.error(`❌ Login failed ➔ Email: ${req.body?.email}`, { error });
       next(error);
     }
   }
@@ -125,7 +141,8 @@ export class AuthController {
 
   async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
-      const refreshToken = req.cookies?.refresh_token;
+      //const refreshToken = req.cookies?.refresh_token;
+      const refreshToken = req.cookies[jwtService.refreshTokenName];
 
       if (!refreshToken) {
         throw new AppError(
@@ -144,7 +161,7 @@ export class AuthController {
       // const storedToken = await tokenService.findValidRefreshToken(decoded.userId, refreshToken);
       // if (!storedToken) return res.status(401).json({ message: "Token no longer valid." });
 
-      const user = await this.voterService.getVoterById(jwtPayload.id);
+      const user = await this.voterService.getVoterById(jwtPayload.userId);
       if (!user) {
         throw new AppError("User no longer exists.", StatusCodes.UNAUTHORIZED);
       }

@@ -86,7 +86,7 @@ export class CandidateController {
   async vote(req: Request, res: Response, next: NextFunction) {
     try {
       const { id, electionId } = req.params;
-      const voterId = req.user?.id as string;
+      const voterId = req.user?.userId as string;
 
       validateMongoId(id);
       validateMongoId(voterId);

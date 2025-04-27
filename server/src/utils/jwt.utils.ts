@@ -1,7 +1,7 @@
+import { AccessTokenPayload } from "./extend-express-request.utils";
 import { AppError } from "./exceptions.utils";
 import { CookieOptions } from "express";
 import { StatusCodes } from "http-status-codes";
-import { TokenPayload } from "./extend-express-request.utils";
 import { env } from "./env-config.utils";
 import jwt from "jsonwebtoken";
 import logger from "logger";
@@ -12,7 +12,7 @@ export const jwtService = {
   accessTokenName: "access_token",
   refreshTokenName: "refresh_token",
   verify: (token: string, tokenSecret: string) => {
-    const decoded = jwt.verify(token, tokenSecret) as TokenPayload;
+    const decoded = jwt.verify(token, tokenSecret) as AccessTokenPayload;
     if (!decoded) {
       logger.error("❌ Invalid token", { token });
       throw new AppError(

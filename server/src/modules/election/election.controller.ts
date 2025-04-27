@@ -194,7 +194,7 @@ export class ElectionController {
       const { id } = req.params;
       validateMongoId(id);
       let hasVoted = false;
-      const voterId = req.user?.id;
+      const voterId = req.user?.userId;
 
       if (!voterId) {
         logger.warn("⚠️ Voter ID not found in token");

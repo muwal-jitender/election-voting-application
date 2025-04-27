@@ -7,14 +7,31 @@ export interface IRefreshTokenDocument extends Document {
   userAgent: string;
   isRevoked: boolean;
   expiresAt: Date;
+  issuedAt: Date;
+  lastUsedAt?: Date;
 }
-const refreshTokenSchema = new Schema<IRefreshTokenDocument>({
-  refreshToken: { type: String, required: true, unique: true },
-  userId: { type: String, required: true },
-  ipAddress: { type: String, required: false },
-  userAgent: { type: String, required: false },
-  isRevoked: { type: Boolean, default: false },
-  expiresAt: { type: Date, required: true },
+const refreshTokenSchema = new Schema<IRefreshTokenDocument>(
+  {
+    refreshToken: { type: String, required: true, unique: true },
+    userId: { type: String, required: true },
+    ipAddress: { type: String, required: false },
+    userAgent: { type: String, required: false },
+    isRevoked: { type: Boolean, default: false },
+    expiresAt: { type: Date, required: true },
+    issuedAt: { type: Date, required: true },
+    lastUsedAt: { type: Date, required: false },
+  },
+  { timestamps: true }
+);
+
+// Convert `_id` to `id` when returning data
+refreshTokenSchema.set("toJSON", {
+  transform: (_doc, ret) => {
+    ret.id = ret._id.toString(); // Map `_id` to `id`
+    delete ret._id; // Remove `_id`
+    delete ret.__v; // Remove version key
+    return ret;
+  },
 });
 
 export const RefreshTokenModel = model<IRefreshTokenDocument>(
