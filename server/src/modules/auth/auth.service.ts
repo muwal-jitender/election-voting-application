@@ -15,7 +15,7 @@ import logger from "logger";
 import { jwtService } from "utils/jwt.utils";
 import { VoterRepository } from "modules/voter/voter.repository";
 import { RefreshTokenPayload } from "utils/extend-express-request.utils";
-import mongoose, { mongo } from "mongoose";
+import { mongo } from "mongoose";
 import { runTransactionWithRetry } from "utils/db-transaction.utils";
 import { IRefreshTokenDocument } from "./auth.model";
 @singleton()
