@@ -15,7 +15,9 @@ import logger from "logger";
 import { jwtService } from "utils/jwt.utils";
 import { VoterRepository } from "modules/voter/voter.repository";
 import { RefreshTokenPayload } from "utils/extend-express-request.utils";
-import { mongo } from "mongoose";
+import mongoose, { mongo } from "mongoose";
+import { runTransactionWithRetry } from "utils/db-transaction.utils";
+import { IRefreshTokenDocument } from "./auth.model";
 @singleton()
 export class AuthService {
   constructor(
@@ -42,11 +44,47 @@ export class AuthService {
     logger.info(`✅ Registration successful ➔ ${data.email}`);
     return voter;
   }
-  async saveRefreshToken(data: RefreshTokenDTO) {
-    logger.info(`📩 Saving Refresh Token ➔ ${data.userId}`);
-    const refreshTokenDetail = await this.refreshTokenRepository.create(data);
-    logger.info(`✅ Refresh Token Saved Successfully ➔ ${data.userId}`);
-    return refreshTokenDetail;
+  async saveRefreshToken(
+    data: RefreshTokenDTO
+  ): Promise<IRefreshTokenDocument> {
+    return await runTransactionWithRetry<IRefreshTokenDocument>(
+      async (session) => {
+        logger.info(
+          `🔄 Updating multiple documents to "isRevoked = true" when same user login multiple times from the same device/browser`
+        );
+
+        await this.refreshTokenRepository.updateMany(
+          {
+            userId: data.userId,
+            isRevoked: false,
+            ipAddress: data.ipAddress,
+            userAgent: data.userAgent,
+          },
+          { isRevoked: true },
+          session
+        );
+
+        logger.info(`📩 Saving new Refresh Token ➔ ${data.userId}`);
+        const refreshTokenDetail = await this.refreshTokenRepository.create(
+          data,
+          session
+        );
+        logger.info(`✅ Refresh Token Saved Successfully ➔ ${data.userId}`);
+
+        return refreshTokenDetail; // ✅ Now perfectly valid to return it!
+      }
+    );
+  }
+
+  async updateMany(
+    voterId: mongo.ObjectId,
+    ipAddress: string,
+    userAgent: string
+  ) {
+    await this.refreshTokenRepository.updateMany(
+      { userId: voterId, isRevoked: false, ipAddress, userAgent },
+      { isRevoked: true }
+    );
   }
 
   async findByEmail(email: string) {

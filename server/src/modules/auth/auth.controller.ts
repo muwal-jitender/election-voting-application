@@ -65,8 +65,12 @@ export class AuthController {
       logger.info(`🔐 Access token issued ➔ UserID: ${voter.id}`);
 
       // 3. Capture IP and User-Agent for security tracking
-      const ipAddress = req.ip || req.socket.remoteAddress;
-      const userAgent = req.headers["user-agent"];
+      const ipAddress = (req.ip ||
+        req.socket.remoteAddress ||
+        "unknown") as string;
+
+      const userAgent = (req.headers["user-agent"] as string) || "unknown";
+
       logger.info(`🌍 IP & Device ➔ IP: ${ipAddress}, UA: ${userAgent}`);
 
       // 4. Save refresh token placeholder to DB to get _id

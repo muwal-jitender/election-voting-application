@@ -176,4 +176,12 @@ export class BaseRepository<T extends Document> {
   ): Promise<void> {
     await this.model.deleteMany(filter, session).exec();
   }
+
+  async updateMany(
+    filter: object = {},
+    update: object = {},
+    session?: mongoose.ClientSession
+  ): Promise<void> {
+    await this.model.updateMany(filter, update, { session }).exec();
+  }
 }
