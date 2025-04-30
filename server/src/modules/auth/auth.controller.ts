@@ -14,6 +14,7 @@ import logger from "logger";
 import { jwtService } from "utils/jwt.utils";
 import { AppError } from "utils/exceptions.utils";
 import { VoterService } from "modules/voter/voter.service";
+import { RefreshTokenPayload } from "utils/extend-express-request.utils";
 
 @injectable()
 export class AuthController {
@@ -65,13 +66,8 @@ export class AuthController {
       logger.info(`🔐 Access token issued ➔ UserID: ${voter.id}`);
 
       // 3. Capture IP and User-Agent for security tracking
-      const ipAddress = (req.ip ||
-        req.socket.remoteAddress ||
-        "unknown") as string;
 
-      const userAgent = (req.headers["user-agent"] as string) || "unknown";
-
-      logger.info(`🌍 IP & Device ➔ IP: ${ipAddress}, UA: ${userAgent}`);
+      const { ipAddress, userAgent } = jwtService.extractRequestMeta(req);
 
       // 4. Save refresh token placeholder to DB to get _id
       const dbRefreshToken = await this.authService.saveRefreshToken({
@@ -140,7 +136,7 @@ export class AuthController {
       });
 
       // 2. Revoke refresh token in DB (if exists)
-      const refreshToken = req.refreshToken;
+      const refreshToken = req.refreshTokenPayload;
       if (refreshToken?.id) {
         await this.authService.update(refreshToken.id);
         logger.info(`🚪 Logout: Revoked refresh token ➔ ${refreshToken.id}`);
@@ -160,27 +156,28 @@ export class AuthController {
 
   async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
-      //const refreshToken = req.cookies?.refresh_token;
-      const refreshToken = req.cookies[jwtService.refreshTokenName];
-
-      if (!refreshToken) {
-        throw new AppError(
-          "No refresh token provided.",
-          StatusCodes.UNAUTHORIZED
-        );
-      }
-
-      // Verify refresh token
-      const jwtPayload = jwtService.verify(
-        refreshToken,
-        env.JWT_REFRESH_SECRET
-      );
+      const refreshToken = req.refreshTokenPayload as RefreshTokenPayload;
 
       // (Optional) Verify if refresh token is still valid in DB
       // const storedToken = await tokenService.findValidRefreshToken(decoded.userId, refreshToken);
       // if (!storedToken) return res.status(401).json({ message: "Token no longer valid." });
-
-      const user = await this.voterService.getVoterById(jwtPayload.userId);
+      const { ipAddress, userAgent } = jwtService.extractRequestMeta(req);
+      const refreshTokenPayload: RefreshTokenPayload = {
+        ...refreshToken,
+        ipAddress,
+        userAgent,
+      };
+      const dbRefreshToken = await this.authService.findRefreshToken(
+        refreshTokenPayload,
+        req.refreshToken as string
+      );
+      if (!dbRefreshToken) {
+        throw new AppError(
+          "Refresh no longer exists.",
+          StatusCodes.UNAUTHORIZED
+        );
+      }
+      const user = await this.voterService.getVoterById(refreshToken.userId);
       if (!user) {
         throw new AppError("User no longer exists.", StatusCodes.UNAUTHORIZED);
       }
@@ -200,7 +197,10 @@ export class AuthController {
 
       // (Optional) Replace old refresh token in DB
       // await tokenService.updateRefreshToken(user.id, newRefreshToken);
-
+      await this.authService.update(refreshToken.id);
+      logger.info(
+        `🚪 Refresh Token: Revoked refresh token ➔ ${refreshToken.id}`
+      );
       // Set new cookies
       res.cookie(
         "access_token",

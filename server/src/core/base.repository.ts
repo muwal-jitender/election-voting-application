@@ -1,5 +1,8 @@
 import mongoose, { Document, Model, Types, UpdateQuery } from "mongoose";
 
+import { AppError } from "utils/exceptions.utils";
+import { StatusCodes } from "http-status-codes";
+
 type PopulateOption = {
   path: string;
   select?: string[];
@@ -146,6 +149,49 @@ export class BaseRepository<T extends Document> {
       .findOne({ [field]: value } as Record<string, unknown>)
       .select(selectedFields.join(" ")) // Dynamically select required fields
       .exec();
+  }
+  /**
+   * Finds multiple documents that match multiple field-value conditions.
+   *
+   * @template K - Keys of the document type T (field names)
+   * @param fields - Array of field names to filter by
+   * @param values - Array of values corresponding to each field
+   * @param selectedFields - (Optional) Array of field names to include in the result.
+   *                         If not provided, all fields will be returned.
+   * @returns Promise that resolves to an array of matching documents
+   * @example
+   * Fetch users with role "admin" and isActive = true, return only _id and email
+   * findManyByFields(["role", "isActive"], ["admin", true], ["_id", "email"]);
+   *
+   * @example
+   *  Fetch all fields for matching user
+   * findManyByFields(["email"], ["user@example.com"]);
+   */
+  async findManyByFields<K extends keyof T>(
+    fields: K[],
+    values: unknown[],
+    selectedFields?: string[] // Fields to include explicitly
+  ): Promise<T[]> {
+    if (fields.length !== values.length) {
+      throw new AppError(
+        "Fields and values arrays must have the same length.",
+        StatusCodes.BAD_REQUEST
+      );
+    }
+
+    const query = fields.reduce(
+      (acc, field, index) => {
+        acc[field as string] = values[index];
+        return acc;
+      },
+      {} as Record<string, unknown>
+    );
+
+    const mongoQuery = this.model.find(query);
+    if (selectedFields && selectedFields.length > 0) {
+      mongoQuery.select(selectedFields.join(" ")); // Dynamically select required fields
+    }
+    return await mongoQuery.exec();
   }
 
   /** Update a document by ID */

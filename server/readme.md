@@ -53,3 +53,7 @@ npm install
 # 📂 Project Folder Structure
 
 ```
+
+# Clean Architecture Pattern
+
+### Route ➝ Middleware ➝ Service ➝ Repository ➝ Mongoose Model

@@ -96,10 +96,24 @@ export class AuthService {
   }
 
   async findByIds(ids: string[]) {
-    logger.debug(`🔎 Searching voters by IDs ➔ ${ids.join(", ")}`);
+    logger.info(`🔎 Searching voters by IDs ➔ ${ids.join(", ")}`);
     return await this.voterRepository.findByIds(ids);
   }
-
+  async findRefreshToken(payload: RefreshTokenPayload, refreshToken: string) {
+    logger.info(`🔎 Searching refresh token ➔ ${payload.userId}`);
+    const result = await this.refreshTokenRepository.findManyByFields(
+      ["userId", "id", "ipAddress", "userAgent", "refreshToken"],
+      [
+        payload.userId,
+        payload.id,
+        payload.ipAddress,
+        payload.userAgent,
+        refreshToken,
+      ]
+    );
+    logger.info(`Search complete, returning the result ➔ ${payload.userId}`);
+    return result;
+  }
   async checkCredentials(
     email: string,
     password: string

@@ -18,7 +18,8 @@ declare global {
   namespace Express {
     interface Request {
       user?: AccessTokenPayload;
-      refreshToken?: RefreshTokenPayload;
+      refreshTokenPayload?: RefreshTokenPayload;
+      refreshToken?: string;
     }
   }
 }

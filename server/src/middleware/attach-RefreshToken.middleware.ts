@@ -1,13 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 
 import { AppError } from "utils/exceptions.utils";
+import { RefreshTokenModel } from "modules/auth/auth.model";
 import { RefreshTokenPayload } from "utils/extend-express-request.utils";
 import { StatusCodes } from "http-status-codes";
 import { env } from "utils/env-config.utils";
 import { jwtService } from "utils/jwt.utils";
 import logger from "logger";
 
-export const attachRefreshToken = (
+export const attachRefreshToken = async (
   req: Request,
   _res: Response,
   next: NextFunction
@@ -25,7 +26,21 @@ export const attachRefreshToken = (
     refreshToken,
     env.JWT_REFRESH_SECRET
   );
-  req.refreshToken = decoded;
-
+  // 🔍 Fetch the refresh token document by ID
+  const tokenDoc = await RefreshTokenModel.findById(decoded.id).exec();
+  if (!tokenDoc) {
+    logger.warn("❌ Invalid or deleted refresh token");
+    throw new AppError(
+      "Refresh token no longer exists.",
+      StatusCodes.UNAUTHORIZED
+    );
+  }
+  // ⏰ Check if the refresh token has expired
+  if (tokenDoc.expiresAt.getTime() < Date.now()) {
+    logger.warn("❌ Refresh token expired");
+    throw new AppError("Refresh token expired.", StatusCodes.UNAUTHORIZED);
+  }
+  req.refreshTokenPayload = decoded;
+  req.refreshToken = refreshToken;
   next();
 };

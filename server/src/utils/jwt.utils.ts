@@ -5,6 +5,7 @@ import {
 
 import { AppError } from "./exceptions.utils";
 import { CookieOptions } from "express";
+import { Request } from "express";
 import { StatusCodes } from "http-status-codes";
 import { env } from "./env-config.utils";
 import jwt from "jsonwebtoken";
@@ -56,5 +57,25 @@ export const jwtService = {
    */
   getRefreshTokenExpiryDate: () => {
     return new Date(Date.now() + parseDurationToMs(env.JWT_REFRESH_EXPIRES_IN));
+  },
+  extractRequestMeta: (
+    req: Request
+  ): {
+    ipAddress: string;
+    userAgent: string;
+  } => {
+    const ipAddress = (
+      req.ip ||
+      req.socket?.remoteAddress ||
+      "unknown"
+    ).toString();
+
+    const userAgent =
+      (req.headers["user-agent"] as string | undefined) || "unknown";
+    logger.info(`🌍 IP & Device ➔ IP: ${ipAddress}, UA: ${userAgent}`);
+    return {
+      ipAddress,
+      userAgent,
+    };
   },
 };
