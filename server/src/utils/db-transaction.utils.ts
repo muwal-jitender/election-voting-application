@@ -30,7 +30,7 @@ export async function runTransactionWithRetry<T>(
       attempt++;
       session.startTransaction();
       logger.info(`🚀 Starting transaction attempt ${attempt}/${maxRetries}`);
-
+      // ✅ A dependency injection or callback parameter injection.
       const result = await callback(session); // Execute your transactional logic
       await session.commitTransaction();
       logger.info(

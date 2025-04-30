@@ -15,7 +15,7 @@ import logger from "logger";
 import { jwtService } from "utils/jwt.utils";
 import { VoterRepository } from "modules/voter/voter.repository";
 import { RefreshTokenPayload } from "utils/extend-express-request.utils";
-import { mongo } from "mongoose";
+import { Types } from "mongoose";
 import { runTransactionWithRetry } from "utils/db-transaction.utils";
 import { IRefreshTokenDocument } from "./auth.model";
 @singleton()
@@ -77,7 +77,7 @@ export class AuthService {
   }
 
   async updateMany(
-    voterId: mongo.ObjectId,
+    voterId: Types.ObjectId,
     ipAddress: string,
     userAgent: string
   ) {
@@ -85,6 +85,9 @@ export class AuthService {
       { userId: voterId, isRevoked: false, ipAddress, userAgent },
       { isRevoked: true }
     );
+  }
+  async update(id: Types.ObjectId) {
+    await this.refreshTokenRepository.update(id, { isRevoked: true });
   }
 
   async findByEmail(email: string) {
@@ -138,7 +141,7 @@ export class AuthService {
     return accessToken;
   }
   generateRefreshToken(
-    id: mongo.ObjectId,
+    id: Types.ObjectId,
     userId: string,
     email: string,
     ipAddress?: string,

@@ -1,4 +1,8 @@
-import { AccessTokenPayload } from "./extend-express-request.utils";
+import {
+  AccessTokenPayload,
+  RefreshTokenPayload,
+} from "./extend-express-request.utils";
+
 import { AppError } from "./exceptions.utils";
 import { CookieOptions } from "express";
 import { StatusCodes } from "http-status-codes";
@@ -11,8 +15,11 @@ type TokenType = "AccessToken" | "RefreshToken";
 export const jwtService = {
   accessTokenName: "access_token",
   refreshTokenName: "refresh_token",
-  verify: (token: string, tokenSecret: string) => {
-    const decoded = jwt.verify(token, tokenSecret) as AccessTokenPayload;
+  verify: <T extends AccessTokenPayload | RefreshTokenPayload>(
+    token: string,
+    tokenSecret: string
+  ): T => {
+    const decoded = jwt.verify(token, tokenSecret);
     if (!decoded) {
       logger.error("❌ Invalid token", { token });
       throw new AppError(
@@ -20,7 +27,7 @@ export const jwtService = {
         StatusCodes.UNAUTHORIZED
       );
     }
-    return decoded;
+    return decoded as T;
   },
   signin: (payload: object, tokenSecret: string, tokenType: TokenType) => {
     return jwt.sign(payload, tokenSecret, {

@@ -126,19 +126,34 @@ export class AuthController {
     }
   }
 
-  async logout(_req: Request, res: Response, next: NextFunction) {
+  async logout(req: Request, res: Response, next: NextFunction) {
     try {
+      // 1. Clear access and refresh cookies
       res.clearCookie(jwtService.accessTokenName, {
         ...jwtService.cookieOptions("AccessToken"),
         maxAge: 0,
       });
+
       res.clearCookie(jwtService.refreshTokenName, {
         ...jwtService.cookieOptions("RefreshToken"),
         maxAge: 0,
       });
+
+      // 2. Revoke refresh token in DB (if exists)
+      const refreshToken = req.refreshToken;
+      if (refreshToken?.id) {
+        await this.authService.update(refreshToken.id);
+        logger.info(`🚪 Logout: Revoked refresh token ➔ ${refreshToken.id}`);
+      } else {
+        logger.warn(
+          "⚠️ Logout attempted without valid refresh token in request"
+        );
+      }
+
+      // 3. Return success response
       res.status(StatusCodes.OK).json({ message: "Logged out successfully" });
     } catch (error) {
-      logger.error(`❌ Logout failed`, { error });
+      logger.error("❌ Logout failed", { error });
       next(error);
     }
   }

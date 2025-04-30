@@ -2,6 +2,7 @@ import { RegisterVoterDTO, SignInDTO } from "modules/voter/voter.dto";
 
 import { AuthController } from "./auth.controller";
 import { Router } from "express";
+import { attachRefreshToken } from "middleware/attach-RefreshToken.middleware";
 import { authenticateJWT } from "middleware/auth.middleware";
 import { container } from "tsyringe";
 import { validateRequest } from "middleware/validate-request.middleware";
@@ -24,8 +25,13 @@ authRouter.post(
   }
 );
 
-authRouter.post("/logout", authenticateJWT, async (req, res, next) => {
-  await authController.logout(req, res, next);
-});
+authRouter.post(
+  "/logout",
+  authenticateJWT,
+  attachRefreshToken,
+  async (req, res, next) => {
+    await authController.logout(req, res, next);
+  }
+);
 
 export default authRouter;

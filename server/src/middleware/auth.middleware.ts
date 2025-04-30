@@ -15,20 +15,20 @@ export const authenticateJWT = (
   _res: Response,
   next: NextFunction
 ) => {
-  const token = req.cookies.access_token;
+  const token = req.cookies[jwtService.accessTokenName];
 
   if (!token) {
     logger.warn("🔐 Unauthorized request: No token found");
     throw new AppError(
-      "Access Denied: No token provided.",
+      "Access Denied: No access-token provided.",
       StatusCodes.UNAUTHORIZED
     );
   }
 
-  const decoded = jwtService.verify(
+  const decoded = jwtService.verify<AccessTokenPayload>(
     token,
     env.JWT_ACCESS_SECRET
-  ) as AccessTokenPayload;
+  );
 
   req.user = decoded;
   logger.info(`🔓 Authenticated user ➜ ${decoded.email}`);

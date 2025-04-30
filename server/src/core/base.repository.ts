@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, UpdateQuery } from "mongoose";
+import mongoose, { Document, Model, Types, UpdateQuery } from "mongoose";
 
 type PopulateOption = {
   path: string;
@@ -150,7 +150,7 @@ export class BaseRepository<T extends Document> {
 
   /** Update a document by ID */
   async update(
-    id: string,
+    id: Types.ObjectId | string,
     updateData: UpdateQuery<T>,
     session?: mongoose.ClientSession
   ): Promise<T | null> {
