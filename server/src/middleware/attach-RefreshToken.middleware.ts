@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 
 import { AppError } from "utils/exceptions.utils";
-import { RefreshTokenModel } from "modules/auth/auth.model";
+import { AuthService } from "modules/auth/auth.service";
 import { RefreshTokenPayload } from "utils/extend-express-request.utils";
 import { StatusCodes } from "http-status-codes";
 import { env } from "utils/env-config.utils";
 import { jwtService } from "utils/jwt.utils";
 import logger from "logger";
+import { resolve } from "utils/resolve.utils";
 
 export const attachRefreshToken = async (
   req: Request,
@@ -15,9 +16,9 @@ export const attachRefreshToken = async (
 ) => {
   const refreshToken = req.cookies[jwtService.refreshTokenName];
   if (!refreshToken) {
-    logger.warn("🔐 Unauthorized request: No token found");
+    logger.warn("🔐 Unauthorized request: No refresh-token found");
     throw new AppError(
-      "Access Denied: No refresh-token provided.",
+      "Refresh Denied: No refresh-token provided.",
       StatusCodes.UNAUTHORIZED
     );
   }
@@ -27,7 +28,8 @@ export const attachRefreshToken = async (
     env.JWT_REFRESH_SECRET
   );
   // 🔍 Fetch the refresh token document by ID
-  const tokenDoc = await RefreshTokenModel.findById(decoded.id).exec();
+  const authService = resolve(AuthService);
+  const tokenDoc = await authService.findById(decoded.id);
   if (!tokenDoc) {
     logger.warn("❌ Invalid or deleted refresh token");
     throw new AppError(

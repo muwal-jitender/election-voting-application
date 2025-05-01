@@ -79,7 +79,7 @@ export class BaseRepository<T extends Document> {
 
   /** Find one document by ID */
   async findById(
-    id: string,
+    id: string | Types.ObjectId,
     populateFields: string[] = [],
     session?: mongoose.ClientSession
   ): Promise<T | null> {

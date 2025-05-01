@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import { Types } from "mongoose";
 
 // ✅ Extend Express Request interface to include user
 export {};
@@ -8,7 +8,7 @@ export type AccessTokenPayload = {
   isAdmin: boolean;
 };
 export type RefreshTokenPayload = {
-  id: mongoose.Types.ObjectId;
+  id: Types.ObjectId;
   userId: string;
   ipAddress?: string;
   userAgent?: string;

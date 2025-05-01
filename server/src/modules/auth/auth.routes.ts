@@ -26,7 +26,6 @@ authRouter.post(
 );
 authRouter.post(
   "/refresh-token",
-  authenticateJWT,
   attachRefreshToken,
   async (req, res, next) => {
     await authController.refreshToken(req, res, next);

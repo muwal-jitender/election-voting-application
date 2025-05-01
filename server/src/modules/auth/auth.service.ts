@@ -95,9 +95,9 @@ export class AuthService {
     return await this.voterRepository.findOneByField("email", email);
   }
 
-  async findByIds(ids: string[]) {
-    logger.info(`🔎 Searching voters by IDs ➔ ${ids.join(", ")}`);
-    return await this.voterRepository.findByIds(ids);
+  async findById(id: Types.ObjectId) {
+    logger.info(`🔎 Searching refresh-token by ID ➔ ${id}`);
+    return await this.refreshTokenRepository.findById(id);
   }
   async findRefreshToken(payload: RefreshTokenPayload, refreshToken: string) {
     logger.info(`🔎 Searching refresh token ➔ ${payload.userId}`);
