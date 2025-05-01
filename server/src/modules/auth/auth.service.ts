@@ -101,7 +101,7 @@ export class AuthService {
   }
   async findRefreshToken(payload: RefreshTokenPayload, refreshToken: string) {
     logger.info(`🔎 Searching refresh token ➔ ${payload.userId}`);
-    const result = await this.refreshTokenRepository.findManyByFields(
+    const result = await this.refreshTokenRepository.findOneByMultipleSelect(
       ["userId", "id", "ipAddress", "userAgent", "refreshToken"],
       [
         payload.userId,
@@ -111,6 +111,7 @@ export class AuthService {
         refreshToken,
       ]
     );
+
     logger.info(`Search complete, returning the result ➔ ${payload.userId}`);
     return result;
   }

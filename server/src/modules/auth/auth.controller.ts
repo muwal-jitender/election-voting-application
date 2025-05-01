@@ -160,9 +160,6 @@ export class AuthController {
     try {
       const refreshToken = req.refreshTokenPayload as RefreshTokenPayload;
 
-      // (Optional) Verify if refresh token is still valid in DB
-      // const storedToken = await tokenService.findValidRefreshToken(decoded.userId, refreshToken);
-      // if (!storedToken) return res.status(401).json({ message: "Token no longer valid." });
       const { ipAddress, userAgent } = jwtService.extractRequestMeta(req);
       const refreshTokenPayload: RefreshTokenPayload = {
         ...refreshToken,
@@ -173,7 +170,9 @@ export class AuthController {
         refreshTokenPayload,
         req.refreshToken as string
       );
-      if (!dbRefreshToken) {
+      // TODO : Shall this be considered as token security breach and revoke all tokens from devices to this user?
+      if (!dbRefreshToken || dbRefreshToken.isRevoked) {
+        logger.warn("❌ Refresh token revoked or invalid");
         throw new AppError(
           "Refresh no longer exists.",
           StatusCodes.UNAUTHORIZED

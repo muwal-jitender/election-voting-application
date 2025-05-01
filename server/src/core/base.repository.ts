@@ -194,6 +194,45 @@ export class BaseRepository<T extends Document> {
     return await mongoQuery.exec();
   }
 
+  /**
+   * Finds single document that matches multiple field-value conditions.
+   *
+   * @template K - Keys of the document type T (field names)
+   * @param fields - Array of field names to filter by
+   * @param values - Array of values corresponding to each field
+   * @param selectedFields - (Optional) Array of field names to include in the result.
+   *                         If not provided, all fields will be returned.
+   * @returns Promise that resolves to an array of matching documents
+   * @example
+   * Fetch users with role "admin" and isActive = true, return only _id and email
+   * findOneByMultipleSelect(["role", "isActive"], ["admin", true], ["_id", "email"]);
+   *
+   * @example
+   *  Fetch all fields for matching user
+   * findOneByMultipleSelect(["email"], ["user@example.com"]);
+   */
+  async findOneByMultipleSelect<K extends keyof T>(
+    fields: K[],
+    values: unknown[],
+    selectedFields?: string[] // Fields to include explicitly
+  ): Promise<T | null> {
+    if (fields.length !== values.length) {
+      throw new AppError(
+        "Fields and values arrays must have the same length.",
+        StatusCodes.BAD_REQUEST
+      );
+    }
+
+    const mongoQuery = this.model.findOne({ fields: values } as Record<
+      string,
+      unknown
+    >);
+    if (selectedFields && selectedFields.length > 0) {
+      mongoQuery.select(selectedFields.join(" ")); // Dynamically select required fields
+    }
+    return await mongoQuery.exec();
+  }
+
   /** Update a document by ID */
   async update(
     id: Types.ObjectId | string,
