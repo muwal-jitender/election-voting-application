@@ -8,7 +8,7 @@ import { RegisterVoterDTO, SignInDTO } from "modules/voter/voter.dto";
 import { AuthService } from "modules/auth/auth.service";
 
 import { StatusCodes } from "http-status-codes";
-
+import { randomUUID } from "crypto";
 import logger from "logger";
 
 import { jwtService } from "utils/jwt-service.utils";
@@ -16,6 +16,7 @@ import { AppError } from "utils/exceptions.utils";
 import { VoterService } from "modules/voter/voter.service";
 import { RefreshTokenPayload } from "utils/extend-express-request.utils";
 import { VoterDocument } from "modules/voter/voter.model";
+import { env } from "utils/env-config.utils";
 
 @injectable()
 export class AuthController {
@@ -25,40 +26,58 @@ export class AuthController {
   ) {}
 
   async register(req: Request, res: Response, next: NextFunction) {
-    try {
-      // ✅ Register Voter
-      const voterData: RegisterVoterDTO = req.body;
-      const voter = await this.authService.registerVoter(voterData);
+    const voterData: RegisterVoterDTO = req.body;
 
-      // ✅ Remove password before returning the new created voter
+    try {
+      logger.info(
+        `📝 [Register] Registration attempt ➔ Email: ${voterData.email}`
+      );
+
+      // 1️⃣ Register voter in database
+      const voter = await this.authService.registerVoter(voterData);
+      logger.info(
+        `✅ [Register] Voter created successfully ➔ ID: ${voter.id}, Email: ${voter.email}`
+      );
+
+      // 2️⃣ Remove sensitive fields before sending response
       const { password, ...safeNewVoter } = voter.toJSON();
+
+      // 3️⃣ Respond with voter info
       return res.status(StatusCodes.CREATED).json({
         message: "Voter registered successfully",
         data: safeNewVoter,
       });
     } catch (error: unknown) {
-      logger.error("❌ Registration failed", { error });
+      logger.error(`❌ [Register] Failed ➔ Email: ${voterData.email}`, {
+        error,
+      });
       next(error);
     }
   }
 
   async login(req: Request, res: Response, next: NextFunction) {
-    try {
-      const signInDTO: SignInDTO = req.body;
+    const signInDTO: SignInDTO = req.body;
+    const email = signInDTO.email.toLowerCase();
 
-      logger.info(`🔑 Login attempt initiated ➔ Email: ${signInDTO.email}`);
-      // Validate user credentials
+    try {
+      logger.info(`🔑 [Login] Attempt started ➔ Email: ${email}`);
+
+      // 1️⃣ Validate credentials
       const voter = await this.authService.checkCredentials(
-        signInDTO.email.toLowerCase(),
+        email,
         signInDTO.password
       );
       logger.info(
-        `✅ Credentials validated ➔ UserID: ${voter.id}, Email: ${voter.email}`
+        `✅ [Login] Credentials verified ➔ UserID: ${voter.id}, Email: ${voter.email}`
       );
 
-      // Generate access and refresh tokens
+      // 2️⃣ Issue access and refresh tokens
       await this.generateTokens(req, res, voter);
-      // Respond with user data (No token in response body for security)
+      logger.info(
+        `🔐 [Login] Tokens generated and cookies set ➔ UserID: ${voter.id}`
+      );
+
+      // 3️⃣ Respond with safe user data
       return res.status(StatusCodes.OK).json({
         message: "You are now logged in",
         data: {
@@ -68,28 +87,38 @@ export class AuthController {
         },
       });
     } catch (error: unknown) {
-      logger.error(`❌ Login failed ➔ Email: ${req.body?.email}`, { error });
+      logger.error(`❌ [Login] Failed ➔ Email: ${email}`, { error });
       next(error);
     }
   }
+
   async generateTokens(req: Request, res: Response, voter: VoterDocument) {
-    // 2. Generate and set access token cookie
+    logger.info(
+      `🎯 [Token Generation] Starting token issuance ➔ UserID: ${voter.id}, Email: ${voter.email}`
+    );
+
+    // 1️⃣ Generate access token
     const accessToken = this.authService.generateAccessToken(voter);
     res.cookie(
       jwtService.accessTokenName,
       accessToken,
       jwtService.cookieOptions("AccessToken")
     );
-    logger.info(`🔐 Access token issued ➔ UserID: ${voter.id}`);
+    logger.info(
+      `🔐 [AccessToken] Issued and set as cookie ➔ UserID: ${voter.id}`
+    );
 
-    // 3. Capture IP and User-Agent for security tracking
-
+    // 2️⃣ Capture metadata for refresh token
     const { ipAddress, userAgent } = jwtService.extractRequestMeta(req);
+    logger.info(
+      `📡 [Metadata] Captured IP and User-Agent ➔ IP: ${ipAddress}, UA: ${userAgent}`
+    );
 
-    // 4. Save refresh token placeholder to DB to get _id
+    // 3️⃣ Save placeholder refresh token
+    const placeholderToken = randomUUID();
     const dbRefreshToken = await this.authService.saveRefreshToken({
       userId: voter.id,
-      refreshToken: "placeholder", // Will update after generating token
+      refreshToken: placeholderToken,
       ipAddress,
       userAgent,
       isRevoked: false,
@@ -97,10 +126,10 @@ export class AuthController {
       issuedAt: new Date(),
     });
     logger.info(
-      `💾 Refresh token placeholder saved ➔ TokenID: ${dbRefreshToken.id}`
+      `💾 [RefreshToken] Placeholder stored ➔ TokenID: ${dbRefreshToken.id}`
     );
 
-    // 5. Generate refresh token using DB token ID
+    // 4️⃣ Generate actual refresh token with DB ID
     const refreshToken = this.authService.generateRefreshToken(
       dbRefreshToken.id,
       voter.id,
@@ -108,50 +137,61 @@ export class AuthController {
       ipAddress,
       userAgent
     );
+    logger.info(`🔁 [RefreshToken] JWT generated ➔ UserID: ${voter.id}`);
 
-    // 6. Update the DB with the actual refresh token
+    // 5️⃣ Update DB with final refresh token
     dbRefreshToken.refreshToken = refreshToken;
     await dbRefreshToken.save();
     logger.info(
-      `🔁 Refresh token finalized and saved ➔ TokenID: ${dbRefreshToken.id}`
+      `✅ [RefreshToken] Final token saved ➔ TokenID: ${dbRefreshToken.id}`
     );
 
-    // 7. Set refresh token cookie
+    // 6️⃣ Set refresh token cookie
     res.cookie(
       jwtService.refreshTokenName,
       refreshToken,
       jwtService.cookieOptions("RefreshToken")
     );
-    logger.info(`🍪 Refresh token cookie set ➔ UserID: ${voter.id}`);
+    logger.info(`🍪 [RefreshToken] Cookie set ➔ UserID: ${voter.id}`);
+
+    logger.info(
+      `🎉 [Token Generation] Completed successfully ➔ UserID: ${voter.id}`
+    );
   }
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
-      // 1. Clear access and refresh cookies
-      res.clearCookie(jwtService.accessTokenName, {
-        ...jwtService.cookieOptions("AccessToken"),
-        maxAge: 0,
-      });
+      const rawRefreshToken = req.cookies[jwtService.refreshTokenName];
 
-      res.clearCookie(jwtService.refreshTokenName, {
-        ...jwtService.cookieOptions("RefreshToken"),
-        maxAge: 0,
-      });
-
-      // 2. Revoke refresh token in DB (if exists)
-      const refreshToken = req.refreshTokenPayload;
-      if (refreshToken?.id) {
-        await this.authService.update(refreshToken.id);
-        logger.info(`🚪 Logout: Revoked refresh token ➔ ${refreshToken.id}`);
-      } else {
+      if (!rawRefreshToken) {
         logger.warn(
-          "⚠️ Logout attempted without valid refresh token in request"
+          "⚠️ [Logout] No refresh token cookie found. Proceeding to clear cookies."
         );
+      } else {
+        try {
+          const decoded = jwtService.verify<RefreshTokenPayload>(
+            rawRefreshToken,
+            env.JWT_REFRESH_SECRET
+          );
+          await this.authService.update(decoded.id);
+          logger.info(
+            `🚪 [Logout] Refresh token revoked ➔ TokenID: ${decoded.id}, UserID: ${decoded.userId}`
+          );
+        } catch (verifyErr) {
+          logger.warn(
+            "⚠️ [Logout] Failed to decode refresh token during logout",
+            { verifyErr }
+          );
+        }
       }
 
-      // 3. Return success response
+      // 🧼 Always clear cookies regardless of token validity
+      jwtService.clearAuthCookies(res);
+      logger.info("🧹 [Logout] Access and refresh cookies cleared.");
+
+      // ✅ Respond to client
       res.status(StatusCodes.OK).json({ message: "Logged out successfully" });
     } catch (error) {
-      logger.error("❌ Logout failed", { error });
+      logger.error("❌ [Logout] Logout process failed", { error });
       next(error);
     }
   }
@@ -159,14 +199,25 @@ export class AuthController {
   async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
       const refreshToken = req.refreshTokenPayload as RefreshTokenPayload;
+      const tokenId = refreshToken?.id?.toString() || "unknown";
+
+      logger.info(
+        `🔄 [RefreshToken] Attempt ➔ TokenID: ${tokenId}, UserID: ${refreshToken.userId}`
+      );
 
       const user = await this.voterService.getVoterById(refreshToken.userId);
       if (!user) {
+        logger.warn(
+          `❌ [RefreshToken] User not found ➔ UserID: ${refreshToken.userId}`
+        );
         throw new AppError("User no longer exists.", StatusCodes.UNAUTHORIZED);
       }
 
-      // Generate new tokens
+      logger.info(`✅ [RefreshToken] User validated ➔ ${user.email}`);
+
+      // 🔁 Generate and issue new tokens
       await this.generateTokens(req, res, user);
+      logger.info(`🔐 [RefreshToken] New tokens issued ➔ UserID: ${user.id}`);
 
       return res.status(StatusCodes.OK).json({
         message: "Token refreshed successfully.",
@@ -177,7 +228,9 @@ export class AuthController {
         },
       });
     } catch (error) {
-      logger.error("⚠️ Error refreshing token", { error });
+      logger.error("⚠️ [RefreshToken] Error occurred while refreshing token", {
+        error,
+      });
       next(error);
     }
   }

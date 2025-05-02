@@ -2,12 +2,13 @@ import {
   AccessTokenPayload,
   RefreshTokenPayload,
 } from "./extend-express-request.utils";
+import { CookieOptions, Response } from "express";
 
 import { AppError } from "./exceptions.utils";
-import { CookieOptions } from "express";
 import { IRefreshTokenDocument } from "modules/auth/auth.model";
 import { Request } from "express";
 import { StatusCodes } from "http-status-codes";
+import crypto from "crypto";
 import { env } from "./env-config.utils";
 import jwt from "jsonwebtoken";
 import logger from "logger";
@@ -56,6 +57,17 @@ export const jwtService = {
       maxAge,
     } as CookieOptions;
   },
+  clearAuthCookies: (res: Response) => {
+    res.clearCookie(jwtService.accessTokenName, {
+      ...jwtService.cookieOptions("AccessToken"),
+      maxAge: 0,
+    });
+    res.clearCookie(jwtService.refreshTokenName, {
+      ...jwtService.cookieOptions("RefreshToken"),
+      maxAge: 0,
+    });
+  },
+
   /**
    * The date to be saved in the database for the refresh-token expiry date.
    * @returns
@@ -82,5 +94,8 @@ export const jwtService = {
       ipAddress,
       userAgent,
     };
+  },
+  hashToken: (token: string) => {
+    return crypto.createHash("sha256").update(token).digest("hex");
   },
 };

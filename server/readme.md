@@ -41,6 +41,22 @@ This is the **backend API** for the Election Voting App, built with **Node.js**,
 - Example: When casting a vote, both the candidate's vote count and voter's status are updated atomically.
 - Transactions are implemented using `mongoose` sessions to handle complex operations safely.
 
+## ✅ REFRESH TOKEN FLOW REVIEW
+
+### ✔ Strengths:
+
+- Token Hashing with SHA-256 before storing in DB → ✅ Prevents token leakage exploitation.
+
+- Token Reuse Detection → ✅ Hash comparison + forced global logout if mismatch.
+
+- IP & User-Agent Validation → ✅ Guards against session hijacking.
+
+- Token Versioning → ✅ Prepares for future revocation strategies.
+
+- Centralized Metadata Extraction → ✅ Clean and reusable via jwtService.extractRequestMeta.
+
+- Clear Cookie Logic → ✅ Encapsulated in clearAuthCookies() utility.
+
 ## 🛠️ Setup Instructions
 
 ### 1. **Install dependencies**

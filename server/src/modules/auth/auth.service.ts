@@ -2,7 +2,7 @@ import { inject, singleton } from "tsyringe";
 import bcrypt from "bcryptjs";
 
 import { StatusCodes } from "http-status-codes";
-
+import { Response } from "express";
 import { RefreshTokenDTO } from "./auth.dto";
 import { RegisterVoterDTO } from "modules/voter/voter.dto";
 import { AuthRepository } from "./auth.repository";
@@ -18,6 +18,7 @@ import { RefreshTokenPayload } from "utils/extend-express-request.utils";
 import { Types } from "mongoose";
 import { runTransactionWithRetry } from "utils/db-transaction.utils";
 import { IRefreshTokenDocument } from "./auth.model";
+
 @singleton()
 export class AuthService {
   constructor(
@@ -26,10 +27,13 @@ export class AuthService {
   ) {}
 
   async registerVoter(data: RegisterVoterDTO) {
-    logger.info(`📩 Registering voter ➔ ${data.email}`);
-    const emailExists = await this.findByEmail(data.email);
+    logger.info(`📩 [RegisterVoter] Attempt ➔ ${data.email}`);
+    const emailExists = await this.voterRepository.findOneByField(
+      "email",
+      data.email
+    );
     if (emailExists) {
-      logger.warn(`⚠️ Duplicate email registration attempt ➔ ${data.email}`);
+      logger.warn(`⚠️ [RegisterVoter] Duplicate Email ➔ ${data.email}`);
       throw new AppError(
         "This email is already registered. Try signing in instead.",
         StatusCodes.CONFLICT
@@ -41,18 +45,18 @@ export class AuthService {
       isAdmin: false,
     });
 
-    logger.info(`✅ Registration successful ➔ ${data.email}`);
+    logger.info(`✅ [RegisterVoter] Success ➔ ${data.email}`);
     return voter;
   }
+
   async saveRefreshToken(
     data: RefreshTokenDTO
   ): Promise<IRefreshTokenDocument> {
     return await runTransactionWithRetry<IRefreshTokenDocument>(
       async (session) => {
         logger.info(
-          `🔄 Updating multiple documents to "isRevoked = true" when same user login multiple times from the same device/browser`
+          `🔄 [saveRefreshToken] Revoking old tokens for user ➔ ${data.userId}`
         );
-
         await this.refreshTokenRepository.updateMany(
           {
             userId: data.userId,
@@ -64,80 +68,141 @@ export class AuthService {
           session
         );
 
-        logger.info(`📩 Saving new Refresh Token ➔ ${data.userId}`);
+        logger.info(
+          `📥 [saveRefreshToken] Creating new token record ➔ ${data.userId}`
+        );
+        const hashedToken = jwtService.hashToken(data.refreshToken);
         const refreshTokenDetail = await this.refreshTokenRepository.create(
-          data,
+          { ...data, refreshToken: hashedToken },
           session
         );
-        logger.info(`✅ Refresh Token Saved Successfully ➔ ${data.userId}`);
 
-        return refreshTokenDetail; // ✅ Now perfectly valid to return it!
+        logger.info(
+          `✅ [saveRefreshToken] Token Saved ➔ TokenID: ${refreshTokenDetail.id}`
+        );
+        return refreshTokenDetail;
       }
-    );
-  }
-
-  async updateMany(
-    voterId: Types.ObjectId,
-    ipAddress: string,
-    userAgent: string
-  ) {
-    await this.refreshTokenRepository.updateMany(
-      { userId: voterId, isRevoked: false, ipAddress, userAgent },
-      { isRevoked: true }
     );
   }
   async update(id: Types.ObjectId) {
     await this.refreshTokenRepository.update(id, { isRevoked: true });
   }
-
-  async findByEmail(email: string) {
-    logger.debug(`🔎 Searching voter by email ➔ ${email}`);
-    return await this.voterRepository.findOneByField("email", email);
-  }
-
-  async findById(id: Types.ObjectId) {
-    logger.info(`🔎 Searching refresh-token by ID ➔ ${id}`);
-    return await this.refreshTokenRepository.findById(id);
-  }
-  async findRefreshToken(payload: RefreshTokenPayload, refreshToken: string) {
-    logger.info(`🔎 Searching refresh token ➔ ${payload.userId}`);
-    const result = await this.refreshTokenRepository.findOneByFieldWithSelect(
-      {
-        userId: payload.userId,
-        id: payload.id,
-        ipAddress: payload.ipAddress,
-        userAgent: payload.userAgent,
-        refreshToken,
-      },
-      ["userId", "id", "ipAddress", "userAgent", "refreshToken", "isRevoked"]
-    );
-
-    logger.info(`Search complete, returning the result ➔ ${payload.userId}`);
-    return result;
-  }
   async checkCredentials(
     email: string,
     password: string
   ): Promise<VoterDocument> {
-    logger.info(`🔐 Login attempt ➔ ${email}`);
+    logger.info(`🔐 [Login] Checking credentials ➔ ${email}`);
 
     const voter = await this.voterRepository.findOneByFieldWithSelect(
-      { email: email },
+      { email },
       ["_id", "fullName", "email", "password", "isAdmin"]
     );
 
     if (!voter || !(await bcrypt.compare(password, voter.password))) {
-      logger.warn(`❌ Login failed ➔ ${email}`);
+      logger.warn(`❌ [Login] Invalid credentials ➔ ${email}`);
       throw new AppError(
         "Invalid username or password",
         StatusCodes.UNAUTHORIZED
       );
     }
 
-    logger.info(`✅ Login successful ➔ ${email}`);
+    logger.info(`✅ [Login] Authentication successful ➔ ${email}`);
     return voter;
   }
 
+  async validateRefreshToken(
+    decoded: RefreshTokenPayload,
+    incomingToken: string,
+    res: Response,
+    meta: { ipAddress: string; userAgent: string }
+  ): Promise<TokenValidationResult> {
+    logger.info(
+      `🔍 [validateRefreshToken] Verifying token for ➔ ${decoded.userId}`
+    );
+
+    const dbRefreshToken = await this.refreshTokenRepository.findById(
+      decoded.id
+    );
+    if (!dbRefreshToken) {
+      logger.warn("❌ [TokenCheck] Token not found in DB");
+      return {
+        success: false,
+        code: StatusCodes.UNAUTHORIZED,
+        message: "Refresh token no longer exists.",
+      };
+    }
+
+    const incomingHashedToken = jwtService.hashToken(incomingToken);
+
+    if (incomingHashedToken !== dbRefreshToken.refreshToken) {
+      logger.warn("🚨 [TokenReuse] Hashed mismatch ➔ Reuse suspected!");
+      await this.revokeAllTokens(decoded.userId, res);
+      return {
+        success: false,
+        code: StatusCodes.UNAUTHORIZED,
+        message: "Token reuse detected.",
+      };
+    }
+
+    if (dbRefreshToken.isRevoked) {
+      logger.warn("🚫 [TokenStatus] Token is revoked");
+      return {
+        success: false,
+        code: StatusCodes.UNAUTHORIZED,
+        message: "Refresh token revoked.",
+      };
+    }
+
+    if (dbRefreshToken.expiresAt.getTime() < Date.now()) {
+      logger.warn("⏰ [TokenExpiry] Token expired");
+      return {
+        success: false,
+        code: StatusCodes.UNAUTHORIZED,
+        message: "Refresh token expired.",
+      };
+    }
+
+    if (dbRefreshToken.ipAddress !== meta.ipAddress) {
+      logger.warn(
+        `🛑 [IPMismatch] IP changed ➔ Expected: ${dbRefreshToken.ipAddress}, Got: ${meta.ipAddress}`
+      );
+      await this.revokeAllTokens(decoded.userId, res);
+      return {
+        success: false,
+        code: StatusCodes.UNAUTHORIZED,
+        message: "IP address mismatch.",
+      };
+    }
+
+    if (dbRefreshToken.userAgent !== meta.userAgent) {
+      logger.warn(
+        `🛑 [User-Agent Mismatch] UA changed ➔ Expected: ${dbRefreshToken.userAgent}, Got: ${meta.userAgent}`
+      );
+      await this.revokeAllTokens(decoded.userId, res);
+      return {
+        success: false,
+        code: StatusCodes.UNAUTHORIZED,
+        message: "User agent mismatch.",
+      };
+    }
+
+    if (decoded.version !== jwtService.currentTokenVersion) {
+      logger.warn(
+        `⚙️ [VersionMismatch] Expected: ${jwtService.currentTokenVersion}, Got: ${decoded.version}`
+      );
+      await this.revokeAllTokens(decoded.userId, res);
+      return {
+        success: false,
+        code: StatusCodes.UNAUTHORIZED,
+        message: "Outdated token version.",
+      };
+    }
+
+    logger.info(
+      `✅ [validateRefreshToken] Token is valid for ➔ ${decoded.userId}`
+    );
+    return { success: true, token: dbRefreshToken };
+  }
   generateAccessToken(voter: VoterDocument): string {
     logger.info(`🎟️ Generating Access token for ➔ ${voter.email}`);
     const payload = {
@@ -179,62 +244,15 @@ export class AuthService {
     logger.debug(`✅ Refresh token generated for ➔ ${email}`);
     return refreshToken;
   }
-  async validateRefreshToken(
-    decoded: RefreshTokenPayload,
-    meta: {
-      ipAddress: string;
-      userAgent: string;
-    }
-  ): Promise<TokenValidationResult> {
-    const tokenDoc = await this.refreshTokenRepository.findById(decoded.id);
-    if (!tokenDoc) {
-      logger.warn("❌ Invalid or deleted refresh token");
-      return {
-        success: false,
-        code: StatusCodes.UNAUTHORIZED,
-        message: "Refresh token no longer exists.",
-      };
-    }
-    if (tokenDoc.isRevoked) {
-      logger.warn("❌ Refresh token revoked");
-      return {
-        success: false,
-        code: StatusCodes.UNAUTHORIZED,
-        message: "Refresh token revoked.",
-      };
-    }
-    if (tokenDoc.expiresAt.getTime() < Date.now()) {
-      logger.warn("❌ Refresh token expired");
-      return {
-        success: false,
-        code: StatusCodes.UNAUTHORIZED,
-        message: "Refresh token expired.",
-      };
-    }
-    if (tokenDoc.ipAddress !== meta.ipAddress) {
-      logger.warn("❌ Refresh token IP address mismatch");
-      return {
-        success: false,
-        code: StatusCodes.UNAUTHORIZED,
-        message: "Refresh token IP address mismatch.",
-      };
-    }
-    if (tokenDoc.userAgent !== meta.userAgent) {
-      logger.warn("❌ Refresh token user agent mismatch");
-      return {
-        success: false,
-        code: StatusCodes.UNAUTHORIZED,
-        message: "Refresh token user agent mismatch.",
-      };
-    }
-    if (decoded.version !== jwtService.currentTokenVersion) {
-      logger.warn(`❌ Old token version: ${decoded.version}`);
-      return {
-        success: false,
-        code: StatusCodes.UNAUTHORIZED,
-        message: "Outdated token version. Please log in again.",
-      };
-    }
-    return { success: true, token: tokenDoc };
+  private async revokeAllTokens(userId: string, res: Response) {
+    logger.warn(`🧹 [RevokeAll] Revoking all tokens for user ➔ ${userId}`);
+    await this.refreshTokenRepository.updateMany(
+      { userId, isRevoked: false },
+      { isRevoked: true }
+    );
+    jwtService.clearAuthCookies(res);
+    logger.info(
+      `✅ [RevokeAll] Cookies cleared and tokens revoked for ➔ ${userId}`
+    );
   }
 }

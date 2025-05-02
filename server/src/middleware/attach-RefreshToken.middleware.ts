@@ -13,34 +13,71 @@ export const attachRefreshToken = async (
   res: Response,
   next: NextFunction
 ) => {
+  const meta = jwtService.extractRequestMeta(req);
+  const { ipAddress, userAgent } = meta;
+
   try {
     const refreshToken = req.cookies[jwtService.refreshTokenName];
     if (!refreshToken) {
-      logger.warn("🔐 Unauthorized request: No refresh-token found.");
+      logger.warn(
+        "🔐 No refresh-token provided ➔ IP: %s | UA: %s",
+        ipAddress,
+        userAgent
+      );
       res.status(StatusCodes.UNAUTHORIZED).json({
         message: "Unauthorized request: No refresh-token found.",
       });
       return;
     }
 
+    logger.info(
+      "🧪 Verifying refresh token ➔ IP: %s | UA: %s",
+      ipAddress,
+      userAgent
+    );
+
     const decoded = jwtService.verify<RefreshTokenPayload>(
       refreshToken,
       env.JWT_REFRESH_SECRET
     );
-    const meta = jwtService.extractRequestMeta(req);
+
     const authService = resolve(AuthService);
-    const result = await authService.validateRefreshToken(decoded, meta);
+    const result = await authService.validateRefreshToken(
+      decoded,
+      refreshToken,
+      res,
+      meta
+    );
 
     if (!result.success) {
-      logger.warn(`❌ Refresh token validation failed ➔ ${result.message}`);
+      logger.warn(
+        "❌ Refresh token validation failed ➔ Reason: %s | UserID: %s | IP: %s | UA: %s",
+        result.message,
+        decoded.userId,
+        ipAddress,
+        userAgent
+      );
+
       res.status(result.code).json({ message: result.message });
       return;
     }
+
+    logger.info(
+      "✅ Refresh token validated successfully ➔ UserID: %s | TokenID: %s",
+      decoded.userId,
+      decoded.id
+    );
 
     req.refreshTokenPayload = decoded;
     req.refreshToken = refreshToken;
     next();
   } catch (err) {
-    next(err); // Pass error to global error handler
+    logger.error(
+      "🔥 Unexpected error during refresh-token verification ➔ IP: %s | UA: %s",
+      ipAddress,
+      userAgent,
+      { err }
+    );
+    next(err);
   }
 };
