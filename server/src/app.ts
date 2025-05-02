@@ -47,7 +47,7 @@ app.set("trust proxy", ["127.0.0.1", "10.0.0.1"]);
 configureFileUpload(app);
 
 // ✅ Test route
-app.get("/", (_: Request, res: Response) => {
+app.get("/", (_req: Request, res: Response) => {
   res.send("Express + TypeScript Server is running!");
 });
 

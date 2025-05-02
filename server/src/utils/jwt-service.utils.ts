@@ -5,6 +5,7 @@ import {
 
 import { AppError } from "./exceptions.utils";
 import { CookieOptions } from "express";
+import { IRefreshTokenDocument } from "modules/auth/auth.model";
 import { Request } from "express";
 import { StatusCodes } from "http-status-codes";
 import { env } from "./env-config.utils";
@@ -13,9 +14,13 @@ import logger from "logger";
 import { parseDurationToMs } from "./duration-parser.utils";
 
 type TokenType = "AccessToken" | "RefreshToken";
+export type TokenValidationResult =
+  | { success: true; token: IRefreshTokenDocument }
+  | { success: false; code: number; message: string };
 export const jwtService = {
   accessTokenName: "access_token",
   refreshTokenName: "refresh_token",
+  currentTokenVersion: Number(env.CURRENT_TOKEN_VERSION),
   verify: <T extends AccessTokenPayload | RefreshTokenPayload>(
     token: string,
     tokenSecret: string

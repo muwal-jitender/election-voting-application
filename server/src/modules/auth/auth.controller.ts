@@ -11,7 +11,7 @@ import { StatusCodes } from "http-status-codes";
 
 import logger from "logger";
 
-import { jwtService } from "utils/jwt.utils";
+import { jwtService } from "utils/jwt-service.utils";
 import { AppError } from "utils/exceptions.utils";
 import { VoterService } from "modules/voter/voter.service";
 import { RefreshTokenPayload } from "utils/extend-express-request.utils";
@@ -160,33 +160,11 @@ export class AuthController {
     try {
       const refreshToken = req.refreshTokenPayload as RefreshTokenPayload;
 
-      const { ipAddress, userAgent } = jwtService.extractRequestMeta(req);
-      const refreshTokenPayload: RefreshTokenPayload = {
-        ...refreshToken,
-        ipAddress,
-        userAgent,
-      };
-      const dbRefreshToken = await this.authService.findRefreshToken(
-        refreshTokenPayload,
-        req.refreshToken as string
-      );
-      // TODO : Shall this be considered as token security breach and revoke all tokens from devices to this user?
-      if (!dbRefreshToken || dbRefreshToken.isRevoked) {
-        logger.warn("❌ Refresh token revoked or invalid");
-        throw new AppError(
-          "Refresh no longer exists.",
-          StatusCodes.UNAUTHORIZED
-        );
-      }
       const user = await this.voterService.getVoterById(refreshToken.userId);
       if (!user) {
         throw new AppError("User no longer exists.", StatusCodes.UNAUTHORIZED);
       }
 
-      await this.authService.update(refreshToken.id);
-      logger.info(
-        `🚪 Refresh Token: Revoked old refresh token ➔ ${refreshToken.id}`
-      );
       // Generate new tokens
       await this.generateTokens(req, res, user);
 

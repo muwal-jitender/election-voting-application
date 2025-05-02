@@ -140,13 +140,12 @@ export class BaseRepository<T extends Document> {
   }
 
   /** Find one document by field name and allow selecting specific fields */
-  async findOneByFieldWithSelect<K extends keyof T>(
-    field: K,
-    value: unknown,
+  async findOneByFieldWithSelect(
+    filter: object = {},
     selectedFields: string[] // Fields to include explicitly
   ): Promise<T | null> {
     return await this.model
-      .findOne({ [field]: value } as Record<string, unknown>)
+      .findOne(filter)
       .select(selectedFields.join(" ")) // Dynamically select required fields
       .exec();
   }

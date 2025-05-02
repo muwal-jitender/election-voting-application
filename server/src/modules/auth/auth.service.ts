@@ -12,7 +12,7 @@ import { AppError } from "utils/exceptions.utils";
 
 import logger from "logger";
 
-import { jwtService } from "utils/jwt.utils";
+import { jwtService, TokenValidationResult } from "utils/jwt-service.utils";
 import { VoterRepository } from "modules/voter/voter.repository";
 import { RefreshTokenPayload } from "utils/extend-express-request.utils";
 import { Types } from "mongoose";
@@ -101,15 +101,15 @@ export class AuthService {
   }
   async findRefreshToken(payload: RefreshTokenPayload, refreshToken: string) {
     logger.info(`🔎 Searching refresh token ➔ ${payload.userId}`);
-    const result = await this.refreshTokenRepository.findOneByMultipleSelect(
-      ["userId", "id", "ipAddress", "userAgent", "refreshToken"],
-      [
-        payload.userId,
-        payload.id,
-        payload.ipAddress,
-        payload.userAgent,
+    const result = await this.refreshTokenRepository.findOneByFieldWithSelect(
+      {
+        userId: payload.userId,
+        id: payload.id,
+        ipAddress: payload.ipAddress,
+        userAgent: payload.userAgent,
         refreshToken,
-      ]
+      },
+      ["userId", "id", "ipAddress", "userAgent", "refreshToken", "isRevoked"]
     );
 
     logger.info(`Search complete, returning the result ➔ ${payload.userId}`);
@@ -122,8 +122,7 @@ export class AuthService {
     logger.info(`🔐 Login attempt ➔ ${email}`);
 
     const voter = await this.voterRepository.findOneByFieldWithSelect(
-      "email",
-      email,
+      { email: email },
       ["_id", "fullName", "email", "password", "isAdmin"]
     );
 
@@ -145,6 +144,7 @@ export class AuthService {
       id: voter.id,
       email: voter.email,
       isAdmin: voter.isAdmin,
+      version: jwtService.currentTokenVersion,
     };
 
     const accessToken = jwtService.signin(
@@ -168,6 +168,7 @@ export class AuthService {
       id,
       ipAddress,
       userAgent,
+      version: jwtService.currentTokenVersion,
     };
 
     const refreshToken = jwtService.signin(
@@ -177,5 +178,63 @@ export class AuthService {
     );
     logger.debug(`✅ Refresh token generated for ➔ ${email}`);
     return refreshToken;
+  }
+  async validateRefreshToken(
+    decoded: RefreshTokenPayload,
+    meta: {
+      ipAddress: string;
+      userAgent: string;
+    }
+  ): Promise<TokenValidationResult> {
+    const tokenDoc = await this.refreshTokenRepository.findById(decoded.id);
+    if (!tokenDoc) {
+      logger.warn("❌ Invalid or deleted refresh token");
+      return {
+        success: false,
+        code: StatusCodes.UNAUTHORIZED,
+        message: "Refresh token no longer exists.",
+      };
+    }
+    if (tokenDoc.isRevoked) {
+      logger.warn("❌ Refresh token revoked");
+      return {
+        success: false,
+        code: StatusCodes.UNAUTHORIZED,
+        message: "Refresh token revoked.",
+      };
+    }
+    if (tokenDoc.expiresAt.getTime() < Date.now()) {
+      logger.warn("❌ Refresh token expired");
+      return {
+        success: false,
+        code: StatusCodes.UNAUTHORIZED,
+        message: "Refresh token expired.",
+      };
+    }
+    if (tokenDoc.ipAddress !== meta.ipAddress) {
+      logger.warn("❌ Refresh token IP address mismatch");
+      return {
+        success: false,
+        code: StatusCodes.UNAUTHORIZED,
+        message: "Refresh token IP address mismatch.",
+      };
+    }
+    if (tokenDoc.userAgent !== meta.userAgent) {
+      logger.warn("❌ Refresh token user agent mismatch");
+      return {
+        success: false,
+        code: StatusCodes.UNAUTHORIZED,
+        message: "Refresh token user agent mismatch.",
+      };
+    }
+    if (decoded.version !== jwtService.currentTokenVersion) {
+      logger.warn(`❌ Old token version: ${decoded.version}`);
+      return {
+        success: false,
+        code: StatusCodes.UNAUTHORIZED,
+        message: "Outdated token version. Please log in again.",
+      };
+    }
+    return { success: true, token: tokenDoc };
   }
 }

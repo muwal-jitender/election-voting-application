@@ -213,7 +213,7 @@ export class ElectionService {
 
   async getVotersWhoAlreadyVoted(id: string) {
     logger.info(`📋 Fetching voters who voted ➔ ${id}`);
-    return await this.electionRepository.findOneByFieldWithSelect("_id", id, [
+    return await this.electionRepository.findOneByFieldWithSelect({ _id: id }, [
       "voters",
     ]);
   }

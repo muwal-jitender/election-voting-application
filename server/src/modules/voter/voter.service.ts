@@ -12,7 +12,7 @@ import { stripMongoMeta } from "utils/utils";
 
 import logger from "logger";
 import { v4 as uuidv4 } from "uuid";
-import { jwtService } from "utils/jwt.utils";
+import { jwtService } from "utils/jwt-service.utils";
 @singleton()
 export class VoterService {
   constructor(
@@ -96,8 +96,7 @@ export class VoterService {
     logger.info(`🔐 Login attempt ➔ ${email}`);
 
     const voter = await this.voterRepository.findOneByFieldWithSelect(
-      "email",
-      email,
+      { email },
       ["_id", "fullName", "email", "password", "isAdmin"]
     );
 

@@ -25,4 +25,5 @@ export const env = {
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || "",
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || "",
   LOG_LEVEL: process.env.LOG_LEVEL || "info",
+  CURRENT_TOKEN_VERSION: process.env.CURRENT_TOKEN_VERSION || 1,
 };

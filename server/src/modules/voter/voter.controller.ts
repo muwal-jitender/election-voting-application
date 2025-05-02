@@ -11,7 +11,7 @@ import { StatusCodes } from "http-status-codes";
 import { env } from "utils/env-config.utils";
 import logger from "logger";
 import { validateMongoId } from "utils/utils";
-import { jwtService } from "utils/jwt.utils";
+import { jwtService } from "utils/jwt-service.utils";
 import { AppError } from "utils/exceptions.utils";
 
 @injectable()
