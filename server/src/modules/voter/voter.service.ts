@@ -13,6 +13,7 @@ import { stripMongoMeta } from "utils/utils";
 import logger from "logger";
 import { v4 as uuidv4 } from "uuid";
 import { jwtService } from "utils/jwt-service.utils";
+import { Types } from "mongoose";
 @singleton()
 export class VoterService {
   constructor(
@@ -51,7 +52,7 @@ export class VoterService {
     return await this.voterRepository.findAll({ electionId: id });
   }
 
-  async getVoterById(id: string) {
+  async getVoterById(id: Types.ObjectId) {
     logger.info(`🔍 Fetching voter by ID ➔ ${id}`);
     return await this.voterRepository.findById(id);
   }

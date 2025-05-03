@@ -8,6 +8,7 @@ import { CandidateService } from "./candidate.service";
 import { StatusCodes } from "http-status-codes";
 import { validateMongoId } from "utils/utils";
 import logger from "logger"; // ✅ Winston logger
+import { AccessTokenPayload } from "utils/extend-express-request.utils";
 
 @injectable()
 export class CandidateController {
@@ -49,10 +50,10 @@ export class CandidateController {
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      validateMongoId(id);
+      const candidateId = validateMongoId(id);
       logger.info(`🔍 Getting candidate by ID: ${id}`);
 
-      const candidate = await this.candidateService.getById(id);
+      const candidate = await this.candidateService.getById(candidateId);
       return res
         .status(StatusCodes.OK)
         .json({ message: "Found candidate", data: candidate });
@@ -65,10 +66,10 @@ export class CandidateController {
   async remove(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      validateMongoId(id);
+      const candidateId = validateMongoId(id);
       logger.info(`🗑️ Deleting candidate: ${id}`);
 
-      await this.candidateService.delete(id);
+      await this.candidateService.delete(candidateId);
       logger.info(`✅ Candidate deleted: ${id}`);
 
       return res.status(StatusCodes.OK).json({
@@ -86,16 +87,20 @@ export class CandidateController {
   async vote(req: Request, res: Response, next: NextFunction) {
     try {
       const { id, electionId } = req.params;
-      const voterId = req.user?.userId as string;
 
-      validateMongoId(id);
-      validateMongoId(voterId);
-      validateMongoId(electionId);
+      const voterId = (req.user as AccessTokenPayload).userId;
+      const candidateId = validateMongoId(id);
+
+      const electionMongoId = validateMongoId(electionId);
 
       logger.info(
         `🗳️ Casting vote ➔ candidate: ${id}, voter: ${voterId}, election: ${electionId}`
       );
-      await this.candidateService.voteCandidate(id, voterId, electionId);
+      await this.candidateService.voteCandidate(
+        candidateId,
+        voterId,
+        electionMongoId
+      );
 
       return res.status(StatusCodes.OK).json({
         message: "Vote casted successfully",

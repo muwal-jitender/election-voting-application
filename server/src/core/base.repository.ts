@@ -79,7 +79,7 @@ export class BaseRepository<T extends Document> {
 
   /** Find one document by ID */
   async findById(
-    id: string | Types.ObjectId,
+    id: Types.ObjectId,
     populateFields: string[] = [],
     session?: mongoose.ClientSession
   ): Promise<T | null> {
@@ -248,7 +248,7 @@ export class BaseRepository<T extends Document> {
   }
   /** Delete a document by ID */
   async delete(
-    id: string,
+    id: Types.ObjectId,
     session?: mongoose.ClientSession
   ): Promise<T | null> {
     return await this.model.findOneAndDelete({ _id: id }, { session }).exec();

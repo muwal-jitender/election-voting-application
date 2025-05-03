@@ -1,7 +1,7 @@
 import { inject, singleton } from "tsyringe";
 import { CandidateDTO } from "./candidate.dto";
 import { CandidateRepository } from "./candidate.repository";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { ElectionRepository } from "modules/election/election.repository";
 import { AppError } from "utils/exceptions.utils";
 import { deleteFile, uploadFile } from "utils/file.utils";
@@ -65,7 +65,11 @@ export class CandidateService {
     }
   }
 
-  async voteCandidate(id: string, voterId: string, electionId: string) {
+  async voteCandidate(
+    id: Types.ObjectId,
+    voterId: Types.ObjectId,
+    electionId: Types.ObjectId
+  ) {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -80,7 +84,7 @@ export class CandidateService {
         throw new AppError("Election not found", StatusCodes.BAD_REQUEST);
       }
 
-      if (election.voters.find((id) => id.toString() === voterId)) {
+      if (election.voters.find((id) => id.toString() === voterId.toString())) {
         logger.warn(
           `⚠️ Voter already voted ➔ voter: ${voterId}, election: ${electionId}`
         );
@@ -142,7 +146,7 @@ export class CandidateService {
     return await this.candidateRepository.findAll();
   }
 
-  async getById(id: string) {
+  async getById(id: Types.ObjectId) {
     return await this.candidateRepository.findById(id, ["electionId"]);
   }
 
@@ -154,7 +158,7 @@ export class CandidateService {
     return await this.candidateRepository.findAll({ electionId: id });
   }
 
-  async delete(id: string) {
+  async delete(id: Types.ObjectId) {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {

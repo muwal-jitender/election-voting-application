@@ -3,14 +3,14 @@ import { Types } from "mongoose";
 // ✅ Extend Express Request interface to include user
 export {};
 export type AccessTokenPayload = {
-  userId: string;
+  userId: Types.ObjectId;
   email: string;
   isAdmin: boolean;
   version: number;
 };
 export type RefreshTokenPayload = {
   id: Types.ObjectId;
-  userId: string;
+  userId: Types.ObjectId;
   ipAddress?: string;
   userAgent?: string;
   version: number;

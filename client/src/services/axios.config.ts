@@ -39,7 +39,7 @@ export const setupAxiosInterceptors = (
     (error) => {
       setLoading(false);
 
-      // 🚫 Unauthorized: redirect to login
+      // ⛔ Unauthorized: redirect to login
       if (error.status === 401) {
         navigate("/");
       }

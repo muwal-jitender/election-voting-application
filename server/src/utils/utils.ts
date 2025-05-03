@@ -1,7 +1,8 @@
+import mongoose, { Types } from "mongoose";
+
 import { AppError } from "./exceptions.utils";
 import { StatusCodes } from "http-status-codes";
 import logger from "logger";
-import mongoose from "mongoose";
 
 /**
  * Validates if a given ID is a valid MongoDB ObjectId
@@ -16,6 +17,7 @@ export const validateMongoId = (id: string, fieldName = "ID") => {
       StatusCodes.BAD_REQUEST
     );
   }
+  return id as unknown as Types.ObjectId;
 };
 
 export function transformMongoId<T extends { _id?: any; __v?: any }>(

@@ -1,7 +1,7 @@
 import { inject, singleton } from "tsyringe";
 import { ElectionDTO } from "./election.dto";
 import { ElectionRepository } from "./election.repository";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { AppError } from "utils/exceptions.utils";
 import { CandidateRepository } from "modules/candidate/candidate.repository";
 import { deleteFromCloudinary } from "config/cloudinary.config";
@@ -46,7 +46,7 @@ export class ElectionService {
   }
 
   async update(
-    electionId: string,
+    electionId: Types.ObjectId,
     dto: ElectionDTO,
     files: FileArray | null | undefined
   ) {
@@ -108,7 +108,7 @@ export class ElectionService {
     }
   }
 
-  async getById(id: string) {
+  async getById(id: Types.ObjectId) {
     logger.info(`🔍 Fetching election by ID ➔ ${id}`);
     return await this.electionRepository.findById(id, ["voters", "candidates"]);
   }
@@ -167,7 +167,7 @@ export class ElectionService {
     });
   }
 
-  async delete(id: string) {
+  async delete(id: Types.ObjectId) {
     const session = await mongoose.startSession();
     session.startTransaction();
     let deletedElection: ElectionDocument | null = null;
@@ -211,7 +211,7 @@ export class ElectionService {
     }
   }
 
-  async getVotersWhoAlreadyVoted(id: string) {
+  async getVotersWhoAlreadyVoted(id: Types.ObjectId) {
     logger.info(`📋 Fetching voters who voted ➔ ${id}`);
     return await this.electionRepository.findOneByFieldWithSelect({ _id: id }, [
       "voters",
