@@ -222,7 +222,7 @@ export class AuthService {
   }
   generateRefreshToken(
     id: Types.ObjectId,
-    userId: string,
+    userId: Types.ObjectId,
     email: string,
     ipAddress?: string,
     userAgent?: string
@@ -244,7 +244,7 @@ export class AuthService {
     logger.debug(`✅ Refresh token generated for ➔ ${email}`);
     return refreshToken;
   }
-  private async revokeAllTokens(userId: string, res: Response) {
+  private async revokeAllTokens(userId: Types.ObjectId, res: Response) {
     logger.warn(`🧹 [RevokeAll] Revoking all tokens for user ➔ ${userId}`);
     await this.refreshTokenRepository.updateMany(
       { userId, isRevoked: false },

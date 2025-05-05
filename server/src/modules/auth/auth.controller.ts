@@ -140,7 +140,7 @@ export class AuthController {
     logger.info(`🔁 [RefreshToken] JWT generated ➔ UserID: ${voter.id}`);
 
     // 5️⃣ Update DB with final refresh token
-    dbRefreshToken.refreshToken = refreshToken;
+    dbRefreshToken.refreshToken = jwtService.hashToken(refreshToken);
     await dbRefreshToken.save();
     logger.info(
       `✅ [RefreshToken] Final token saved ➔ TokenID: ${dbRefreshToken.id}`
