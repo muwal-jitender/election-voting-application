@@ -58,7 +58,9 @@ export const attachRefreshToken = async (
         userAgent
       );
 
-      res.status(result.code).json({ message: result.message });
+      res
+        .status(result.code)
+        .json({ message: result.message, errorType: "REFRESH_TOKEN_INVALID" });
       return;
     }
 

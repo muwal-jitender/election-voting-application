@@ -21,6 +21,7 @@ export const authenticateJWT = (
       logger.warn("🔐 Unauthorized request: No token found");
       res.status(StatusCodes.UNAUTHORIZED).json({
         message: "Access Denied: No access-token provided.",
+        errorType: "ACCESS_TOKEN_EXPIRED",
       });
       return;
     }

@@ -1,6 +1,7 @@
 export interface IApiResponse<T> {
   status: number;
   message: string;
+  errorType?: "ACCESS_TOKEN_EXPIRED" | "REFRESH_TOKEN_INVALID";
   data?: T | null;
 }
 

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { IUserResponse } from "types";
+import { voterService } from "./voter.service";
 
 // 🌐 Base URL for API from environment variable
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL?.trim();
@@ -36,12 +37,27 @@ export const setupAxiosInterceptors = (
       setLoading(false);
       return response;
     },
-    (error) => {
+    async (error) => {
       setLoading(false);
 
-      // ⛔ Unauthorized: redirect to login
+      // ⛔ 1. Unauthorized: redirect to login
       if (error.status === 401) {
-        navigate("/");
+        const errorType = error?.data?.errorType;
+        if (errorType === "ACCESS_TOKEN_EXPIRED") {
+          // ✅ 2. Try to refresh token
+          try {
+            await voterService.refreshToken();
+            // ✅ 3. Retry the original request
+            return api(error.config);
+          } catch (refreshErr) {
+            // ✅ 4. Refresh token failed, logout user
+            navigate("/");
+          }
+        }
+        if (errorType === "REFRESH_TOKEN_INVALID") {
+          // ✅ 5. Don't attempt refresh, just logout
+          navigate("/");
+        }
       }
       // ⛔ Forbidden: Reset admin privileges and redirect
       if (error.status === 403 && user?.isAdmin) {

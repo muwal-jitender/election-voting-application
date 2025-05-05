@@ -36,5 +36,6 @@ export interface IVoterService {
   register: (voter: IRegisterModel) => Promise<IApiResponse<IVoterModel>>;
   login: (user: ILoginModel) => Promise<IApiResponse<IUserResponse>>;
   logout: () => Promise<IApiResponse<null>>;
+  refreshToken: () => Promise<IApiResponse<null>>;
   me: () => Promise<IApiResponse<IUserResponse>>;
 }
