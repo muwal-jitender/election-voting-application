@@ -8,6 +8,7 @@ import { AppError } from "./exceptions.utils";
 import { IRefreshTokenDocument } from "modules/auth/auth.model";
 import { Request } from "express";
 import { StatusCodes } from "http-status-codes";
+import { Types } from "mongoose";
 import crypto from "crypto";
 import { env } from "./env-config.utils";
 import jwt from "jsonwebtoken";
@@ -57,7 +58,11 @@ export const jwtService = {
       maxAge,
     } as CookieOptions;
   },
-  clearAuthCookies: (res: Response) => {
+  clearAuthCookies: (
+    res: Response,
+    userId?: Types.ObjectId,
+    meta?: { ipAddress: string; userAgent: string }
+  ) => {
     res.clearCookie(jwtService.accessTokenName, {
       ...jwtService.cookieOptions("AccessToken"),
       maxAge: 0,
@@ -66,6 +71,18 @@ export const jwtService = {
       ...jwtService.cookieOptions("RefreshToken"),
       maxAge: 0,
     });
+    logger.info(
+      userId
+        ? `✅ [RevokeAll] Cookies cleared and tokens revoked ➔ UserID: ${userId}`
+        : `✅ [RevokeAll] Cookies cleared and tokens revoked`
+    );
+    if (meta?.ipAddress) {
+      logger.info(`🌐 [RevokeAll] IP Address ➔ ${meta.ipAddress}`);
+    }
+
+    if (meta?.userAgent) {
+      logger.info(`🖥️ [RevokeAll] User Agent ➔ ${meta.userAgent}`);
+    }
   },
 
   /**

@@ -182,16 +182,52 @@ export class AuthController {
             { verifyErr }
           );
         }
+        // 🧼 Always clear cookies regardless of token validity
+        jwtService.clearAuthCookies(res);
       }
-
-      // 🧼 Always clear cookies regardless of token validity
-      jwtService.clearAuthCookies(res);
-      logger.info("🧹 [Logout] Access and refresh cookies cleared.");
 
       // ✅ Respond to client
       res.status(StatusCodes.OK).json({ message: "Logged out successfully" });
     } catch (error) {
       logger.error("❌ [Logout] Logout process failed", { error });
+      next(error);
+    }
+  }
+  async logoutAllDevices(req: Request, res: Response, next: NextFunction) {
+    try {
+      const rawRefreshToken = req.cookies[jwtService.refreshTokenName];
+
+      if (!rawRefreshToken) {
+        logger.warn(
+          "⚠️ [Logout] No refresh token cookie found. Proceeding to clear cookies."
+        );
+      } else {
+        try {
+          const decoded = jwtService.verify<RefreshTokenPayload>(
+            rawRefreshToken,
+            env.JWT_REFRESH_SECRET
+          );
+          await this.authService.revokeAllTokensByUserId(decoded.id);
+          logger.info(
+            `🚪 [Logout] Refresh token revoked ➔ TokenID: ${decoded.id}, UserID: ${decoded.userId}`
+          );
+          logger.info("🧹 [Logout] Access and refresh cookies cleared.");
+        } catch (verifyErr) {
+          logger.warn(
+            "⚠️ [Logout] Failed to decode refresh token during logout",
+            { verifyErr }
+          );
+        }
+        // 🧼 Always clear cookies regardless of token validity
+        jwtService.clearAuthCookies(res);
+      }
+
+      // ✅ Respond to client
+      res
+        .status(StatusCodes.OK)
+        .json({ message: "Logged out from all devices successfully" });
+    } catch (error) {
+      logger.error("❌ [LogoutAll] Logout from all devices failed", { error });
       next(error);
     }
   }

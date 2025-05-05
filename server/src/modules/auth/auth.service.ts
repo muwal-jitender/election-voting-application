@@ -136,7 +136,8 @@ export class AuthService {
 
     if (incomingHashedToken !== dbRefreshToken.refreshToken) {
       logger.warn("🚨 [TokenReuse] Hashed mismatch ➔ Reuse suspected!");
-      await this.revokeAllTokens(decoded.userId, res);
+      await this.revokeAllTokensByUserId(decoded.userId);
+      jwtService.clearAuthCookies(res, decoded.userId, meta);
       return {
         success: false,
         code: StatusCodes.UNAUTHORIZED,
@@ -166,7 +167,8 @@ export class AuthService {
       logger.warn(
         `🛑 [IPMismatch] IP changed ➔ Expected: ${dbRefreshToken.ipAddress}, Got: ${meta.ipAddress}`
       );
-      await this.revokeAllTokens(decoded.userId, res);
+      await this.revokeAllTokensByUserId(decoded.userId);
+      jwtService.clearAuthCookies(res, decoded.userId, meta);
       return {
         success: false,
         code: StatusCodes.UNAUTHORIZED,
@@ -178,7 +180,8 @@ export class AuthService {
       logger.warn(
         `🛑 [User-Agent Mismatch] UA changed ➔ Expected: ${dbRefreshToken.userAgent}, Got: ${meta.userAgent}`
       );
-      await this.revokeAllTokens(decoded.userId, res);
+      await this.revokeAllTokensByUserId(decoded.userId);
+      jwtService.clearAuthCookies(res, decoded.userId, meta);
       return {
         success: false,
         code: StatusCodes.UNAUTHORIZED,
@@ -190,7 +193,8 @@ export class AuthService {
       logger.warn(
         `⚙️ [VersionMismatch] Expected: ${jwtService.currentTokenVersion}, Got: ${decoded.version}`
       );
-      await this.revokeAllTokens(decoded.userId, res);
+      await this.revokeAllTokensByUserId(decoded.userId);
+      jwtService.clearAuthCookies(res, decoded.userId, meta);
       return {
         success: false,
         code: StatusCodes.UNAUTHORIZED,
@@ -244,15 +248,11 @@ export class AuthService {
     logger.debug(`✅ Refresh token generated for ➔ ${email}`);
     return refreshToken;
   }
-  private async revokeAllTokens(userId: Types.ObjectId, res: Response) {
+  async revokeAllTokensByUserId(userId: Types.ObjectId) {
     logger.warn(`🧹 [RevokeAll] Revoking all tokens for user ➔ ${userId}`);
     await this.refreshTokenRepository.updateMany(
       { userId, isRevoked: false },
       { isRevoked: true }
-    );
-    jwtService.clearAuthCookies(res);
-    logger.info(
-      `✅ [RevokeAll] Cookies cleared and tokens revoked for ➔ ${userId}`
     );
   }
 }

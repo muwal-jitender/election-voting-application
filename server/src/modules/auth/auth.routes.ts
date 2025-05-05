@@ -34,5 +34,8 @@ authRouter.post(
 authRouter.post("/logout", async (req, res, next) => {
   await authController.logout(req, res, next);
 });
+authRouter.post("/logout-all-devices", async (req, res, next) => {
+  await authController.logoutAllDevices(req, res, next);
+});
 
 export default authRouter;
