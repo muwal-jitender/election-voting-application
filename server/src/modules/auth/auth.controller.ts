@@ -92,7 +92,11 @@ export class AuthController {
     }
   }
 
-  async generateTokens(req: Request, res: Response, voter: VoterDocument) {
+  private async generateTokens(
+    req: Request,
+    res: Response,
+    voter: VoterDocument
+  ) {
     logger.info(
       `🎯 [Token Generation] Starting token issuance ➔ UserID: ${voter.id}, Email: ${voter.email}`
     );
