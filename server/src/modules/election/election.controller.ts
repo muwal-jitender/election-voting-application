@@ -69,9 +69,9 @@ export class ElectionController {
   async getById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      validateMongoId(id);
+      const electionId = validateMongoId(id);
 
-      const election = await this.electionService.getById(id);
+      const election = await this.electionService.getById(electionId);
       if (!election) {
         logger.warn(`⚠️ Election not found ➔ ${id}`);
         throw new AppError("Election not found.", StatusCodes.NOT_FOUND);
@@ -90,8 +90,8 @@ export class ElectionController {
   async getDetailsById(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      validateMongoId(id);
-      const election = await this.electionService.getById(id);
+      const electionId = validateMongoId(id);
+      const election = await this.electionService.getById(electionId);
 
       if (!election) {
         logger.warn(`⚠️ Election details not found ➔ ${id}`);
@@ -111,8 +111,8 @@ export class ElectionController {
   async remove(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      validateMongoId(id);
-      const result = await this.electionService.delete(id);
+      const electionId = validateMongoId(id);
+      const result = await this.electionService.delete(electionId);
       return res.status(StatusCodes.OK).json({
         message: "Election removed successfully",
         data: result,
@@ -126,9 +126,9 @@ export class ElectionController {
   async update(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      validateMongoId(id);
+      const electionId = validateMongoId(id);
       const updatedElection = await this.electionService.update(
-        id,
+        electionId,
         req.body,
         req.files
       );
@@ -192,7 +192,7 @@ export class ElectionController {
   async checkIfVoterVoted(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      validateMongoId(id);
+      const electionId = validateMongoId(id);
       let hasVoted = false;
       const voterId = req.user?.userId;
 
@@ -201,7 +201,8 @@ export class ElectionController {
         throw new AppError("Voter not found", StatusCodes.NOT_FOUND);
       }
 
-      const election = await this.electionService.getVotersWhoAlreadyVoted(id);
+      const election =
+        await this.electionService.getVotersWhoAlreadyVoted(electionId);
       if (!election) {
         logger.warn(`⚠️ Election not found ➔ ${id}`);
         throw new AppError("Election not found", StatusCodes.NOT_FOUND);
@@ -209,7 +210,7 @@ export class ElectionController {
 
       if (
         election.voters.length > 0 &&
-        election.voters.find((id) => id.toString() === voterId)
+        election.voters.find((id) => id === voterId)
       ) {
         hasVoted = true;
       }
