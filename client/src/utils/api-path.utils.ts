@@ -1,13 +1,14 @@
 const VOTER_CONTROLLER = "/voters";
+const AUTH_CONTROLLER = "/auth";
 const CANDIDATE_CONTROLLER = "/candidates";
 const ELECTION_CONTROLLER = "/elections";
 
 export const API_PATH = {
   // Voter
   VOTER: `${VOTER_CONTROLLER}`,
-  VOTER_REGISTER: `${VOTER_CONTROLLER}/register`,
-  VOTER_LOGIN: `${VOTER_CONTROLLER}/login`,
-  VOTER_LOGOUT: `${VOTER_CONTROLLER}/logout`,
+  AUTH_REGISTER: `${AUTH_CONTROLLER}/register`,
+  AUTH_LOGIN: `${AUTH_CONTROLLER}/login`,
+  AUTH_LOGOUT: `${AUTH_CONTROLLER}/logout`,
   LOGIN_USER_DETAIL: `${VOTER_CONTROLLER}/me`,
   // Candidate
   CANDIDATE: `${CANDIDATE_CONTROLLER}`,
