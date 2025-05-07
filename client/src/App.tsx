@@ -11,6 +11,7 @@ import {
   Results,
 } from "./pages/general/index";
 
+import { UserProvider } from "context/UserContext"; // ✅ Import it
 import { useWindowWidth } from "hooks/useWindowWidth";
 import React from "react";
 import { ToastContainer } from "react-toastify";
@@ -21,7 +22,7 @@ import PublicLayout from "./components/layout/PublicLayout";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <PublicLayout />, // ✅ Public Layout for non-authenticated users
+    element: <PublicLayout />,
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <Login /> },
@@ -29,12 +30,17 @@ const router = createBrowserRouter([
     ],
   },
   {
-    element: <PrivateLayout />, // ✅ Private Layout for authenticated users
+    // ✅ Wrap PrivateLayout in UserProvider here
+    element: (
+      <UserProvider>
+        <PrivateLayout />
+      </UserProvider>
+    ),
     children: [
       { path: "/results", element: <Results /> },
       { path: "/elections/:id/candidates", element: <Candidates /> },
       {
-        element: <AdminRoute />, // ✅ Protect admin routes
+        element: <AdminRoute />,
         children: [
           { path: "/elections", element: <Elections /> },
           { path: "/elections/:id", element: <ElectionDetails /> },
