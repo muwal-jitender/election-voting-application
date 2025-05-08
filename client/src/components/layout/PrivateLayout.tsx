@@ -22,9 +22,16 @@ const PrivateLayout: React.FC = () => {
   const [showNav, setShowNav] = useState(!isMobile);
   const { name: theme, toggleTheme } = useTheme();
   const [loading, setLoading] = useState(false);
-  const { isAdmin, logout: userLogout, setUser, user } = useUser();
+  const { isAdmin, logout: userLogout, setUser, user, fetchUser } = useUser();
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      fetchUser();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ✅ Set up Axios interceptors on first render
   useEffect(() => {

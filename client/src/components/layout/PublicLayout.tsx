@@ -1,25 +1,23 @@
 import "./PrivateLayout";
 
+import React, { useEffect, useState } from "react";
 import { IoIosMoon, IoMdSunny } from "react-icons/io";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import React, { useEffect, useState } from "react";
 import { getTheme, setTheme } from "../../utils/theme.utils";
 
-import Loader from "./Loader";
 import LogoIcon from "components/ui/LogoIcon";
 import { setupAxiosInterceptors } from "../../services/axios.config";
-import { useUser } from "context/UserContext";
+import Loader from "./Loader";
 
 const PublicLayout: React.FC = () => {
   const [darkTheme, setDarkTheme] = useState(getTheme());
   const [loading, setLoading] = useState(false);
-  const { setUser, user } = useUser();
   const navigate = useNavigate();
 
   // ✅ Set up Axios interceptors on mount
   useEffect(() => {
-    setupAxiosInterceptors(setLoading, navigate, user, setUser);
-  }, [navigate, user, setUser]);
+    setupAxiosInterceptors(setLoading, navigate, null, null);
+  }, [navigate]);
 
   // ✅ Update document body class when theme changes
   useEffect(() => {

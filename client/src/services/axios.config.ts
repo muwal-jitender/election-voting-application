@@ -18,7 +18,7 @@ export const setupAxiosInterceptors = (
   setLoading: (loading: boolean) => void,
   navigate: ReturnType<typeof useNavigate>,
   user: IUserResponse | null,
-  setUser: (user: IUserResponse | null) => void,
+  setUser: ((user: IUserResponse | null) => void) | null,
 ) => {
   // 📤 Request Interceptor: Start loading before request
   api.interceptors.request.use(
@@ -42,7 +42,7 @@ export const setupAxiosInterceptors = (
 
       // ⛔ 1. Unauthorized: redirect to login
       if (error.status === 401) {
-        const errorType = error?.data?.errorType;
+        const errorType = error?.response?.data?.errorType;
         if (errorType === "ACCESS_TOKEN_EXPIRED") {
           // ✅ 2. Try to refresh token
           try {
@@ -61,7 +61,7 @@ export const setupAxiosInterceptors = (
       }
       // ⛔ Forbidden: Reset admin privileges and redirect
       if (error.status === 403 && user?.isAdmin) {
-        setUser({ ...user, isAdmin: false });
+        setUser && setUser({ ...user, isAdmin: false });
         navigate("/results");
       }
 

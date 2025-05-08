@@ -1,3 +1,4 @@
+import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 import { NextFunction, Request, Response } from "express";
 
 import { AccessTokenPayload } from "utils/extend-express-request.utils";
@@ -9,6 +10,7 @@ import logger from "logger"; // ✅ Winston logger
 /**
  * ✅ Middleware to authenticate incoming requests using JWT (from HTTP-only cookie)
  */
+
 export const authenticateJWT = (
   req: Request,
   res: Response,
@@ -34,7 +36,25 @@ export const authenticateJWT = (
     req.user = decoded;
     logger.info(`🔓 Authenticated user ➜ ${decoded.email}`);
     next();
-  } catch (err) {
-    next(err); // Pass error to global error handler
+  } catch (err: any) {
+    if (err instanceof TokenExpiredError) {
+      logger.warn("🔐 Token expired");
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "Access token expired",
+        errorType: "ACCESS_TOKEN_EXPIRED",
+      });
+      return;
+    }
+
+    if (err instanceof JsonWebTokenError) {
+      logger.warn("🔐 Invalid token");
+      res.status(StatusCodes.UNAUTHORIZED).json({
+        message: "Invalid access token",
+        errorType: "INVALID_ACCESS_TOKEN",
+      });
+      return;
+    }
+
+    next(err); // For all other unknown errors
   }
 };

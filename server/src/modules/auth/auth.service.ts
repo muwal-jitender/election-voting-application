@@ -14,7 +14,10 @@ import logger from "logger";
 
 import { jwtService, TokenValidationResult } from "utils/jwt-service.utils";
 import { VoterRepository } from "modules/voter/voter.repository";
-import { RefreshTokenPayload } from "utils/extend-express-request.utils";
+import {
+  AccessTokenPayload,
+  RefreshTokenPayload,
+} from "utils/extend-express-request.utils";
 import { Types } from "mongoose";
 import { runTransactionWithRetry } from "utils/db-transaction.utils";
 import { IRefreshTokenDocument } from "./auth.model";
@@ -209,8 +212,8 @@ export class AuthService {
   }
   generateAccessToken(voter: VoterDocument): string {
     logger.info(`🎟️ Generating Access token for ➔ ${voter.email}`);
-    const payload = {
-      id: voter.id,
+    const payload: AccessTokenPayload = {
+      userId: voter.id,
       email: voter.email,
       isAdmin: voter.isAdmin,
       version: jwtService.currentTokenVersion,

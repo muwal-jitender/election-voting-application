@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 import { voterService } from "services/voter.service";
 import { IUserResponse } from "types";
@@ -35,11 +35,6 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoading(false); // Stop loading in all cases
     }
   };
-
-  // 📦 Load user data once on component mount
-  useEffect(() => {
-    fetchUser();
-  }, []);
 
   // ❌ Logout user (frontend only; backend logout likely handled elsewhere)
   const logout = () => {
