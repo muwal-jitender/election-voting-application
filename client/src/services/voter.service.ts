@@ -24,7 +24,7 @@ export const voterService: IVoterService = {
     return await apiRequest<null>(API_PATH.AUTH_LOGOUT, "POST");
   },
   refreshToken: async () => {
-    return await apiRequest<null>(API_PATH.AUTH_LOGOUT, "POST");
+    return await apiRequest<null>(API_PATH.AUTH_REFRESH_TOKEN, "POST");
   },
   me: async () => {
     return await apiRequest<IUserResponse>(API_PATH.LOGIN_USER_DETAIL, "GET");
