@@ -1,9 +1,4 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  Matches,
-  MinLength,
-} from "class-validator";
+import { IsEmail, IsNotEmpty, Matches, MinLength } from "class-validator";
 
 // DTO (Data Transfer Object) for Voter Registration
 export class RegisterVoterDTO {
