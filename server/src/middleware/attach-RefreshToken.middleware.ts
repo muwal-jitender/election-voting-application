@@ -25,7 +25,8 @@ export const attachRefreshToken = async (
         userAgent
       );
       res.status(StatusCodes.UNAUTHORIZED).json({
-        message: "Unauthorized request: No refresh-token found.",
+        message: "Unauthorized request: No refresh-token cookie found.",
+        errorType: "REFRESH_TOKEN_INVALID",
       });
       return;
     }

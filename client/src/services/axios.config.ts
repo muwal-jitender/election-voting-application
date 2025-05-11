@@ -52,6 +52,7 @@ export const setupAxiosInterceptors = (
           } catch (refreshErr) {
             // ✅ 4. Refresh token failed, logout user
             navigate("/");
+            return Promise.reject(refreshErr);
           }
         }
         if (errorType === "REFRESH_TOKEN_INVALID") {
