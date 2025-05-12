@@ -2,6 +2,28 @@
 
 This is the **client-side** of the Election Voting App, built using **React 19**, **TypeScript**, **Redux Toolkit**, and **React Router v7**. It provides both admin and voter interfaces to manage and participate in elections.
 
+## 🔐 Authentication Strategy
+
+This application uses short-lived access tokens (stored in HTTP-only cookies) along with refresh tokens for secure authentication.
+
+### 🛠️ How It Works
+
+- All API requests use Axios with interceptors to handle access token expiration.
+- If an API call fails with `401 ACCESS_TOKEN_EXPIRED`, the client:
+  - Calls the `/refresh-token` endpoint via `voterService.refreshToken()`
+  - Queues all failed requests during refresh to avoid duplication
+  - Replays queued requests once new access token is received
+  - Uses a `_retry` flag to prevent infinite retry loops
+
+### 🚫 Failure Scenarios
+
+- If the refresh token is missing or invalid (`REFRESH_TOKEN_INVALID`), the user is logged out and redirected to the login page.
+- If a user has `isAdmin` and gets a `403`, their role is downgraded and they are redirected to the results page.
+
+### 📁 Related File
+
+See [`axios.config.ts`](./src/services/axios.config.ts) for full implementation details.
+
 ## Available Scripts
 
 In the project directory, you can run:
