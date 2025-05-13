@@ -126,6 +126,7 @@ export class AuthService {
     const dbRefreshToken = await this.refreshTokenRepository.findById(
       decoded.id
     );
+    // ❌ Not found (token manually revoked or expired)
     if (!dbRefreshToken) {
       logger.warn("❌ [TokenCheck] Token not found in DB");
       return {
@@ -208,6 +209,20 @@ export class AuthService {
     logger.info(
       `✅ [validateRefreshToken] Token is valid for ➔ ${decoded.userId}`
     );
+
+    // 🕒 Track the last time a refresh token was used
+    /**
+     * Analytics (e.g., "which sessions are still active?")
+     * Reuse detection with time gap analysis
+     * Auditing/reporting
+     */
+    dbRefreshToken.usedAt = new Date();
+    await dbRefreshToken.save();
+    logger.info(
+      `✅ [validateRefreshToken] Save the date when the token was last time used ➔ ${decoded.userId}`
+    );
+    // ⏳ Add delay to reduce replay attack risk
+    await new Promise((resolve) => global.setTimeout(resolve, 1500)); // 1.5s delay
     return { success: true, token: dbRefreshToken };
   }
   generateAccessToken(voter: VoterDocument): string {

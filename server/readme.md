@@ -82,6 +82,7 @@ If any validation fails, the token is revoked and all associated tokens are inva
 - Token Versioning → ✅ Prepares for future revocation strategies.
 - Centralized Metadata Extraction → ✅ Clean and reusable via jwtService.extractRequestMeta.
 - Clear Cookie Logic → ✅ Encapsulated in clearAuthCookies() utility.
+- Replay Protection Delay Window → ✅ Introduced delay before issuing new tokens to reduce risk of timing-based replay attacks.
 
 ## 🍪 Cookie Security
 
@@ -99,6 +100,14 @@ If any validation fails, the token is revoked and all associated tokens are inva
 - Token versioning via currentTokenVersion supports future upgrades or mass revocations.
 - IP/User-Agent mismatch revokes tokens to prevent session hijacking.
 - Logging is done using Winston to trace all auth events.
+
+## 🔥 This is Top-Tier Token Security
+
+What I’ve implemented mirrors the most secure practices used by:
+
+- 🔐 Banks
+- 🧑‍⚕️ Healthcare apps
+- 🧾 High-compliance enterprise systems
 
 ## 🛠️ Setup Instructions
 

@@ -1,6 +1,7 @@
 // eslint.config.js
 
 import js from "@eslint/js";
+import nodeGlobals from "globals";
 import prettierConfig from "eslint-config-prettier";
 import prettierPlugin from "eslint-plugin-prettier";
 import tsParser from "@typescript-eslint/parser";
@@ -17,6 +18,9 @@ export default [
         ecmaVersion: "latest",
         sourceType: "module",
       },
+    },
+    globals: {
+      ...nodeGlobals.node,
     },
     plugins: {
       "@typescript-eslint": tsPlugin,

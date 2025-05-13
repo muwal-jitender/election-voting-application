@@ -9,6 +9,7 @@ export interface IRefreshTokenDocument extends Document {
   expiresAt: Date;
   issuedAt: Date;
   lastUsedAt?: Date;
+  usedAt: Date | null;
 }
 const refreshTokenSchema = new Schema<IRefreshTokenDocument>(
   {
@@ -20,6 +21,7 @@ const refreshTokenSchema = new Schema<IRefreshTokenDocument>(
     expiresAt: { type: Date, required: true },
     issuedAt: { type: Date, required: true },
     lastUsedAt: { type: Date, required: false },
+    usedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );
