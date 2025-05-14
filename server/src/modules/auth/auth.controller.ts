@@ -17,12 +17,16 @@ import { VoterService } from "modules/voter/voter.service";
 import { RefreshTokenPayload } from "utils/extend-express-request.utils";
 import { VoterDocument } from "modules/voter/voter.model";
 import { env } from "utils/env-config.utils";
+import { AuditService } from "modules/audit/audit.service";
+import { AuditAction } from "modules/audit/audit.enums";
+import { AuditLogDTO } from "modules/audit/audit.dto";
 
 @injectable()
 export class AuthController {
   constructor(
     @inject(AuthService) private authService: AuthService,
-    @inject(VoterService) private voterService: VoterService
+    @inject(VoterService) private voterService: VoterService,
+    @inject(AuditService) private auditService: AuditService
   ) {}
 
   async register(req: Request, res: Response, next: NextFunction) {
@@ -76,7 +80,20 @@ export class AuthController {
       logger.info(
         `🔐 [Login] Tokens generated and cookies set ➔ UserID: ${voter.id}`
       );
-
+      const { ipAddress, userAgent } = jwtService.extractRequestMeta(req);
+      const dto: AuditLogDTO = {
+        userId: voter.id,
+        action: AuditAction.LOGIN_SUCCESS,
+        ipAddress: ipAddress,
+        userAgent: userAgent,
+        timestamp: new Date(),
+        metadata: {
+          email: voter.email,
+          fullName: voter.fullName,
+          isAdmin: voter.isAdmin,
+        },
+      };
+      await this.auditService.logAction(dto);
       // 3️⃣ Respond with safe user data
       return res.status(StatusCodes.OK).json({
         message: "You are now logged in",

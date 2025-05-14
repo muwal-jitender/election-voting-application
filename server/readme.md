@@ -16,7 +16,7 @@ This is the **backend API** for the Election Voting App, built with **Node.js**,
 - 🗄️ **MongoDB** with `mongoose` for data storage
 - 📂 File uploads with `express-fileupload`
 - 🌐 **CORS-enabled API** for frontend communication
-- 📈 **Winston** logging with daily file rotation
+- 📈 **Winston & Morgan** logging with daily file rotation
 
 ---
 
