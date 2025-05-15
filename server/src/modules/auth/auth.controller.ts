@@ -19,7 +19,8 @@ import { VoterDocument } from "modules/voter/voter.model";
 import { env } from "utils/env-config.utils";
 import { AuditService } from "modules/audit/audit.service";
 import { AuditAction } from "modules/audit/audit.enums";
-import { AuditLogDTO } from "modules/audit/audit.dto";
+
+import { auditLogUtil } from "utils/audit-log.utils";
 
 @injectable()
 export class AuthController {
@@ -69,7 +70,8 @@ export class AuthController {
       // 1️⃣ Validate credentials
       const voter = await this.authService.checkCredentials(
         email,
-        signInDTO.password
+        signInDTO.password,
+        req
       );
       logger.info(
         `✅ [Login] Credentials verified ➔ UserID: ${voter.id}, Email: ${voter.email}`
@@ -80,21 +82,19 @@ export class AuthController {
       logger.info(
         `🔐 [Login] Tokens generated and cookies set ➔ UserID: ${voter.id}`
       );
-      const { ipAddress, userAgent } = jwtService.extractRequestMeta(req);
-      const dto: AuditLogDTO = {
-        userId: voter.id,
-        action: AuditAction.LOGIN_SUCCESS,
-        ipAddress: ipAddress,
-        userAgent: userAgent,
-        timestamp: new Date(),
-        metadata: {
-          email: voter.email,
-          fullName: voter.fullName,
-          isAdmin: voter.isAdmin,
-        },
+
+      // 3️⃣ Save login event to audit log
+      const meta = {
+        email: voter.email,
+        fullName: voter.fullName,
+        isAdmin: voter.isAdmin,
       };
+      const dto = auditLogUtil.payload(req, AuditAction.LOGIN_SUCCESS, meta);
       await this.auditService.logAction(dto);
-      // 3️⃣ Respond with safe user data
+      logger.info(
+        `📝 [Audit] Login event recorded ➔ UserID: ${voter.id}, Action: ${dto.action}`
+      );
+      // 4️⃣ Respond with voter info
       return res.status(StatusCodes.OK).json({
         message: "You are now logged in",
         data: {
@@ -182,7 +182,7 @@ export class AuthController {
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
       const rawRefreshToken = req.cookies[jwtService.refreshTokenName];
-
+      let meta = undefined;
       if (!rawRefreshToken) {
         logger.warn(
           "⚠️ [Logout] No refresh token cookie found. Proceeding to clear cookies."
@@ -197,16 +197,26 @@ export class AuthController {
           logger.info(
             `🚪 [Logout] Refresh token revoked ➔ TokenID: ${decoded.id}, UserID: ${decoded.userId}`
           );
+          meta = {
+            userId: decoded.userId,
+            tokenId: decoded.id,
+          };
         } catch (verifyErr) {
           logger.warn(
             "⚠️ [Logout] Failed to decode refresh token during logout",
             { verifyErr }
           );
+          meta = {
+            error: verifyErr,
+          };
         }
         // 🧼 Always clear cookies regardless of token validity
         jwtService.clearAuthCookies(res);
       }
 
+      // Save login event to audit log
+      const dto = auditLogUtil.payload(req, AuditAction.LOGOUT, meta);
+      await this.auditService.logAction(dto);
       // ✅ Respond to client
       res.status(StatusCodes.OK).json({ message: "Logged out successfully" });
     } catch (error) {

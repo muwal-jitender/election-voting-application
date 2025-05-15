@@ -2,7 +2,7 @@ import { inject, singleton } from "tsyringe";
 import bcrypt from "bcryptjs";
 
 import { StatusCodes } from "http-status-codes";
-import { Response } from "express";
+import { Response, Request } from "express";
 import { RefreshTokenDTO } from "./auth.dto";
 import { RegisterVoterDTO } from "modules/voter/voter.dto";
 import { AuthRepository } from "./auth.repository";
@@ -21,12 +21,16 @@ import {
 import { Types } from "mongoose";
 import { runTransactionWithRetry } from "utils/db-transaction.utils";
 import { IRefreshTokenDocument } from "./auth.model";
+import { auditLogUtil } from "utils/audit-log.utils";
+import { AuditAction } from "modules/audit/audit.enums";
+import { AuditService } from "modules/audit/audit.service";
 
 @singleton()
 export class AuthService {
   constructor(
     @inject(AuthRepository) private refreshTokenRepository: AuthRepository,
-    @inject(VoterRepository) private voterRepository: VoterRepository
+    @inject(VoterRepository) private voterRepository: VoterRepository,
+    @inject(AuditService) private auditService: AuditService
   ) {}
 
   async registerVoter(data: RegisterVoterDTO) {
@@ -92,7 +96,8 @@ export class AuthService {
   }
   async checkCredentials(
     email: string,
-    password: string
+    password: string,
+    req: Request
   ): Promise<VoterDocument> {
     logger.info(`🔐 [Login] Checking credentials ➔ ${email}`);
 
@@ -103,6 +108,14 @@ export class AuthService {
 
     if (!voter || !(await bcrypt.compare(password, voter.password))) {
       logger.warn(`❌ [Login] Invalid credentials ➔ ${email}`);
+
+      // Save login event to audit log
+      const meta = {
+        email,
+      };
+      const dto = auditLogUtil.payload(req, AuditAction.LOGIN_FAILED, meta);
+      await this.auditService.logAction(dto);
+      // Throw error
       throw new AppError(
         "Invalid username or password",
         StatusCodes.UNAUTHORIZED
