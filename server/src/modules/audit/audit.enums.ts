@@ -13,5 +13,7 @@ export enum AuditAction {
   ADMIN_DOWNGRADED = "admin_downgraded",
   ELECTION_CREATED = "election_created",
   ELECTION_DELETED = "election_deleted",
+  ELECTION_UPDATED = "election_updated",
+  VOTE_CONFIRMED = "vote_confirmed",
   USER_REGISTERED = "user_registered",
 }
