@@ -48,7 +48,16 @@ export class AuthController {
       // 2️⃣ Remove sensitive fields before sending response
       const { password, ...safeNewVoter } = voter.toJSON();
 
-      // 3️⃣ Respond with voter info
+      // 3️⃣ Save register event to audit log
+      const dto = auditLogUtil.payload(
+        req,
+        AuditAction.USER_REGISTERED,
+        voterData,
+        voter.id
+      );
+      await this.auditService.logAction(dto);
+
+      // 4️⃣ Respond with voter info
       return res.status(StatusCodes.CREATED).json({
         message: "Voter registered successfully",
         data: safeNewVoter,
