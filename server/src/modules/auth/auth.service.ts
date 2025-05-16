@@ -139,9 +139,22 @@ export class AuthService {
     const dbRefreshToken = await this.refreshTokenRepository.findById(
       decoded.id
     );
-    // ❌ Not found (token manually revoked or expired)
+
+    // ❌ Case 1: Token not found — may have been revoked or expired
     if (!dbRefreshToken) {
       logger.warn("❌ [TokenCheck] Token not found in DB");
+
+      const dto = auditLogUtil.payload(
+        { ip: meta.ipAddress, userAgent: meta.userAgent } as any, // simulated req
+        AuditAction.TOKEN_REVOKED,
+        {
+          reason: "Refresh token not found",
+          tokenId: decoded.id.toString(),
+        },
+        decoded.userId
+      );
+      await this.auditService.logAction(dto);
+
       return {
         success: false,
         code: StatusCodes.UNAUTHORIZED,
@@ -151,10 +164,24 @@ export class AuthService {
 
     const incomingHashedToken = jwtService.hashToken(incomingToken);
 
+    // ❌ Case 2: Token reuse detected
     if (incomingHashedToken !== dbRefreshToken.refreshToken) {
       logger.warn("🚨 [TokenReuse] Hashed mismatch ➔ Reuse suspected!");
+
       await this.revokeAllTokensByUserId(decoded.userId);
       jwtService.clearAuthCookies(res, decoded.userId, meta);
+
+      const dto = auditLogUtil.payload(
+        { ip: meta.ipAddress, userAgent: meta.userAgent } as any,
+        AuditAction.TOKEN_REUSE,
+        {
+          reason: "Refresh token reuse detected",
+          tokenId: decoded.id.toString(),
+        },
+        decoded.userId
+      );
+      await this.auditService.logAction(dto);
+
       return {
         success: false,
         code: StatusCodes.UNAUTHORIZED,
@@ -162,8 +189,21 @@ export class AuthService {
       };
     }
 
+    // ❌ Case 3: Token was explicitly revoked
     if (dbRefreshToken.isRevoked) {
       logger.warn("🚫 [TokenStatus] Token is revoked");
+
+      const dto = auditLogUtil.payload(
+        { ip: meta.ipAddress, userAgent: meta.userAgent } as any,
+        AuditAction.TOKEN_REVOKED,
+        {
+          reason: "Token marked as revoked",
+          tokenId: decoded.id.toString(),
+        },
+        decoded.userId
+      );
+      await this.auditService.logAction(dto);
+
       return {
         success: false,
         code: StatusCodes.UNAUTHORIZED,
@@ -171,8 +211,21 @@ export class AuthService {
       };
     }
 
+    // ❌ Case 4: Token expired
     if (dbRefreshToken.expiresAt.getTime() < Date.now()) {
       logger.warn("⏰ [TokenExpiry] Token expired");
+
+      const dto = auditLogUtil.payload(
+        { ip: meta.ipAddress, userAgent: meta.userAgent } as any,
+        AuditAction.TOKEN_REVOKED,
+        {
+          reason: "Refresh token expired",
+          tokenId: decoded.id.toString(),
+        },
+        decoded.userId
+      );
+      await this.auditService.logAction(dto);
+
       return {
         success: false,
         code: StatusCodes.UNAUTHORIZED,
@@ -180,12 +233,28 @@ export class AuthService {
       };
     }
 
+    // ❌ Case 5: IP address mismatch
     if (dbRefreshToken.ipAddress !== meta.ipAddress) {
       logger.warn(
         `🛑 [IPMismatch] IP changed ➔ Expected: ${dbRefreshToken.ipAddress}, Got: ${meta.ipAddress}`
       );
+
       await this.revokeAllTokensByUserId(decoded.userId);
       jwtService.clearAuthCookies(res, decoded.userId, meta);
+
+      const dto = auditLogUtil.payload(
+        { ip: meta.ipAddress, userAgent: meta.userAgent } as any,
+        AuditAction.IP_MISMATCH,
+        {
+          reason: "IP address mismatch",
+          expectedIp: dbRefreshToken.ipAddress,
+          receivedIp: meta.ipAddress,
+          tokenId: decoded.id.toString(),
+        },
+        decoded.userId
+      );
+      await this.auditService.logAction(dto);
+
       return {
         success: false,
         code: StatusCodes.UNAUTHORIZED,
@@ -193,12 +262,28 @@ export class AuthService {
       };
     }
 
+    // ❌ Case 6: User-Agent mismatch
     if (dbRefreshToken.userAgent !== meta.userAgent) {
       logger.warn(
         `🛑 [User-Agent Mismatch] UA changed ➔ Expected: ${dbRefreshToken.userAgent}, Got: ${meta.userAgent}`
       );
+
       await this.revokeAllTokensByUserId(decoded.userId);
       jwtService.clearAuthCookies(res, decoded.userId, meta);
+
+      const dto = auditLogUtil.payload(
+        { ip: meta.ipAddress, userAgent: meta.userAgent } as any,
+        AuditAction.UA_MISMATCH,
+        {
+          reason: "User-Agent mismatch",
+          expectedUA: dbRefreshToken.userAgent,
+          receivedUA: meta.userAgent,
+          tokenId: decoded.id.toString(),
+        },
+        decoded.userId
+      );
+      await this.auditService.logAction(dto);
+
       return {
         success: false,
         code: StatusCodes.UNAUTHORIZED,
@@ -206,12 +291,28 @@ export class AuthService {
       };
     }
 
+    // ❌ Case 7: Version mismatch (e.g., after password change or app update)
     if (decoded.version !== jwtService.currentTokenVersion) {
       logger.warn(
         `⚙️ [VersionMismatch] Expected: ${jwtService.currentTokenVersion}, Got: ${decoded.version}`
       );
+
       await this.revokeAllTokensByUserId(decoded.userId);
       jwtService.clearAuthCookies(res, decoded.userId, meta);
+
+      const dto = auditLogUtil.payload(
+        { ip: meta.ipAddress, userAgent: meta.userAgent } as any,
+        AuditAction.TOKEN_REVOKED,
+        {
+          reason: "Token version mismatch",
+          expectedVersion: jwtService.currentTokenVersion,
+          receivedVersion: decoded.version,
+          tokenId: decoded.id.toString(),
+        },
+        decoded.userId
+      );
+      await this.auditService.logAction(dto);
+
       return {
         success: false,
         code: StatusCodes.UNAUTHORIZED,
@@ -219,25 +320,32 @@ export class AuthService {
       };
     }
 
+    // ✅ Case: All validations passed
     logger.info(
       `✅ [validateRefreshToken] Token is valid for ➔ ${decoded.userId}`
     );
 
-    // 🕒 Track the last time a refresh token was used
-    /**
-     * Analytics (e.g., "which sessions are still active?")
-     * Reuse detection with time gap analysis
-     * Auditing/reporting
-     */
+    // Track when this token was last used
     dbRefreshToken.usedAt = new Date();
     await dbRefreshToken.save();
-    logger.info(
-      `✅ [validateRefreshToken] Save the date when the token was last time used ➔ ${decoded.userId}`
+
+    const successAudit = auditLogUtil.payload(
+      { ip: meta.ipAddress, userAgent: meta.userAgent } as any,
+      AuditAction.REFRESH_TOKEN,
+      {
+        tokenId: decoded.id.toString(),
+        usedAt: dbRefreshToken.usedAt,
+      },
+      decoded.userId
     );
-    // ⏳ Add delay to reduce replay attack risk
+    await this.auditService.logAction(successAudit);
+
+    // Optional delay to reduce replay attacks
     await new Promise((resolve) => global.setTimeout(resolve, 1500)); // 1.5s delay
+
     return { success: true, token: dbRefreshToken };
   }
+
   generateAccessToken(voter: VoterDocument): string {
     logger.info(`🎟️ Generating Access token for ➔ ${voter.email}`);
     const payload: AccessTokenPayload = {
