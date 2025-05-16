@@ -16,4 +16,7 @@ export enum AuditAction {
   ELECTION_UPDATED = "election_updated",
   VOTE_CONFIRMED = "vote_confirmed",
   USER_REGISTERED = "user_registered",
+  CANDIDATE_CREATED = "candidate_created",
+  CANDIDATE_DELETED = "candidate_deleted",
+  VOTE_CAST = "vote_cast",
 }

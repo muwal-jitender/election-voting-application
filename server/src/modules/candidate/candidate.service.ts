@@ -163,13 +163,26 @@ export class CandidateService {
     session.startTransaction();
     try {
       logger.info(`🗑️ Deleting candidate ➔ ${id}`);
+
       const candidate = await this.candidateRepository.findById(id);
       if (!candidate) {
         logger.warn(`⚠️ Candidate not found ➔ ${id}`);
         throw new AppError("Candidate not found", StatusCodes.NOT_FOUND);
       }
 
-      await this.candidateRepository.delete(id, session);
+      const deletedCandidate = await this.candidateRepository.delete(
+        id,
+        session
+      );
+      if (!deletedCandidate) {
+        // Extra safety check (rare, but good practice)
+        logger.error(`❌ Candidate delete failed unexpectedly ➔ ${id}`);
+        throw new AppError(
+          "Candidate deletion failed",
+          StatusCodes.INTERNAL_SERVER_ERROR
+        );
+      }
+
       await this.electionRepository.update(
         candidate.electionId,
         { $pull: { candidates: id } },
@@ -184,6 +197,7 @@ export class CandidateService {
       session.endSession();
 
       logger.info(`✅ Candidate deleted successfully ➔ ${id}`);
+      return deletedCandidate;
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
