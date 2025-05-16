@@ -21,6 +21,7 @@ import { AuditService } from "modules/audit/audit.service";
 import { AuditAction } from "modules/audit/audit.enums";
 
 import { auditLogUtil } from "utils/audit-log.utils";
+import { Types } from "mongoose";
 
 @injectable()
 export class AuthController {
@@ -183,6 +184,8 @@ export class AuthController {
     try {
       const rawRefreshToken = req.cookies[jwtService.refreshTokenName];
       let meta = undefined;
+      let userId: Types.ObjectId | undefined = undefined;
+
       if (!rawRefreshToken) {
         logger.warn(
           "⚠️ [Logout] No refresh token cookie found. Proceeding to clear cookies."
@@ -202,12 +205,20 @@ export class AuthController {
             tokenId: decoded.id,
           };
         } catch (verifyErr) {
+          const err =
+            verifyErr instanceof Error
+              ? verifyErr
+              : new Error(String(verifyErr));
           logger.warn(
             "⚠️ [Logout] Failed to decode refresh token during logout",
             { verifyErr }
           );
           meta = {
-            error: verifyErr,
+            error: {
+              name: err.name,
+              message: err.message,
+              stack: err.stack,
+            },
           };
         }
         // 🧼 Always clear cookies regardless of token validity
@@ -215,7 +226,7 @@ export class AuthController {
       }
 
       // Save login event to audit log
-      const dto = auditLogUtil.payload(req, AuditAction.LOGOUT, meta);
+      const dto = auditLogUtil.payload(req, AuditAction.LOGOUT, meta, userId);
       await this.auditService.logAction(dto);
       // ✅ Respond to client
       res.status(StatusCodes.OK).json({ message: "Logged out successfully" });
@@ -277,6 +288,14 @@ export class AuthController {
         logger.warn(
           `❌ [RefreshToken] User not found ➔ UserID: ${refreshToken.userId}`
         );
+        // Save failed token attempt to audit log
+        const dto = auditLogUtil.payload(
+          req,
+          AuditAction.REFRESH_TOKEN_INVALID_USER,
+          { reason: "User does not exist", tokenId: refreshToken.id },
+          refreshToken.userId
+        );
+        await this.auditService.logAction(dto);
         throw new AppError("User no longer exists.", StatusCodes.UNAUTHORIZED);
       }
 
@@ -285,6 +304,19 @@ export class AuthController {
       // 🔁 Generate and issue new tokens
       await this.generateTokens(req, res, user);
       logger.info(`🔐 [RefreshToken] New tokens issued ➔ UserID: ${user.id}`);
+
+      // Save token attempt to audit log
+      const dto = auditLogUtil.payload(
+        req,
+        AuditAction.REFRESH_TOKEN,
+        {
+          email: user.email,
+          fullName: user.fullName,
+          isAdmin: user.isAdmin,
+        },
+        refreshToken.userId
+      );
+      await this.auditService.logAction(dto);
 
       return res.status(StatusCodes.OK).json({
         message: "Token refreshed successfully.",

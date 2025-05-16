@@ -5,6 +5,7 @@ export enum AuditAction {
   LOGIN_FAILED = "login_failed",
   LOGOUT = "logout",
   REFRESH_TOKEN = "refresh_token",
+  REFRESH_TOKEN_INVALID_USER = "refresh_token_invalid_user",
   TOKEN_REUSE = "token_reuse",
   TOKEN_REVOKED = "token_revoked",
   IP_MISMATCH = "ip_mismatch",
