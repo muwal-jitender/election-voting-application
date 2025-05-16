@@ -109,6 +109,33 @@ What I’ve implemented mirrors the most secure practices used by:
 - 🧑‍⚕️ Healthcare apps
 - 🧾 High-compliance enterprise systems
 
+## 📘 Audit Logging (Overview)
+
+The Audit Log module exists to track critical actions performed within the application for security, traceability, and compliance purposes.
+
+### We use audit logging to:
+
+- Monitor sensitive operations (e.g., login, logout, vote casting, resource creation/deletion)
+- Support forensic investigations and accountability
+- Meet internal and external compliance requirements
+
+### ✅ What We Track
+
+- Authentication events (LOGIN_SUCCESS, LOGOUT, TOKEN_REUSE)
+- Voting-related actions (VOTE_CAST, VOTE_CONFIRMED)
+- Administrative operations (ELECTION_CREATED, CANDIDATE_DELETED)
+- Security anomalies (IP_MISMATCH, UA_MISMATCH)
+
+### 🔐 Privacy & Data Handling
+
+We do not log sensitive data, including:
+
+- Passwords
+- Raw access or refresh tokens
+- Voter IDs linked to specific votes (to preserve anonymity)
+
+Audit logs only capture what’s necessary to establish intent and trace actions — not personal or confidential content.
+
 ## 🛠️ Setup Instructions
 
 ### 1. **Install dependencies**
