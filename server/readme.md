@@ -109,7 +109,7 @@ What I’ve implemented mirrors the most secure practices used by:
 - 🧑‍⚕️ Healthcare apps
 - 🧾 High-compliance enterprise systems
 
-## 📘 Audit Logging (Overview)
+## 📘 Audit Logging
 
 The Audit Log module exists to track critical actions performed within the application for security, traceability, and compliance purposes.
 
@@ -135,6 +135,49 @@ We do not log sensitive data, including:
 - Voter IDs linked to specific votes (to preserve anonymity)
 
 Audit logs only capture what’s necessary to establish intent and trace actions — not personal or confidential content.
+
+## 🛡️ Rate Limiting
+
+This application uses a configurable rate-limiting middleware to protect API endpoints from abuse, brute-force attacks, and excessive traffic.
+
+### 🔧 Global Rate Limiting
+
+A default global rate limiter is applied to all routes (except sensitive endpoints like `/login` and `/vote`) using the following configuration:
+
+- Max Requests: `100`
+- Window Duration: `15 minutes`
+- Keyed by: `IP address`
+
+### 🔐 Custom Rate Limiters
+
+#### 1. Login Endpoint
+
+- Route: POST `/api/auth/login`
+- Max Requests: `5`
+- Window: `5 minutes`
+- Keyed by: `IP address`
+
+This prevents brute-force login attempts.
+
+#### 2. Vote Endpoint
+
+- Route: PATCH `/candidate/:id/elections/:electionId`
+- Max Requests: `3`
+- Window: `10 minutes`
+- Keyed by: `User ID (fallback to IP)`
+
+This ensures fair voting behavior and prevents abuse.
+
+### 🧱 Configuration
+
+Rate limiter behavior is centralized in:
+
+- `src/middleware/rateLimiter.ts`
+
+You can create additional custom rate limiters by calling:
+
+- `rateLimiter({ max, windowMs, keyGenerator, message });
+`
 
 ## 🛠️ Setup Instructions
 
