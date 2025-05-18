@@ -12,11 +12,15 @@ import { env } from "utils/env-config.utils";
 import { errorHandler } from "middleware/error.middleware";
 import { requestLogger } from "middleware/logger.middleware";
 import router from "core/base.routes";
+import securityHeaders from "middleware/security-headers.middleware";
 
 dotenv.config();
 
 const app = express();
+app.use(securityHeaders); // ✅ Security headers middleware
 app.use(requestLogger); // ✅ All incoming requests logged to Winston
+// 🔒 Hide tech stack from headers
+app.disable("x-powered-by");
 const PORT = env.PORT || 5000;
 
 // 1️⃣ CORS first — allows cookies to be accepted from frontend

@@ -130,6 +130,7 @@ export class AuthService {
     decoded: RefreshTokenPayload,
     incomingToken: string,
     res: Response,
+    req: Request,
     meta: { ipAddress: string; userAgent: string }
   ): Promise<TokenValidationResult> {
     logger.info(
@@ -145,7 +146,7 @@ export class AuthService {
       logger.warn("❌ [TokenCheck] Token not found in DB");
 
       const dto = auditLogUtil.payload(
-        { ip: meta.ipAddress, userAgent: meta.userAgent } as any, // simulated req
+        req, // simulated req
         AuditAction.TOKEN_REVOKED,
         {
           reason: "Refresh token not found",
@@ -169,10 +170,10 @@ export class AuthService {
       logger.warn("🚨 [TokenReuse] Hashed mismatch ➔ Reuse suspected!");
 
       await this.revokeAllTokensByUserId(decoded.userId);
-      jwtService.clearAuthCookies(res, decoded.userId, meta);
+      jwtService.clearAuthCookies(res, req, decoded.userId);
 
       const dto = auditLogUtil.payload(
-        { ip: meta.ipAddress, userAgent: meta.userAgent } as any,
+        req,
         AuditAction.TOKEN_REUSE,
         {
           reason: "Refresh token reuse detected",
@@ -194,7 +195,7 @@ export class AuthService {
       logger.warn("🚫 [TokenStatus] Token is revoked");
 
       const dto = auditLogUtil.payload(
-        { ip: meta.ipAddress, userAgent: meta.userAgent } as any,
+        req,
         AuditAction.TOKEN_REVOKED,
         {
           reason: "Token marked as revoked",
@@ -216,7 +217,7 @@ export class AuthService {
       logger.warn("⏰ [TokenExpiry] Token expired");
 
       const dto = auditLogUtil.payload(
-        { ip: meta.ipAddress, userAgent: meta.userAgent } as any,
+        req,
         AuditAction.TOKEN_REVOKED,
         {
           reason: "Refresh token expired",
@@ -240,10 +241,10 @@ export class AuthService {
       );
 
       await this.revokeAllTokensByUserId(decoded.userId);
-      jwtService.clearAuthCookies(res, decoded.userId, meta);
+      jwtService.clearAuthCookies(res, req, decoded.userId);
 
       const dto = auditLogUtil.payload(
-        { ip: meta.ipAddress, userAgent: meta.userAgent } as any,
+        req,
         AuditAction.IP_MISMATCH,
         {
           reason: "IP address mismatch",
@@ -269,10 +270,10 @@ export class AuthService {
       );
 
       await this.revokeAllTokensByUserId(decoded.userId);
-      jwtService.clearAuthCookies(res, decoded.userId, meta);
+      jwtService.clearAuthCookies(res, req, decoded.userId);
 
       const dto = auditLogUtil.payload(
-        { ip: meta.ipAddress, userAgent: meta.userAgent } as any,
+        req,
         AuditAction.UA_MISMATCH,
         {
           reason: "User-Agent mismatch",
@@ -298,10 +299,10 @@ export class AuthService {
       );
 
       await this.revokeAllTokensByUserId(decoded.userId);
-      jwtService.clearAuthCookies(res, decoded.userId, meta);
+      jwtService.clearAuthCookies(res, req, decoded.userId);
 
       const dto = auditLogUtil.payload(
-        { ip: meta.ipAddress, userAgent: meta.userAgent } as any,
+        req,
         AuditAction.TOKEN_REVOKED,
         {
           reason: "Token version mismatch",
@@ -330,7 +331,7 @@ export class AuthService {
     await dbRefreshToken.save();
 
     const successAudit = auditLogUtil.payload(
-      { ip: meta.ipAddress, userAgent: meta.userAgent } as any,
+      req,
       AuditAction.REFRESH_TOKEN,
       {
         tokenId: decoded.id.toString(),

@@ -47,6 +47,7 @@ export const attachRefreshToken = async (
       decoded,
       refreshToken,
       res,
+      req,
       meta
     );
 

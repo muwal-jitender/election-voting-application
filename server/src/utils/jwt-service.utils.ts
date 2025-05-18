@@ -58,11 +58,9 @@ export const jwtService = {
       maxAge,
     } as CookieOptions;
   },
-  clearAuthCookies: (
-    res: Response,
-    userId?: Types.ObjectId,
-    meta?: { ipAddress: string; userAgent: string }
-  ) => {
+  clearAuthCookies: (res: Response, req: Request, userId?: Types.ObjectId) => {
+    const meta = jwtService.extractRequestMeta(req);
+
     res.clearCookie(jwtService.accessTokenName, {
       ...jwtService.cookieOptions("AccessToken"),
       maxAge: 0,

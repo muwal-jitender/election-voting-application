@@ -231,7 +231,7 @@ export class AuthController {
           };
         }
         // 🧼 Always clear cookies regardless of token validity
-        jwtService.clearAuthCookies(res);
+        jwtService.clearAuthCookies(res, req);
       }
 
       // Save login event to audit log
@@ -270,7 +270,7 @@ export class AuthController {
           );
         }
         // 🧼 Always clear cookies regardless of token validity
-        jwtService.clearAuthCookies(res);
+        jwtService.clearAuthCookies(res, req);
       }
 
       // ✅ Respond to client
