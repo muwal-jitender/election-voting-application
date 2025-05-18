@@ -179,6 +179,65 @@ You can create additional custom rate limiters by calling:
 - `rateLimiter({ max, windowMs, keyGenerator, message });
 `
 
+## 🔐 Security Headers (via Helmet)
+
+This application uses helmet to enhance HTTP security by setting recommended response headers. These headers help protect against common web vulnerabilities like XSS, clickjacking, and information leakage.
+
+### ✅ Enabled Headers & Policies
+
+| Header                      | Description                                                                      |
+| --------------------------- | -------------------------------------------------------------------------------- |
+| `Content-Security-Policy`   | Restricts resources (scripts, styles, images) to trusted sources only            |
+| `Referrer-Policy`           | Prevents leaking full page URLs to external services                             |
+| `X-Frame-Options`           | Blocks the site from being embedded in iframes (clickjacking protection)         |
+| `X-Content-Type-Options`    | Prevents browsers from MIME-type sniffing (forces declared types)                |
+| `Strict-Transport-Security` | Enforces HTTPS via HSTS (only active in HTTPS production environments)           |
+| `X-DNS-Prefetch-Control`    | Disables DNS prefetching for better privacy                                      |
+| `X-Powered-By`              | 🚫 Disabled — hides Express from response headers to prevent tech fingerprinting |
+
+### 🧱 Content-Security-Policy (CSP)
+
+The current CSP configuration allows loading:
+
+- All default content from the same origin ('self')
+- Images from Cloudinary (https://res.cloudinary.com)
+
+```
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'"],
+      imgSrc: ["'self'", "https://res.cloudinary.com"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  })
+);
+```
+
+⚠️ `Note:` Inline styles and scripts are not allowed. Use class-based styles and external scripts.
+
+### 🧠 Referrer Policy
+
+- `referrerPolicy: { policy: "no-referrer" }`
+
+This prevents sensitive route paths from being leaked to third-party services like Cloudinary or analytics platforms.
+
+### 🛡️ Clickjacking Protection
+
+- `frameguard: { action: "deny" } `
+
+This blocks the site from being embedded in iframes — preventing clickjacking attacks.
+
+### 🧼 Other Security Measures
+
+- app.disable("x-powered-by"): Removes the X-Powered-By header to obscure the technology stack.
+- Security headers are applied globally in securityHeaders.ts middleware.
+- CSP is prepared for extension to support fonts, analytics, or CDNs as needed.
+
 ## 🛠️ Setup Instructions
 
 ### 1. **Install dependencies**
