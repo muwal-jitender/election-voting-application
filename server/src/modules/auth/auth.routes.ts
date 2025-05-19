@@ -5,6 +5,7 @@ import { Router } from "express";
 import { attachRefreshToken } from "middleware/attach-RefreshToken.middleware";
 import { container } from "tsyringe";
 import { rateLimiter } from "middleware/rateLimiter.middleware";
+import twoFactorRoutes from "./twoFactor/twoFactor.routes";
 import { validateRequest } from "middleware/validate-request.middleware";
 
 const authRouter = Router();
@@ -49,5 +50,8 @@ authRouter.post(
     await authController.logoutAllDevices(req, res, next);
   }
 );
+
+// POST /auth/2fa/setup
+authRouter.use("/2fa", twoFactorRoutes);
 
 export default authRouter;

@@ -3,6 +3,9 @@
     "clickjacking",
     "HSTS",
     "Kumar",
+    "otpauth",
+    "qrcode",
+    "TOTP",
     "Votely",
     "WCAG"
   ]
