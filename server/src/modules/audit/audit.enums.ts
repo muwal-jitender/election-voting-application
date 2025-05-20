@@ -19,5 +19,8 @@ export enum AuditAction {
   CANDIDATE_CREATED = "candidate_created",
   CANDIDATE_DELETED = "candidate_deleted",
   VOTE_CAST = "vote_cast",
+
   TWO_FA_SETUP_INITIATED = "two_fa_setup_initiated",
+  TWO_FA_VERIFICATION_SUCCESS = "two_fa_verification_success",
+  TWO_FA_VERIFICATION_FAILED = "two_fa_verification_failed",
 }

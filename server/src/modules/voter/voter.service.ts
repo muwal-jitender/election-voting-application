@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 
 import { StatusCodes } from "http-status-codes";
 
-import { RegisterVoterDTO } from "./voter.dto";
+import { RegisterVoterDTO, UpdateTwoFactorSettingsDTO } from "./voter.dto";
 import { VoterRepository } from "./voter.repository";
 import { VoterDocument } from "./voter.model";
 import { env } from "utils/env-config.utils";
@@ -13,7 +13,7 @@ import { stripMongoMeta } from "utils/utils";
 import logger from "logger";
 import { v4 as uuidv4 } from "uuid";
 import { jwtService } from "utils/jwt-service.utils";
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 @singleton()
 export class VoterService {
   constructor(
@@ -150,5 +150,50 @@ export class VoterService {
     );
     logger.debug(`✅ Refresh token generated for ➔ ${email}`);
     return refreshToken;
+  }
+
+  async update(voterId: Types.ObjectId, dto: UpdateTwoFactorSettingsDTO) {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      logger.info(`✏️ Updating voter for totp secret ➔ ${voterId}`);
+
+      const dbVoter = await this.getVoterById(voterId);
+      if (!dbVoter) {
+        logger.warn(`⚠️ Voter not found ➔ ${voterId}`);
+        throw new AppError(
+          "Voter not found while enabling 2FA authentication.",
+          StatusCodes.NOT_FOUND
+        );
+      }
+
+      const updatedElection = await this.voterRepository.update(
+        voterId,
+        dto,
+        session
+      );
+
+      if (!updatedElection) {
+        logger.error(`❌ Voter updated failed ➔ ${voterId}`);
+        throw new AppError("Voter updated failed.", StatusCodes.NOT_FOUND);
+      }
+
+      await session.commitTransaction();
+      session.endSession();
+
+      logger.info("✅ Voter 2FA authentication updated successfully", {
+        id: updatedElection._id,
+      });
+      return updatedElection;
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+
+      logger.error(`❌ Error updating voter 2FA authentication ➔ ${voterId}`, {
+        error,
+      });
+      throw error;
+    }
   }
 }

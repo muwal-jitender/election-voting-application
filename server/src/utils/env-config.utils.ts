@@ -26,4 +26,6 @@ export const env = {
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || "",
   LOG_LEVEL: process.env.LOG_LEVEL || "info",
   CURRENT_TOKEN_VERSION: process.env.CURRENT_TOKEN_VERSION || 1,
+  TOTP_SECRET_KEY:
+    process.env.TOTP_SECRET_KEY || "2q4v7Xk0ZsU9L3tM8xDfBcG5TrAjW1yZ", // Base32 encoded secret key
 };

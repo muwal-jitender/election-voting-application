@@ -8,6 +8,8 @@ export interface VoterDocument extends Document {
   password: string;
   votedElectionIds: Types.ObjectId[];
   isAdmin: boolean;
+  totpSecret: string; // 🔐 Encrypted or base32 secret
+  is2FAEnabled: boolean; // 🛡️ 2FA toggle
 }
 
 const voterSchema = new Schema<VoterDocument>(
@@ -32,6 +34,8 @@ const voterSchema = new Schema<VoterDocument>(
       { type: Types.ObjectId, ref: "Election", required: false },
     ], // Not required initially
     isAdmin: { type: Boolean, default: false, immutable: true }, // Immutable prevents users from making themselves admin
+    totpSecret: { type: String, default: null }, // 🔐 Encrypted or base32 secret
+    is2FAEnabled: { type: Boolean, default: false }, // 🛡️ 2FA toggle
   },
   { timestamps: true }
 );

@@ -1,4 +1,12 @@
-import { IsEmail, IsNotEmpty, Matches, MinLength } from "class-validator";
+import {
+  IsBoolean,
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  Length,
+  Matches,
+  MinLength,
+} from "class-validator";
 
 // DTO (Data Transfer Object) for Voter Registration
 export class RegisterVoterDTO {
@@ -26,4 +34,21 @@ export class SignInDTO {
 
   @IsNotEmpty({ message: "Password is required" })
   password!: string;
+}
+
+export class EnableTwoFactorDTO {
+  @IsString()
+  @Length(6, 6, { message: "Code must be exactly 6 digits" })
+  code!: string;
+
+  @IsString()
+  secret!: string; // TOTP base32 string from frontend
+}
+
+export class UpdateTwoFactorSettingsDTO {
+  @IsString()
+  totpSecret!: string;
+
+  @IsBoolean()
+  is2FAEnabled!: boolean;
 }
