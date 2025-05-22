@@ -3,8 +3,10 @@ import "./PrivateLayout.css";
 
 import React, { useEffect, useState } from "react";
 import { IoIosMoon, IoMdSunny } from "react-icons/io";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 
+import Enable2FAModal from "components/modals/Enable2FAModal";
 import LogoIcon from "components/ui/LogoIcon";
 import { useTheme } from "context/ThemeContext";
 import { useUser } from "context/UserContext";
@@ -14,6 +16,8 @@ import { FaUser } from "react-icons/fa";
 import { HiOutlineBars3 } from "react-icons/hi2";
 import { setupAxiosInterceptors } from "services/axios.config";
 import { voterService } from "services/voter.service";
+import { RootState } from "store/store";
+import { UiActions } from "store/ui-slice";
 import Loader from "./Loader";
 
 const PrivateLayout: React.FC = () => {
@@ -25,6 +29,7 @@ const PrivateLayout: React.FC = () => {
   const { isAdmin, logout: userLogout, setUser, user, fetchUser } = useUser();
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!user) {
@@ -60,7 +65,12 @@ const PrivateLayout: React.FC = () => {
     userLogout();
     showHideNav();
   };
-
+  const open2FAModal = () => {
+    dispatch(UiActions.open2FAAuthenticationModal());
+  };
+  const show2FAModal = useSelector(
+    (state: RootState) => state.ui.enable2FAModalShowing,
+  );
   const applyActiveClass = (isActive: boolean) => {
     if (!isActive) return undefined;
     return windowWidth > 600 ? "active-link" : undefined;
@@ -83,6 +93,9 @@ const PrivateLayout: React.FC = () => {
             {/* 📁 Navigation Menu */}
             {showNav && (
               <menu>
+                <NavLink to="#" onClick={open2FAModal}>
+                  Open 2FA
+                </NavLink>
                 {/* ✅ Show "Elections" link only for admin users */}
                 {isAdmin && (
                   <NavLink
@@ -151,6 +164,7 @@ const PrivateLayout: React.FC = () => {
 
       {/* 📄 Main Page Content */}
       <Outlet />
+      {show2FAModal && <Enable2FAModal />}
     </>
   );
 };

@@ -9,6 +9,7 @@ export interface UIState {
   // ✅ States for the Confirm Dialog
   openConfirmModal: boolean;
   confirmModalHeading: string;
+  enable2FAModalShowing: boolean;
   confirmModalCallback: (() => void) | null;
 }
 

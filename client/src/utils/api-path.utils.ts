@@ -10,6 +10,8 @@ export const API_PATH = {
   AUTH_LOGIN: `${AUTH_CONTROLLER}/login`,
   AUTH_LOGOUT: `${AUTH_CONTROLLER}/logout`,
   AUTH_REFRESH_TOKEN: `${AUTH_CONTROLLER}/refresh-token`,
+  AUTH_2FA_SETUP: `${AUTH_CONTROLLER}/2fa/setup`,
+  AUTH_2FA_VERIFY: `${AUTH_CONTROLLER}/2fa/verify`,
 
   LOGIN_USER_DETAIL: `${VOTER_CONTROLLER}/me`,
   // Candidate

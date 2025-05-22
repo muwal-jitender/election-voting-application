@@ -37,5 +37,16 @@ export interface IVoterService {
   login: (user: ILoginModel) => Promise<IApiResponse<IUserResponse>>;
   logout: () => Promise<IApiResponse<null>>;
   refreshToken: () => Promise<IApiResponse<null>>;
+  setup: () => Promise<IApiResponse<I2FASetupResponse>>;
+  verify: (model: I2FAVerifyModel) => Promise<IApiResponse<null>>;
   me: () => Promise<IApiResponse<IUserResponse>>;
+}
+
+export interface I2FASetupResponse {
+  qrCodeImage: string;
+  secret: string;
+}
+export interface I2FAVerifyModel {
+  code: string;
+  secret: string;
 }

@@ -48,8 +48,11 @@ export class TwoFactorController {
       await this.auditService.logAction(dto);
 
       return res.status(200).json({
-        qrCodeImage,
-        secret: secret.base32,
+        message: "TOTP secret generated successfully.",
+        data: {
+          qrCodeImage,
+          secret: secret.base32,
+        },
       });
     } catch (error) {
       logger.error("❌ [2FA Setup] Failed to generate TOTP secret", {

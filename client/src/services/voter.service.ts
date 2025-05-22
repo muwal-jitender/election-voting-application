@@ -1,4 +1,6 @@
 import {
+  I2FASetupResponse,
+  I2FAVerifyModel,
   ILoginModel,
   IRegisterModel,
   IUserResponse,
@@ -25,6 +27,12 @@ export const voterService: IVoterService = {
   },
   refreshToken: async () => {
     return await apiRequest<null>(API_PATH.AUTH_REFRESH_TOKEN, "POST");
+  },
+  setup: async () => {
+    return await apiRequest<I2FASetupResponse>(API_PATH.AUTH_2FA_SETUP, "POST");
+  },
+  verify: async (model: I2FAVerifyModel) => {
+    return await apiRequest<null>(API_PATH.AUTH_2FA_VERIFY, "POST", model);
   },
   me: async () => {
     return await apiRequest<IUserResponse>(API_PATH.LOGIN_USER_DETAIL, "GET");
