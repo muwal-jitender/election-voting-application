@@ -26,6 +26,14 @@
   object-fit: contain;
 }
 
+.verify-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 300px; /* Optional: limit size */
+}
+
 .backup {
   font-size: 0.75rem;
   color: var(--color-gray-600);

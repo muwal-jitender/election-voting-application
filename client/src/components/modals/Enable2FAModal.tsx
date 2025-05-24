@@ -121,24 +121,27 @@ const Enable2FAModal = () => {
               <label htmlFor="code">
                 Enter 6-digit code shown on Authenticator app:
               </label>
-              <TextInput
-                error={errors.code}
-                id="code"
-                placeholder="code"
-                register={register}
-                type="tel"
-                inputMode="numeric"
-                autoFocus={true}
-              />
+              <div className="verify-group">
+                <TextInput
+                  error={errors.code}
+                  id="code"
+                  placeholder="code"
+                  register={register}
+                  type="tel"
+                  inputMode="numeric"
+                  autoFocus={true}
+                />
 
-              <Button
-                type="submit"
-                variant="primary"
-                isLoading={isSubmitting}
-                assistiveText="Verify & Activate 2FA"
-              >
-                Verify & Activate
-              </Button>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  isLoading={isSubmitting}
+                  assistiveText="Verify & Activate 2FA"
+                  align="center"
+                >
+                  Verify & Activate
+                </Button>
+              </div>
             </form>
 
             {/* ❌ Soft error on form failure */}
