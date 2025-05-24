@@ -1,3 +1,10 @@
+import {
+  ApiErrorMessage,
+  Button,
+  FileInput,
+  TextareaInput,
+  TextInput,
+} from "components/ui";
 import { useEffect, useState } from "react";
 import { IAddCandidateModel, ICandidateModel } from "types";
 
@@ -10,11 +17,6 @@ import { candidateService } from "services/candidate.service";
 import { UiActions } from "store/ui-slice";
 import { IErrorResponse } from "types/ResponseModel";
 import { addCandidateValidationSchema } from "validations/schemas/candidate.validation";
-import ApiErrorMessage from "../ui/ApiErrorMessage";
-import Button from "../ui/Button";
-import FileInput from "../ui/FileInput";
-import TextareaInput from "../ui/TextareaInput";
-import TextInput from "../ui/TextInput";
 
 // 📦 Props for AddCandidateModal
 interface AddCandidateModalProp {
