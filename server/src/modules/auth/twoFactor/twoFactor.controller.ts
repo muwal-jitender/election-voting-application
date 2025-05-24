@@ -24,6 +24,7 @@ export class TwoFactorController {
 
       const secret = speakeasy.generateSecret({
         name: `MyVotingApp (${user.email})`,
+        length: 20, // 🔒 Yields ~32 base32 characters
       });
 
       if (!secret.otpauth_url) {

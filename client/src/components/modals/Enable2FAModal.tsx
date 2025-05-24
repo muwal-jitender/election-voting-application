@@ -102,7 +102,10 @@ const Enable2FAModal = () => {
               <img src={qrCode} alt="QR Code" className="qr-image" />
               <p className="backup">Or Enter Manually:</p>
               <p>
-                <strong>{secret}</strong>
+                <strong>
+                  {" "}
+                  {secret ? secret.match(/.{1,4}/g)?.join(" ") : "Loading..."}
+                </strong>
               </p>
             </div>
 
