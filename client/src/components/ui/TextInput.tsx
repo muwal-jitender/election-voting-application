@@ -8,6 +8,7 @@ const TextInput = <T extends FieldValues>({
   placeholder,
   type,
   autoFocus = false,
+  inputMode = "text",
 }: IInputProps<T>) => {
   return (
     <div>
@@ -20,6 +21,7 @@ const TextInput = <T extends FieldValues>({
         placeholder={`Enter ${placeholder}`}
         autoComplete="true"
         autoFocus={autoFocus}
+        inputMode={inputMode}
         {...register(id)}
         className={error ? "input-error" : ""}
       />

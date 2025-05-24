@@ -16,6 +16,7 @@ export interface IInputProps<T extends FieldValues> {
   placeholder: string;
   type: HTMLInputTypeAttribute;
   autoFocus?: boolean;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
 }
 export interface ITextareaProps<T extends FieldValues>
   extends Omit<IInputProps<T>, "type" | "autoFocus"> {}

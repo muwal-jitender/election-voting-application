@@ -36,3 +36,9 @@ export const passwordRules = [
   { rule: /[0-9]/, message: "At least one number (0-9)" },
   { rule: /[\W_]/, message: "At least one special character (!@#$%^&*)" },
 ];
+
+// ✅ Define 2FA Validation Schema
+export const twoFaValidationSchema = Yup.object().shape({
+  code: Yup.string().trim().required("Code is required"),
+  secret: Yup.string().trim().required("Secret is required"),
+});

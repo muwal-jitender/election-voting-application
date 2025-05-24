@@ -1,5 +1,54 @@
+.modal__header {
+  padding: 1rem 2rem;
+  min-width: 450px;
+  overflow: hidden;
+}
+.setup-2fa {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem !important;
+  padding: 1rem 2rem 1rem 2rem !important;
+}
+.setup-2fa h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-gray-900);
+}
 .qr-image {
   width: 200px;
   height: 200px;
-  margin: 10px 0;
+}
+
+.backup {
+  font-size: 0.75rem;
+  color: var(--color-gray-600);
+  text-align: center;
+}
+.divider {
+  width: 100%;
+  margin: 1rem 0;
+}
+hr {
+  width: 80%;
+  height: 1px;
+  background-color: var(--color-gray-300);
+  border: none;
+  margin: auto;
+}
+
+/* Layout for initial state (before QR loaded) */
+.setup-start {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 2.5rem;
+  text-align: center;
+  gap: 1rem;
+}
+
+.form__error-message {
+  text-align: center;
 }
