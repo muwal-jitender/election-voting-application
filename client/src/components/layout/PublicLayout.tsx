@@ -3,10 +3,10 @@ import "./PrivateLayout";
 import React, { useEffect, useState } from "react";
 import { IoIosMoon, IoMdSunny } from "react-icons/io";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import { getTheme, setTheme } from "../../utils/theme.utils";
+import { getTheme, setTheme } from "utils/theme.utils";
 
 import LogoIcon from "components/ui/LogoIcon";
-import { setupAxiosInterceptors } from "../../services/axios.config";
+import { setupAxiosInterceptors } from "services/axios.config";
 import Loader from "./Loader";
 
 const PublicLayout: React.FC = () => {

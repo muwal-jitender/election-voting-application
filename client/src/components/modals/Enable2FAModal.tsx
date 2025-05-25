@@ -103,7 +103,6 @@ const Enable2FAModal = () => {
               <p className="backup">Or Enter Manually:</p>
               <p>
                 <strong>
-                  {" "}
                   {secret ? secret.match(/.{1,4}/g)?.join(" ") : "Loading..."}
                 </strong>
               </p>

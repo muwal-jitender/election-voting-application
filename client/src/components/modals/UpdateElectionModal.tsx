@@ -1,3 +1,10 @@
+import {
+  ApiErrorMessage,
+  Button,
+  FileInput,
+  TextareaInput,
+  TextInput,
+} from "components/ui";
 import { IEditElection, IElectionModel } from "types";
 
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -10,11 +17,6 @@ import { electionService } from "services/election.service";
 import { UiActions } from "store/ui-slice";
 import { IErrorResponse } from "types/ResponseModel";
 import { editElectionValidationSchema } from "validations/schemas/election.validation";
-import ApiErrorMessage from "../ui/ApiErrorMessage";
-import Button from "../ui/Button";
-import FileInput from "../ui/FileInput";
-import TextareaInput from "../ui/TextareaInput";
-import TextInput from "../ui/TextInput";
 
 // 📦 Props interface for update modal
 interface UpdateElectionModalProps {

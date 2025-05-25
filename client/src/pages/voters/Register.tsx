@@ -1,5 +1,11 @@
 import "./Register.css";
 
+import {
+  ApiErrorMessage,
+  Button,
+  PasswordInput,
+  TextInput,
+} from "components/ui";
 import { Link, useNavigate } from "react-router-dom";
 import {
   passwordRules,
@@ -7,10 +13,6 @@ import {
 } from "validations/schemas/voter.validation";
 
 import { yupResolver } from "@hookform/resolvers/yup";
-import ApiErrorMessage from "components/ui/ApiErrorMessage";
-import Button from "components/ui/Button";
-import PasswordInput from "components/ui/PasswordInput";
-import TextInput from "components/ui/TextInput";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";

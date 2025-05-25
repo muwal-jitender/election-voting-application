@@ -1,5 +1,6 @@
 import "./ElectionDetails.css";
 
+import { ApiErrorMessage, CloudinaryImage } from "components/ui";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ICandidateModel, IElectionModel, IVoterModel, RootState } from "types";
@@ -7,8 +8,6 @@ import { ICandidateModel, IElectionModel, IVoterModel, RootState } from "types";
 import ElectionCandidate from "components/election/ElectionCandidate";
 import AddCandidateModal from "components/modals/AddCandidateModal";
 import ConfirmModal from "components/modals/ConfirmModal";
-import ApiErrorMessage from "components/ui/ApiErrorMessage";
-import CloudinaryImage from "components/ui/CloudinaryImage";
 import { IoAddOutline } from "react-icons/io5";
 import { useParams } from "react-router-dom";
 import { electionService } from "services/election.service";

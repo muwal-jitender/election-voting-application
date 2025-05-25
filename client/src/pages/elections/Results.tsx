@@ -3,7 +3,7 @@ import "./Results.css";
 import { useEffect, useState } from "react";
 
 import ResultElection from "components/election/ResultElection";
-import ApiErrorMessage from "components/ui/ApiErrorMessage";
+import { ApiErrorMessage } from "components/ui";
 import { electionService } from "services/election.service";
 import { IElectionDetail } from "types";
 import { IErrorResponse } from "types/ResponseModel";

@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 
 import Enable2FAModal from "components/modals/Enable2FAModal";
-import LogoIcon from "components/ui/LogoIcon";
+import { LogoIcon } from "components/ui";
 import { useTheme } from "context/ThemeContext";
 import { useUser } from "context/UserContext";
 import { useWindowWidth } from "hooks/useWindowWidth";

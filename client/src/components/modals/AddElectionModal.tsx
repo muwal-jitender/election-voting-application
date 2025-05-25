@@ -1,19 +1,20 @@
+import {
+  ApiErrorMessage,
+  Button,
+  FileInput,
+  TextareaInput,
+  TextInput,
+} from "components/ui";
 import React, { useState } from "react";
-import { IAddElection, IElectionModel } from "../../types";
+import { IAddElection, IElectionModel, IErrorResponse } from "types";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
-import { electionService } from "../../services/election.service";
-import { UiActions } from "../../store/ui-slice";
-import { IErrorResponse } from "../../types/ResponseModel";
-import { addElectionValidationSchema } from "../../validations/schemas/election.validation";
-import ApiErrorMessage from "../ui/ApiErrorMessage";
-import Button from "../ui/Button";
-import FileInput from "../ui/FileInput";
-import TextareaInput from "../ui/TextareaInput";
-import TextInput from "../ui/TextInput";
+import { electionService } from "services/election.service";
+import { UiActions } from "store/ui-slice";
+import { addElectionValidationSchema } from "validations/schemas/election.validation";
 
 // 📦 Props for AddElectionModal
 interface AddElectionModalProp {
