@@ -1,6 +1,6 @@
 import "./Enable2FAModal.css"; // 🎨 Component-specific styles
 
-import { Button, TextInput } from "components/ui";
+import { Button, OTPInput } from "components/ui";
 import { useEffect, useRef, useState } from "react";
 import { I2FAVerifyModel, IErrorResponse } from "types";
 
@@ -39,12 +39,16 @@ const Enable2FAModal = () => {
   // ✅ Setup form handling and validation with react-hook-form + Yup
   const {
     register,
-    handleSubmit,
     setValue,
+    handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<I2FAVerifyModel>({
     resolver: yupResolver(twoFaValidationSchema),
   });
+
+  useEffect(() => {
+    register("code", { required: "Code is required" });
+  }, [register]);
 
   // 🧠 Store input ref for autofocus after QR loads
   const inputRef = useRef<HTMLInputElement>(null);
@@ -83,7 +87,7 @@ const Enable2FAModal = () => {
       <div className="modal__content">
         {/* 🧭 Modal Header */}
         <header className="modal__header">
-          <h2>Two-Factor Authentication (2FA)</h2>
+          <h2>Secure Your Account with 2FA</h2>
           <button className="modal__close" onClick={close2FAModal}>
             <IoMdClose />
           </button>
@@ -97,10 +101,10 @@ const Enable2FAModal = () => {
           <div>
             {/* Step 1: Display QR code and backup key */}
             <div className="setup-2fa">
-              <h3>Step 1 - Enable Two-Factor Authentication</h3>
-              <p>Open your Authenticator app and scan this QR code:</p>
+              <h3>🔐 Set Up Two-Factor Authentication</h3>
+              <p>Open your Authenticator app and scan this code:</p>
               <img src={qrCode} alt="QR Code" className="qr-image" />
-              <p className="backup">Or Enter Manually:</p>
+              <p className="backup">Can't scan? Enter this key manually:</p>
               <p>
                 <strong>
                   {secret ? secret.match(/.{1,4}/g)?.join(" ") : "Loading..."}
@@ -118,30 +122,29 @@ const Enable2FAModal = () => {
               noValidate
               className="setup-2fa"
             >
-              <h3>Step 2 - Enter 6-Digit Code</h3>
+              <h3>🔢 Enter Code from Your App</h3>
 
               <label htmlFor="code">
-                Enter 6-digit code shown on Authenticator app:
+                Type the 6-digit code currently shown in your authenticator app:
               </label>
               <div className="verify-group">
-                <TextInput
-                  error={errors.code}
-                  id="code"
-                  placeholder="code"
-                  register={register}
-                  type="tel"
-                  inputMode="numeric"
-                  autoFocus={true}
+                <OTPInput
+                  length={6}
+                  onChange={(value) => setValue("code", value)} // hook-form compatible
                 />
-
+                {errors.code && (
+                  <p className="form__client-error-message" role="alert">
+                    * {String(errors.code.message)}
+                  </p>
+                )}
                 <Button
                   type="submit"
                   variant="primary"
                   isLoading={isSubmitting}
-                  assistiveText="Verify & Activate 2FA"
+                  assistiveText="Verify & Enable 2FA"
                   align="center"
                 >
-                  Verify & Activate
+                  Verify & Enable 2FA
                 </Button>
               </div>
             </form>
@@ -149,7 +152,7 @@ const Enable2FAModal = () => {
             {/* ❌ Soft error on form failure */}
             {status === "error" && (
               <p className="form__error-message" role="alert">
-                Two-Factor authentication setup failed, please try again.
+                Something went wrong. Please check your code and try again.
               </p>
             )}
           </div>
