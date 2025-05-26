@@ -1,11 +1,10 @@
 import "./Enable2FAModal.css"; // 🎨 Component-specific styles
 
-import { Button, OTPInput } from "components/ui";
+import { ApiErrorMessage, Button, OTPInput } from "components/ui";
 import { useEffect, useRef, useState } from "react";
 import { I2FAVerifyModel, IErrorResponse } from "types";
 
 import { yupResolver } from "@hookform/resolvers/yup";
-import ApiErrorMessage from "components/ui/ApiErrorMessage";
 import { useForm } from "react-hook-form";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
@@ -18,9 +17,6 @@ const Enable2FAModal = () => {
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [secret, setSecret] = useState<string | null>(null);
   const [serverErrors, setServerErrors] = useState<string[]>([]);
-  const [status, setStatus] = useState<
-    "idle" | "success" | "error" | "verifying"
-  >("idle");
 
   const dispatch = useDispatch();
 
@@ -72,8 +68,14 @@ const Enable2FAModal = () => {
       );
       close2FAModal();
     } catch (error: unknown) {
-      setStatus("error");
-      setServerErrors((error as IErrorResponse).errorMessages || []);
+      const err = error as IErrorResponse;
+      if (err.status === 401) {
+        setServerErrors(
+          err.message ? [err.message] : ["Invalid code. Please try again."],
+        );
+      } else {
+        setServerErrors((error as IErrorResponse).errorMessages || []);
+      }
     }
   };
 
@@ -92,9 +94,6 @@ const Enable2FAModal = () => {
             <IoMdClose />
           </button>
         </header>
-
-        {/* 🛑 Show any global API errors */}
-        <ApiErrorMessage errors={serverErrors} />
 
         {/* 📦 If QR is loaded, show full setup UI */}
         {qrCode ? (
@@ -130,7 +129,7 @@ const Enable2FAModal = () => {
               <div className="verify-group">
                 <OTPInput
                   length={6}
-                  onChange={(value) => setValue("code", value)} // hook-form compatible
+                  onChangeCallback={(value) => setValue("code", value)} // hook-form compatible
                 />
                 {errors.code && (
                   <p className="form__client-error-message" role="alert">
@@ -149,12 +148,8 @@ const Enable2FAModal = () => {
               </div>
             </form>
 
-            {/* ❌ Soft error on form failure */}
-            {status === "error" && (
-              <p className="form__error-message" role="alert">
-                Something went wrong. Please check your code and try again.
-              </p>
-            )}
+            {/* 🛑 Show any global API errors */}
+            <ApiErrorMessage errors={serverErrors} />
           </div>
         ) : (
           // 🔘 Initial button to begin 2FA setup
