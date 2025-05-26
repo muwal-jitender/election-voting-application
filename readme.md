@@ -87,7 +87,7 @@ Please visit them to explore:
 ### Register Page
 ![Register Page](./screenshots/register.gif)
 ### Two Factor Authentication
-![2FA Page](./screenshots/2fa.png)
+![2FA Page](./screenshots/2fa.PNG)
 ### Election List (Admin Only)
 ![Election Listing](./screenshots/elections.png)
 ### Add Election
