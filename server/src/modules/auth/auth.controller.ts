@@ -87,6 +87,17 @@ export class AuthController {
         `✅ [Login] Credentials verified ➔ UserID: ${voter.id}, Email: ${voter.email}`
       );
 
+      if (voter.is2FAEnabled) {
+        logger.info(
+          `🔐 [Login] 2FA enabled for user ➔ UserID: ${voter.id}, Email: ${voter.email}`
+        );
+        return res.status(StatusCodes.OK).json({
+          message: "You are now required to 2FA OTP",
+          data: {
+            is2FAEnabled: true,
+          },
+        });
+      }
       // 2️⃣ Issue access and refresh tokens
       await this.generateTokens(req, res, voter);
       logger.info(
