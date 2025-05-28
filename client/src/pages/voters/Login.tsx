@@ -18,6 +18,7 @@ import { loginValidationSchema } from "validations/schemas/voter.validation";
 
 const Login = () => {
   const [serverErrors, setServerErrors] = useState<string[]>([]); // 🔴 Server-side error messages
+  const [is2FAEnabled, setIs2FAEnabled] = useState<boolean>(false); // 🔐 2FA state
   const { setUser } = useUser(); // 🔗 Access user context
   const navigate = useNavigate(); // 🚀 Navigate after login
 
@@ -35,13 +36,21 @@ const Login = () => {
     try {
       const result = await voterService.login(formData); // 🔐 Call login API
       const user = result.data;
+      console.log(is2FAEnabled);
 
       if (user) {
-        setUser(user); // ✅ Set user in context
-        if (user.isAdmin) {
-          toast.success("You’ve been logged in as Admin");
+        if (user.is2FAEnabled) {
+          setIs2FAEnabled(true); // 🔐 Set 2FA enabled state
+          toast.success(
+            toast.success(result.message || "Please complete 2FA setup."),
+          );
+        } else {
+          setUser(user); // ✅ Set user in context
+          if (user.isAdmin) {
+            toast.success("You’ve been logged in as Admin");
+          }
+          navigate("/results"); // ➡️ Redirect to results page
         }
-        navigate("/results"); // ➡️ Redirect to results page
       }
     } catch (error: unknown) {
       setServerErrors((error as IErrorResponse).errorMessages || []);

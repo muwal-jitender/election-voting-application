@@ -17,7 +17,9 @@ export interface IUserResponse
   extends Omit<
     IVoterModel,
     "id" | "password" | "createdAt" | "votedElectionIds"
-  > {}
+  > {
+  is2FAEnabled: boolean; // 🛡️ 2FA toggle
+}
 
 export interface IRegisterModel
   extends Omit<

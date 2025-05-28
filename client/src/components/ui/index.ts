@@ -7,3 +7,4 @@ export { default as OTPInput } from "./OTPInput";
 export { default as PasswordInput } from "./PasswordInput";
 export { default as TextareaInput } from "./TextareaInput";
 export { default as TextInput } from "./TextInput";
+export { default as TwoFAVerificationForm } from "./Verify2FAForm";

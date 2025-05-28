@@ -3,14 +3,7 @@
   min-width: 450px;
   overflow: hidden;
 }
-.setup-2fa {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem !important;
-  padding: 1rem 2rem 1rem 2rem !important;
-}
+
 .setup-2fa h3 {
   font-size: 1rem;
   font-weight: 600;
@@ -24,14 +17,6 @@
   border: 1px solid var(--color-gray-200); /* Soft border */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
   object-fit: contain;
-}
-
-.verify-group {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  width: 100%;
-  max-width: 300px; /* Optional: limit size */
 }
 
 .backup {
