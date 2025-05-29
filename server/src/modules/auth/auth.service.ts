@@ -24,6 +24,7 @@ import { IRefreshTokenDocument } from "./auth.model";
 import { auditLogUtil } from "utils/audit-log.utils";
 import { AuditAction } from "modules/audit/audit.enums";
 import { AuditService } from "modules/audit/audit.service";
+import { randomUUID } from "crypto";
 
 @singleton()
 export class AuthService {
@@ -103,7 +104,7 @@ export class AuthService {
 
     const voter = await this.voterRepository.findOneByFieldWithSelect(
       { email },
-      ["_id", "fullName", "email", "password", "isAdmin"]
+      ["_id", "fullName", "email", "password", "isAdmin", "is2FAEnabled"]
     );
 
     if (!voter || !(await bcrypt.compare(password, voter.password))) {
@@ -393,6 +394,73 @@ export class AuthService {
     await this.refreshTokenRepository.updateMany(
       { userId, isRevoked: false },
       { isRevoked: true }
+    );
+  }
+
+  async generateTokens(req: Request, res: Response, voter: VoterDocument) {
+    logger.info(
+      `🎯 [Token Generation] Starting token issuance ➔ UserID: ${voter.id}, Email: ${voter.email}`
+    );
+
+    // 1️⃣ Generate access token
+    const accessToken = this.generateAccessToken(voter);
+    res.cookie(
+      jwtService.accessTokenName,
+      accessToken,
+      jwtService.cookieOptions("AccessToken")
+    );
+    logger.info(
+      `🔐 [AccessToken] Issued and set as cookie ➔ UserID: ${voter.id}`
+    );
+
+    // 2️⃣ Capture metadata for refresh token
+    const { ipAddress, userAgent } = jwtService.extractRequestMeta(req);
+    logger.info(
+      `📡 [Metadata] Captured IP and User-Agent ➔ IP: ${ipAddress}, UA: ${userAgent}`
+    );
+
+    // 3️⃣ Save placeholder refresh token
+    const placeholderToken = randomUUID();
+    const dbRefreshToken = await this.saveRefreshToken({
+      userId: voter.id,
+      refreshToken: placeholderToken,
+      ipAddress,
+      userAgent,
+      isRevoked: false,
+      expiresAt: jwtService.getRefreshTokenExpiryDate(),
+      issuedAt: new Date(),
+    });
+    logger.info(
+      `💾 [RefreshToken] Placeholder stored ➔ TokenID: ${dbRefreshToken.id}`
+    );
+
+    // 4️⃣ Generate actual refresh token with DB ID
+    const refreshToken = this.generateRefreshToken(
+      dbRefreshToken.id,
+      voter.id,
+      voter.email,
+      ipAddress,
+      userAgent
+    );
+    logger.info(`🔁 [RefreshToken] JWT generated ➔ UserID: ${voter.id}`);
+
+    // 5️⃣ Update DB with final refresh token
+    dbRefreshToken.refreshToken = jwtService.hashToken(refreshToken);
+    await dbRefreshToken.save();
+    logger.info(
+      `✅ [RefreshToken] Final token saved ➔ TokenID: ${dbRefreshToken.id}`
+    );
+
+    // 6️⃣ Set refresh token cookie
+    res.cookie(
+      jwtService.refreshTokenName,
+      refreshToken,
+      jwtService.cookieOptions("RefreshToken")
+    );
+    logger.info(`🍪 [RefreshToken] Cookie set ➔ UserID: ${voter.id}`);
+
+    logger.info(
+      `🎉 [Token Generation] Completed successfully ➔ UserID: ${voter.id}`
     );
   }
 }

@@ -43,7 +43,7 @@ const TwoFAVerificationForm: React.FC<ITwoFAVerificationFormProps> = ({
   useEffect(() => {
     if (initialSecret) setValue("secret", initialSecret);
     // Clear secret if not provided (important for login scenario)
-    else setValue("secret", "");
+    else setValue("secret", "temp secret");
   }, [initialSecret, setValue]);
 
   // 🎯 Auto-focus on input after QR loads
@@ -63,7 +63,11 @@ const TwoFAVerificationForm: React.FC<ITwoFAVerificationFormProps> = ({
         <div className="verify-group">
           <OTPInput
             length={6}
-            onChangeCallback={(value) => setValue("code", value)} // hook-form compatible
+            onChangeCallback={(value) => {
+              setValue("code", value);
+
+              console.log(value);
+            }} // hook-form compatible
           />
           {errors.code && (
             <p className="form__client-error-message" role="alert">

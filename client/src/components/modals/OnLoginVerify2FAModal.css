@@ -1,0 +1,6 @@
+.modal__content.min-height {
+  min-height: 20rem;
+}
+.modal__body {
+  margin-top: 1rem;
+}

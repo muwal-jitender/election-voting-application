@@ -10,12 +10,19 @@ import { AuditAction } from "modules/audit/audit.enums";
 import { auditLogUtil } from "utils/audit-log.utils";
 import { VoterService } from "modules/voter/voter.service";
 import { encryptionService } from "utils/encryption.service.utils";
+import { StatusCodes } from "http-status-codes";
+import { jwtService, TwoFAPayload } from "utils/jwt-service.utils";
+import { env } from "utils/env-config.utils";
+import { AppError } from "utils/exceptions.utils";
+import { AuthService } from "../auth.service";
+import { JsonWebTokenError, TokenExpiredError } from "jsonwebtoken";
 
 @injectable()
 export class TwoFactorController {
   constructor(
     @inject(AuditService) private auditService: AuditService,
-    @inject(VoterService) private voterService: VoterService
+    @inject(VoterService) private voterService: VoterService,
+    @inject(AuthService) private authService: AuthService
   ) {}
 
   async generateTOTPSetup(req: Request, res: Response, next: NextFunction) {
@@ -70,7 +77,7 @@ export class TwoFactorController {
 
       if (!code || !secret) {
         return res
-          .status(400)
+          .status(StatusCodes.BAD_REQUEST)
           .json({ message: "Code and secret are required." });
       }
 
@@ -98,7 +105,7 @@ export class TwoFactorController {
         await this.auditService.logAction(dto);
 
         return res
-          .status(401)
+          .status(StatusCodes.UNAUTHORIZED)
           .json({ message: "Invalid authentication code." });
       }
 
@@ -125,11 +132,81 @@ export class TwoFactorController {
       await this.auditService.logAction(dto);
 
       res
-        .status(200)
+        .status(StatusCodes.OK)
         .json({ message: "Two-factor authentication successfully enabled." });
     } catch (error) {
       logger.error("❌ [2FA Verify] Verification failed", { error });
       next(error);
+    }
+  }
+
+  async verify2FA(req: Request, res: Response, next: NextFunction) {
+    const { token: challengeToken, otp } = req.body;
+
+    try {
+      const payload = this.verifyToken(challengeToken) as TwoFAPayload;
+
+      if (payload.step !== "2fa") throw new Error("Invalid step");
+
+      const user = await this.voterService.getById(payload.userId);
+      if (!user) {
+        throw new AppError("Invalid OTP", StatusCodes.UNAUTHORIZED);
+      }
+      const decryptedSecret = encryptionService.decrypt(user.totpSecret);
+
+      const isValid = speakeasy.totp.verify({
+        secret: decryptedSecret,
+        encoding: "base32",
+        token: otp,
+        window: 1,
+      });
+      if (!isValid) {
+        throw new AppError("Invalid OTP", StatusCodes.UNAUTHORIZED);
+      }
+
+      // ✅ OTP Valid — now generate tokens
+      await this.authService.generateTokens(req, res, user);
+
+      // Save audit log
+      const dto = auditLogUtil.payload(req, AuditAction.LOGIN_SUCCESS, {
+        email: user.email,
+        fullName: user.fullName,
+      });
+      await this.auditService.logAction(dto);
+
+      return res.status(StatusCodes.OK).json({
+        message: "2FA verification successful, you are now logged in",
+        data: {
+          email: user.email,
+          fullName: user.fullName,
+          isAdmin: user.isAdmin,
+        },
+      });
+    } catch (error) {
+      logger.error("[2FA] Failed verification", { error });
+      next(error);
+    }
+  }
+  private verifyToken(token: string) {
+    try {
+      return jwtService.verify(token, env.JWT_ACCESS_SECRET) as TwoFAPayload;
+    } catch (err) {
+      if (err instanceof TokenExpiredError) {
+        throw new AppError(
+          "Your session has expired. Please log in again.",
+          StatusCodes.UNAUTHORIZED
+        );
+      }
+      if (err instanceof JsonWebTokenError) {
+        throw new AppError(
+          "Invalid authentication token. Please log in again.",
+          StatusCodes.UNAUTHORIZED
+        );
+      }
+      throw new AppError(
+        "Something went wrong with token verification.",
+        StatusCodes.UNAUTHORIZED
+      );
     }
   }
 }

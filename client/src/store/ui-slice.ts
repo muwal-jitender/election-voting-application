@@ -8,6 +8,7 @@ const initialState: UIState = {
   electionModalShowing: false,
   updateElectionModalShowing: false,
   enable2FAModalShowing: false,
+  enable2FALoginShowing: false,
   selectedElection: null,
 
   // 🛑 Confirm modal dialog state
@@ -49,6 +50,13 @@ const UiSlice = createSlice({
     },
     close2FAAuthenticationModal(state) {
       state.enable2FAModalShowing = false;
+    },
+    // 🔘 Enable 2FA Login
+    open2FALoginModal(state) {
+      state.enable2FALoginShowing = true;
+    },
+    close2FALoginModal(state) {
+      state.enable2FALoginShowing = false;
     },
 
     // 🔘 Election Modal: Update (with selected election info)

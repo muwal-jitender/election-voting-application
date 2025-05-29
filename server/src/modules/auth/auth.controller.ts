@@ -8,14 +8,13 @@ import { RegisterVoterDTO, SignInDTO } from "modules/voter/voter.dto";
 import { AuthService } from "modules/auth/auth.service";
 
 import { StatusCodes } from "http-status-codes";
-import { randomUUID } from "crypto";
+
 import logger from "logger";
 
 import { jwtService } from "utils/jwt-service.utils";
 import { AppError } from "utils/exceptions.utils";
 import { VoterService } from "modules/voter/voter.service";
 import { RefreshTokenPayload } from "utils/extend-express-request.utils";
-import { VoterDocument } from "modules/voter/voter.model";
 import { env } from "utils/env-config.utils";
 import { AuditService } from "modules/audit/audit.service";
 import { AuditAction } from "modules/audit/audit.enums";
@@ -91,15 +90,17 @@ export class AuthController {
         logger.info(
           `🔐 [Login] 2FA enabled for user ➔ UserID: ${voter.id}, Email: ${voter.email}`
         );
+        const token = jwtService.twoFAChallengeToken(voter.id);
         return res.status(StatusCodes.OK).json({
-          message: "You are now required to 2FA OTP",
+          message: "You're almost there! Please enter your 6-digit OTP.",
           data: {
             is2FAEnabled: true,
+            token,
           },
         });
       }
       // 2️⃣ Issue access and refresh tokens
-      await this.generateTokens(req, res, voter);
+      await this.authService.generateTokens(req, res, voter);
       logger.info(
         `🔐 [Login] Tokens generated and cookies set ➔ UserID: ${voter.id}`
       );
@@ -130,76 +131,6 @@ export class AuthController {
     }
   }
 
-  private async generateTokens(
-    req: Request,
-    res: Response,
-    voter: VoterDocument
-  ) {
-    logger.info(
-      `🎯 [Token Generation] Starting token issuance ➔ UserID: ${voter.id}, Email: ${voter.email}`
-    );
-
-    // 1️⃣ Generate access token
-    const accessToken = this.authService.generateAccessToken(voter);
-    res.cookie(
-      jwtService.accessTokenName,
-      accessToken,
-      jwtService.cookieOptions("AccessToken")
-    );
-    logger.info(
-      `🔐 [AccessToken] Issued and set as cookie ➔ UserID: ${voter.id}`
-    );
-
-    // 2️⃣ Capture metadata for refresh token
-    const { ipAddress, userAgent } = jwtService.extractRequestMeta(req);
-    logger.info(
-      `📡 [Metadata] Captured IP and User-Agent ➔ IP: ${ipAddress}, UA: ${userAgent}`
-    );
-
-    // 3️⃣ Save placeholder refresh token
-    const placeholderToken = randomUUID();
-    const dbRefreshToken = await this.authService.saveRefreshToken({
-      userId: voter.id,
-      refreshToken: placeholderToken,
-      ipAddress,
-      userAgent,
-      isRevoked: false,
-      expiresAt: jwtService.getRefreshTokenExpiryDate(),
-      issuedAt: new Date(),
-    });
-    logger.info(
-      `💾 [RefreshToken] Placeholder stored ➔ TokenID: ${dbRefreshToken.id}`
-    );
-
-    // 4️⃣ Generate actual refresh token with DB ID
-    const refreshToken = this.authService.generateRefreshToken(
-      dbRefreshToken.id,
-      voter.id,
-      voter.email,
-      ipAddress,
-      userAgent
-    );
-    logger.info(`🔁 [RefreshToken] JWT generated ➔ UserID: ${voter.id}`);
-
-    // 5️⃣ Update DB with final refresh token
-    dbRefreshToken.refreshToken = jwtService.hashToken(refreshToken);
-    await dbRefreshToken.save();
-    logger.info(
-      `✅ [RefreshToken] Final token saved ➔ TokenID: ${dbRefreshToken.id}`
-    );
-
-    // 6️⃣ Set refresh token cookie
-    res.cookie(
-      jwtService.refreshTokenName,
-      refreshToken,
-      jwtService.cookieOptions("RefreshToken")
-    );
-    logger.info(`🍪 [RefreshToken] Cookie set ➔ UserID: ${voter.id}`);
-
-    logger.info(
-      `🎉 [Token Generation] Completed successfully ➔ UserID: ${voter.id}`
-    );
-  }
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
       const rawRefreshToken = req.cookies[jwtService.refreshTokenName];
@@ -303,7 +234,7 @@ export class AuthController {
         `🔄 [RefreshToken] Attempt ➔ TokenID: ${tokenId}, UserID: ${refreshToken.userId}`
       );
 
-      const user = await this.voterService.getVoterById(refreshToken.userId);
+      const user = await this.voterService.getById(refreshToken.userId);
       if (!user) {
         logger.warn(
           `❌ [RefreshToken] User not found ➔ UserID: ${refreshToken.userId}`
@@ -322,7 +253,7 @@ export class AuthController {
       logger.info(`✅ [RefreshToken] User validated ➔ ${user.email}`);
 
       // 🔁 Generate and issue new tokens
-      await this.generateTokens(req, res, user);
+      await this.authService.generateTokens(req, res, user);
       logger.info(`🔐 [RefreshToken] New tokens issued ➔ UserID: ${user.id}`);
 
       // Save token attempt to audit log

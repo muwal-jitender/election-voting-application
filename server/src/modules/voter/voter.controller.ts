@@ -22,7 +22,7 @@ export class VoterController {
       logger.info("🔍 [VoterGet] Fetching voter by ID", { voterId });
 
       // 📦 2. Fetch voter from service
-      const voter = await this.voterService.getVoterById(voterId);
+      const voter = await this.voterService.getById(voterId);
 
       if (!voter) {
         logger.warn(`⚠️ [VoterGet] Voter not found ➔ ${voterId}`);
@@ -56,7 +56,7 @@ export class VoterController {
       logger.info("🔍 [VoterMe] Fetching profile for current user", { userId });
 
       // 📦 2. Fetch voter info from service
-      const voter = await this.voterService.getVoterById(userId);
+      const voter = await this.voterService.getById(userId);
 
       if (!voter) {
         logger.warn(`⚠️ [VoterMe] Voter profile not found ➔ ${userId}`);

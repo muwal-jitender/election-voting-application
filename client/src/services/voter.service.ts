@@ -1,4 +1,5 @@
 import {
+  I2FALoginModel,
   I2FASetupResponse,
   I2FAVerifyModel,
   ILoginModel,
@@ -36,5 +37,12 @@ export const voterService: IVoterService = {
   },
   me: async () => {
     return await apiRequest<IUserResponse>(API_PATH.LOGIN_USER_DETAIL, "GET");
+  },
+  twoFAlogin: async (twoFALoginModel: I2FALoginModel) => {
+    return await apiRequest<IUserResponse>(
+      API_PATH.AUTH_2FA_LOGIN,
+      "POST",
+      twoFALoginModel,
+    );
   },
 };

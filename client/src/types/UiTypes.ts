@@ -10,6 +10,7 @@ export interface UIState {
   openConfirmModal: boolean;
   confirmModalHeading: string;
   enable2FAModalShowing: boolean;
+  enable2FALoginShowing: boolean;
   confirmModalCallback: (() => void) | null;
 }
 

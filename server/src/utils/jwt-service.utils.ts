@@ -16,6 +16,10 @@ import logger from "logger";
 import { parseDurationToMs } from "./duration-parser.utils";
 
 type TokenType = "AccessToken" | "RefreshToken";
+export type TwoFAPayload = {
+  userId: Types.ObjectId;
+  step: string;
+};
 export type TokenValidationResult =
   | { success: true; token: IRefreshTokenDocument }
   | { success: false; code: number; message: string };
@@ -23,7 +27,7 @@ export const jwtService = {
   accessTokenName: "access_token",
   refreshTokenName: "refresh_token",
   currentTokenVersion: Number(env.CURRENT_TOKEN_VERSION),
-  verify: <T extends AccessTokenPayload | RefreshTokenPayload>(
+  verify: <T extends AccessTokenPayload | RefreshTokenPayload | TwoFAPayload>(
     token: string,
     tokenSecret: string
   ): T => {
@@ -112,5 +116,10 @@ export const jwtService = {
   },
   hashToken: (token: string) => {
     return crypto.createHash("sha256").update(token).digest("hex");
+  },
+  twoFAChallengeToken: (userId: Types.ObjectId) => {
+    return jwt.sign({ userId, step: "2fa" }, env.JWT_ACCESS_SECRET, {
+      expiresIn: "5m",
+    });
   },
 };

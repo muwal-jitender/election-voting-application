@@ -52,7 +52,7 @@ export class VoterService {
     return await this.voterRepository.findAll({ electionId: id });
   }
 
-  async getVoterById(id: Types.ObjectId) {
+  async getById(id: Types.ObjectId) {
     logger.info(`🔍 Fetching voter by ID ➔ ${id}`);
     return await this.voterRepository.findById(id);
   }
@@ -159,7 +159,7 @@ export class VoterService {
     try {
       logger.info(`✏️ Updating voter for totp secret ➔ ${voterId}`);
 
-      const dbVoter = await this.getVoterById(voterId);
+      const dbVoter = await this.getById(voterId);
       if (!dbVoter) {
         logger.warn(`⚠️ Voter not found ➔ ${voterId}`);
         throw new AppError(
