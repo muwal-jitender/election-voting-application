@@ -98,6 +98,7 @@ const Enable2FAModal = () => {
             <TwoFAVerificationForm
               onSubmit={onSubmit}
               serverErrors={serverErrors}
+              btnText="Verify & Enable 2FA"
               initialSecret={secret}
             />
           </div>

@@ -14,12 +14,14 @@ interface ITwoFAVerificationFormProps {
   /** Server-side errors to display. */
   serverErrors: string[];
   /** Optional initial value for the secret (for setup). */
+  btnText: string;
   initialSecret?: string | null;
 }
 
 const TwoFAVerificationForm: React.FC<ITwoFAVerificationFormProps> = ({
   onSubmit,
   serverErrors,
+  btnText,
   initialSecret,
 }) => {
   // ✅ Setup form handling and validation with react-hook-form + Yup
@@ -63,11 +65,7 @@ const TwoFAVerificationForm: React.FC<ITwoFAVerificationFormProps> = ({
         <div className="verify-group">
           <OTPInput
             length={6}
-            onChangeCallback={(value) => {
-              setValue("code", value);
-
-              console.log(value);
-            }} // hook-form compatible
+            onChangeCallback={(value) => setValue("code", value)}
           />
           {errors.code && (
             <p className="form__client-error-message" role="alert">
@@ -78,10 +76,10 @@ const TwoFAVerificationForm: React.FC<ITwoFAVerificationFormProps> = ({
             type="submit"
             variant="primary"
             isLoading={isSubmitting}
-            assistiveText="Verify & Enable 2FA"
+            assistiveText={btnText}
             align="center"
           >
-            Verify & Enable 2FA
+            {btnText}
           </Button>
         </div>
       </form>

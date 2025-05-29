@@ -146,7 +146,8 @@ export class TwoFactorController {
     try {
       const payload = this.verifyToken(challengeToken) as TwoFAPayload;
 
-      if (payload.step !== "2fa") throw new Error("Invalid step");
+      if (payload.step !== "2fa")
+        throw new AppError("Invalid Token", StatusCodes.UNAUTHORIZED);
 
       const user = await this.voterService.getById(payload.userId);
       if (!user) {

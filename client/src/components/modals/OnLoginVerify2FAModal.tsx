@@ -71,6 +71,7 @@ const OnLoginVerify2FAModal: React.FC<IOnLoginVerify2FAModal> = ({ token }) => {
           <TwoFAVerificationForm
             onSubmit={onSubmit}
             serverErrors={serverErrors}
+            btnText="Verify & Login"
           />
         </div>
       </div>
