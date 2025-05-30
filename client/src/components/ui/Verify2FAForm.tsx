@@ -59,7 +59,7 @@ const TwoFAVerificationForm: React.FC<ITwoFAVerificationFormProps> = ({
       <form onSubmit={handleSubmit(onSubmit)} noValidate className="setup-2fa">
         <h3>🔢 Enter Code from Your App</h3>
 
-        <label htmlFor="code">
+        <label htmlFor="code" className="form__label-code">
           Type the 6-digit code currently shown in your authenticator app:
         </label>
         <div className="verify-group">

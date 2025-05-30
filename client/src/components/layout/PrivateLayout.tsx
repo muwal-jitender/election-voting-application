@@ -66,6 +66,8 @@ const PrivateLayout: React.FC = () => {
     showHideNav();
   };
   const open2FAModal = () => {
+    showHideNav();
+    // 🌀 Dispatch action to open 2FA modal
     dispatch(UiActions.open2FAAuthenticationModal());
   };
   const show2FAModal = useSelector(
@@ -93,9 +95,11 @@ const PrivateLayout: React.FC = () => {
             {/* 📁 Navigation Menu */}
             {showNav && (
               <menu>
-                <NavLink to="#" onClick={open2FAModal}>
-                  Open 2FA
-                </NavLink>
+                {!user?.is2FAEnabled && (
+                  <NavLink to="#" onClick={open2FAModal}>
+                    Enable Two-Factor Authentication
+                  </NavLink>
+                )}
                 {/* ✅ Show "Elections" link only for admin users */}
                 {isAdmin && (
                   <NavLink

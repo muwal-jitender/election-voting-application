@@ -298,4 +298,7 @@ textarea {
   .modal__content {
     width: 95%;
   }
+  h3 {
+    font-size: 0.8rem;
+  }
 }

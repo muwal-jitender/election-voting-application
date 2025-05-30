@@ -80,14 +80,31 @@ const Enable2FAModal = () => {
             {/* Step 1: Display QR code and backup key */}
             <div className="setup-2fa">
               <h3>🔐 Set Up Two-Factor Authentication</h3>
-              <p>Open your Authenticator app and scan this code:</p>
+              <p className="setup-2fa__open-auth-app">
+                Open your Authenticator app and scan this code:
+              </p>
               <img src={qrCode} alt="QR Code" className="qr-image" />
               <p className="backup">Can't scan? Enter this key manually:</p>
-              <p>
+              <p className="secret-key">
                 <strong>
                   {secret ? secret.match(/.{1,4}/g)?.join(" ") : "Loading..."}
                 </strong>
               </p>
+              <Button
+                onClick={() => {
+                  if (secret) {
+                    navigator.clipboard.writeText(secret);
+                    toast.success("🔐 Secret key copied to clipboard!");
+                  }
+                }}
+                variant="primary"
+                type="button"
+                size="sm"
+                assistiveText="Copy the backup key to clipboard"
+                align="center"
+              >
+                📋 Copy Key
+              </Button>
             </div>
 
             <div className="divider">
