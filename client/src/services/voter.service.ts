@@ -45,4 +45,7 @@ export const voterService: IVoterService = {
       twoFALoginModel,
     );
   },
+  disable2FA: async () => {
+    return await apiRequest(API_PATH.AUTH_2FA_DISABLE, "POST", {});
+  },
 };

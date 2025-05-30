@@ -46,7 +46,7 @@ const Login = () => {
 
       if (user) {
         if (user.is2FAEnabled) {
-          setToken(user.token); // 🔐 Set 2FA enabled state
+          setToken(user.token!); // 🔐 Set 2FA enabled state
 
           toast.success(result.message || "Please complete 2FA setup.");
 

@@ -14,6 +14,7 @@ import { useWindowWidth } from "hooks/useWindowWidth";
 import { AiOutlineClose } from "react-icons/ai";
 import { FaUser } from "react-icons/fa";
 import { HiOutlineBars3 } from "react-icons/hi2";
+import { toast } from "react-toastify";
 import { setupAxiosInterceptors } from "services/axios.config";
 import { voterService } from "services/voter.service";
 import { RootState } from "store/store";
@@ -78,6 +79,17 @@ const PrivateLayout: React.FC = () => {
     return windowWidth > 600 ? "active-link" : undefined;
   };
 
+  const display2FA = async () => {
+    const response = await voterService.disable2FA();
+    toast.success(
+      response.message ||
+        "Two-Factor Authentication has been disabled successfully.",
+    );
+
+    user && setUser({ ...user, is2FAEnabled: false });
+
+    showHideNav();
+  };
   return (
     <>
       {/* 🌀 Show loader when loading */}
@@ -98,6 +110,11 @@ const PrivateLayout: React.FC = () => {
                 {!user?.is2FAEnabled && (
                   <NavLink to="#" onClick={open2FAModal}>
                     Enable Two-Factor Authentication
+                  </NavLink>
+                )}
+                {user?.is2FAEnabled && (
+                  <NavLink to="#" onClick={display2FA}>
+                    Disable Two-Factor Authentication
                   </NavLink>
                 )}
                 {/* ✅ Show "Elections" link only for admin users */}

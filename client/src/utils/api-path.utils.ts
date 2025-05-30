@@ -13,6 +13,7 @@ export const API_PATH = {
   AUTH_2FA_SETUP: `${AUTH_CONTROLLER}/2fa/setup`,
   AUTH_2FA_VERIFY: `${AUTH_CONTROLLER}/2fa/verify`,
   AUTH_2FA_LOGIN: `${AUTH_CONTROLLER}/2fa/verify-login`,
+  AUTH_2FA_DISABLE: `${AUTH_CONTROLLER}/2fa/disable`,
 
   LOGIN_USER_DETAIL: `${VOTER_CONTROLLER}/me`,
   // Candidate

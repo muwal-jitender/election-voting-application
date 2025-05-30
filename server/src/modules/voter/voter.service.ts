@@ -196,4 +196,10 @@ export class VoterService {
       throw error;
     }
   }
+  async disable2FA(userId: Types.ObjectId) {
+    return this.voterRepository.update(userId, {
+      is2FAEnabled: false,
+      totpSecret: null,
+    });
+  }
 }

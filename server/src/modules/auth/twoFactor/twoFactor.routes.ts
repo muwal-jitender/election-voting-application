@@ -36,4 +36,12 @@ router.post(
     await twoFactorController.verify2FA(req, res, next);
   }
 );
+router.post(
+  "/disable",
+  authenticateJWT,
+  rateLimiter(rateLimiterOptions),
+  async (req, res, next) => {
+    await twoFactorController.disable2FA(req, res, next);
+  }
+);
 export default router;

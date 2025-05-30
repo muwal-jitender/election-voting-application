@@ -19,7 +19,7 @@ export interface IUserResponse
     "id" | "password" | "createdAt" | "votedElectionIds"
   > {
   is2FAEnabled: boolean; // 🛡️ 2FA toggle
-  token: string;
+  token?: string;
 }
 
 export interface IRegisterModel
@@ -44,6 +44,7 @@ export interface IVoterService {
   verify: (model: I2FAVerifyModel) => Promise<IApiResponse<null>>;
   me: () => Promise<IApiResponse<IUserResponse>>;
   twoFAlogin: (user: I2FALoginModel) => Promise<IApiResponse<IUserResponse>>;
+  disable2FA: () => Promise<IApiResponse<null>>;
 }
 
 export interface I2FASetupResponse {

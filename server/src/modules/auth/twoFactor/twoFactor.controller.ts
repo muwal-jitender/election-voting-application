@@ -188,6 +188,20 @@ export class TwoFactorController {
       next(error);
     }
   }
+  // POST /api/v1/auth/2fa/disable
+  async disable2FA(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user!.userId; // Assume user is authenticated via middleware
+      await this.voterService.disable2FA(userId);
+
+      res.status(200).json({
+        message: "Two-Factor Authentication has been disabled.",
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   private verifyToken(token: string) {
     try {
       return jwtService.verify(token, env.JWT_ACCESS_SECRET) as TwoFAPayload;
