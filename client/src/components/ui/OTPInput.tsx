@@ -8,11 +8,14 @@ import React, { useRef, useState } from "react";
 interface OTPInputProps {
   length?: number; // Number of OTP digits (default is 6)
   onChangeCallback: (value: string) => void; // Callback to send OTP value to parent
+
+  hasError: boolean; // ✅ Add this prop
 }
 
 const OTPInput: React.FC<OTPInputProps> = ({
   length = 6, // Default to 6-digit OTP if not provided
   onChangeCallback,
+  hasError, // Default to no error
 }) => {
   // State to store individual digits of OTP
   const [otp, setOtp] = useState<string[]>(Array(length).fill(""));
@@ -65,7 +68,7 @@ const OTPInput: React.FC<OTPInputProps> = ({
           value={digit}
           onChange={(e) => handleChange(e.target.value, index)} // Update digit on change
           onKeyDown={(e) => handleKeyDown(e, index)} // Handle backspace navigation
-          className="otp-box"
+          className={`otp-box ${hasError && !digit ? "otp-error" : ""}`} // Add error class if hasError
         />
       ))}
     </div>

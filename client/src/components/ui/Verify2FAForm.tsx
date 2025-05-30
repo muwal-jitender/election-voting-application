@@ -1,7 +1,7 @@
 import "./Verify2FAForm.css";
 
 import { ApiErrorMessage, Button, OTPInput } from "components/ui";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
@@ -24,19 +24,22 @@ const TwoFAVerificationForm: React.FC<ITwoFAVerificationFormProps> = ({
   btnText,
   initialSecret,
 }) => {
+  const [localServerErrors, setLocalServerErrors] =
+    useState<string[]>(serverErrors);
+
+  // Sync with props when they change (e.g., on failed submission)
+  useEffect(() => {
+    setLocalServerErrors(serverErrors);
+  }, [serverErrors]);
+
   // ✅ Setup form handling and validation with react-hook-form + Yup
   const {
-    register,
     setValue,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<I2FAVerifyModel>({
     resolver: yupResolver(twoFaValidationSchema),
   });
-
-  useEffect(() => {
-    register("code", { required: "Code is required" });
-  }, [register]);
 
   // 🧠 Store input ref for autofocus after QR loads
   const inputRef = useRef<HTMLInputElement>(null);
@@ -53,6 +56,11 @@ const TwoFAVerificationForm: React.FC<ITwoFAVerificationFormProps> = ({
     if (inputRef.current) inputRef.current.focus();
   }, []);
 
+  const combinedErrors = [
+    ...(errors.code ? [String(errors.code.message)] : []),
+    ...localServerErrors,
+  ];
+
   return (
     <div>
       {/* Step 2: Enter the 6-digit verification code */}
@@ -65,13 +73,15 @@ const TwoFAVerificationForm: React.FC<ITwoFAVerificationFormProps> = ({
         <div className="verify-group">
           <OTPInput
             length={6}
-            onChangeCallback={(value) => setValue("code", value)}
+            onChangeCallback={(value) => {
+              if (localServerErrors.length > 0) {
+                setLocalServerErrors([]);
+              }
+              setValue("code", value);
+            }}
+            hasError={!!errors.code}
           />
-          {errors.code && (
-            <p className="form__client-error-message" role="alert">
-              * {String(errors.code.message)}
-            </p>
-          )}
+
           <Button
             type="submit"
             variant="primary"
@@ -85,7 +95,7 @@ const TwoFAVerificationForm: React.FC<ITwoFAVerificationFormProps> = ({
       </form>
 
       {/* 🛑 Show any global API errors */}
-      <ApiErrorMessage errors={serverErrors} />
+      <ApiErrorMessage errors={combinedErrors} />
     </div>
   );
 };

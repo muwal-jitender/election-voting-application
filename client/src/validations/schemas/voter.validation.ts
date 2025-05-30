@@ -39,6 +39,10 @@ export const passwordRules = [
 
 // ✅ Define 2FA Validation Schema
 export const twoFaValidationSchema = Yup.object().shape({
-  code: Yup.string().trim().required("Code is required"),
+  code: Yup.string()
+    .trim()
+    .required("Code is required.")
+    .min(6, "Please enter a 6-digit code.")
+    .max(6, "Please enter a 6-digit code."),
   secret: Yup.string().trim().required("Secret is required"),
 });

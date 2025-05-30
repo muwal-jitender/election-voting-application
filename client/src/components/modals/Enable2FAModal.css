@@ -29,7 +29,6 @@
 
 .divider {
   width: 100%;
-  margin: 1rem 0;
 }
 hr {
   width: 80%;
@@ -57,8 +56,5 @@ hr {
 @media screen and (max-width: 600px) {
   .secret-key {
     font-size: 0.8rem;
-  }
-  .divider {
-    margin: 0.3rem 0px;
   }
 }
