@@ -3,7 +3,6 @@ import "./Candidates.css";
 import { useCallback, useEffect, useState } from "react";
 
 import Candidate from "components/candidate/Candidate";
-import ConfirmModal from "components/modals/ConfirmModal";
 import { useParams } from "react-router-dom";
 import { electionService } from "services/election.service";
 import { ICandidateModel } from "types";
@@ -97,9 +96,6 @@ const Candidates = () => {
           </div>
         )}
       </section>
-
-      {/* ✅ Global confirmation modal */}
-      <ConfirmModal />
     </>
   );
 };

@@ -6,6 +6,7 @@ import { IoIosMoon, IoMdSunny } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 
+import ConfirmModal from "components/modals/ConfirmModal";
 import Enable2FAModal from "components/modals/Enable2FAModal";
 import { LogoIcon } from "components/ui";
 import { useTheme } from "context/ThemeContext";
@@ -19,6 +20,7 @@ import { setupAxiosInterceptors } from "services/axios.config";
 import { voterService } from "services/voter.service";
 import { RootState } from "store/store";
 import { UiActions } from "store/ui-slice";
+import { IErrorResponse } from "types";
 import Loader from "./Loader";
 
 const PrivateLayout: React.FC = () => {
@@ -79,17 +81,30 @@ const PrivateLayout: React.FC = () => {
     return windowWidth > 600 ? "active-link" : undefined;
   };
 
-  const display2FA = async () => {
-    const response = await voterService.disable2FA();
-    toast.success(
-      response.message ||
-        "Two-Factor Authentication has been disabled successfully.",
+  /** ✅ Open the confirm vote modal */
+  const handleCastingVote = () => {
+    dispatch(
+      UiActions.openConfirmModalDialog({
+        heading: "Turn Off Two-Factor Authentication?",
+        callback: async () => {
+          try {
+            const response = await voterService.disable2FA();
+            toast.success(
+              response.message ||
+                "Two-Factor Authentication has been disabled successfully.",
+            );
+
+            user && setUser({ ...user, is2FAEnabled: false });
+
+            showHideNav();
+          } catch (error: unknown) {
+            toast.error((error as IErrorResponse).errorMessages);
+          }
+        },
+      }),
     );
-
-    user && setUser({ ...user, is2FAEnabled: false });
-
-    showHideNav();
   };
+
   return (
     <>
       {/* 🌀 Show loader when loading */}
@@ -113,7 +128,7 @@ const PrivateLayout: React.FC = () => {
                   </NavLink>
                 )}
                 {user?.is2FAEnabled && (
-                  <NavLink to="#" onClick={display2FA}>
+                  <NavLink to="#" onClick={handleCastingVote}>
                     Disable Two-Factor Authentication
                   </NavLink>
                 )}
@@ -185,6 +200,8 @@ const PrivateLayout: React.FC = () => {
 
       {/* 📄 Main Page Content */}
       <Outlet />
+      {/* 🛑 Global Confirmation Modal */}
+      <ConfirmModal />
       {show2FAModal && <Enable2FAModal />}
     </>
   );

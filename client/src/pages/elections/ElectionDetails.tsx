@@ -7,7 +7,6 @@ import { ICandidateModel, IElectionModel, IVoterModel, RootState } from "types";
 
 import ElectionCandidate from "components/election/ElectionCandidate";
 import AddCandidateModal from "components/modals/AddCandidateModal";
-import ConfirmModal from "components/modals/ConfirmModal";
 import { IoAddOutline } from "react-icons/io5";
 import { useParams } from "react-router-dom";
 import { electionService } from "services/election.service";
@@ -162,9 +161,6 @@ const ElectionDetails = () => {
           electionId={id as string}
         />
       )}
-
-      {/* 🛑 Global Confirmation Modal */}
-      <ConfirmModal />
     </>
   );
 };

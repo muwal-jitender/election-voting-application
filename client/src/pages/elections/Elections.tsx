@@ -7,7 +7,6 @@ import { IElectionModel, RootState } from "types";
 
 import Election from "components/election/Election";
 import AddElectionModal from "components/modals/AddElectionModal";
-import ConfirmModal from "components/modals/ConfirmModal";
 import UpdateElectionModal from "components/modals/UpdateElectionModal";
 import { electionService } from "services/election.service";
 import { UiActions } from "store/ui-slice";
@@ -121,9 +120,6 @@ const Elections = () => {
           onElectionUpdated={handleElectionUpdated}
         />
       )}
-
-      {/* ❗ Global Confirm Modal */}
-      <ConfirmModal />
     </>
   );
 };
