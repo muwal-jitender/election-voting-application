@@ -3,15 +3,21 @@ import mongoose, { Document, Model, Types, UpdateQuery } from "mongoose";
 import { AppError } from "utils/exceptions.utils";
 import { StatusCodes } from "http-status-codes";
 
-type PopulateOption = {
-  path: string;
-  select?: string[];
+type PopulateMap = {
+  [k in string]: readonly (keyof any)[];
 };
+
+type PopulateOptionStrict<M extends PopulateMap> = {
+  [K in keyof M]: {
+    path: K extends string ? K : never;
+    select?: M[K];
+  };
+}[keyof M][];
 
 /**
  * Generic Repository for MongoDB CRUD operations using Mongoose
  */
-export class BaseRepository<T extends Document> {
+export class BaseRepository<T extends Document, P extends PopulateMap = {}> {
   private model: Model<T>;
 
   constructor(model: Model<T>) {
@@ -24,26 +30,43 @@ export class BaseRepository<T extends Document> {
     return await document.save();
   }
 
-  /** Find all documents */
-  async findAll(filter: object = {}): Promise<T[]> {
-    return await this.model.find(filter).exec();
-  }
+  /**
+   * Retrieves all documents that match the specified filter and returns them with only the selected fields.
+   *
+   * @template K - A key of the generic type T representing the document's top-level fields.
+   * @template P - A map of fields that can be populated, each with a list of valid subfields to select.
+   *
+   * @param {object} [filter={}] - The MongoDB query filter used to match documents.
+   * @param {K[]} [selectedFields=[]] - An array of field names from the document to include in the result.
+   * @param {PopulateOptionStrict<P>} [populateFields=[]] - A strictly typed array of population options specifying which related documents to populate and which fields to include.
+   *
+   * @returns {Promise<T[]>} A promise that resolves to an array of documents matching the filter,
+   *                         optionally selecting specific fields and populating specified references.
+   *
+   * @example
+   * // Example: Retrieve elections with only 'title' and 'thumbnail', and populate related 'candidates'
+   * await electionRepository.findAll(
+   *   {},
+   *   ['title', 'thumbnail'],
+   *   [
+   *     { path: 'candidates', select: ['fullName', 'image'] },
+   *     { path: 'voters', select: ['email'] }
+   *   ]
+   * );
+   */
 
-  /** Find one document by field name and allow selecting specific fields */
-  async findAll2<K extends keyof T>(
+  async findAll<K extends keyof T>(
     filter: object = {},
-    selectedFields: K[] = [], // Fields to include explicitly
-    populateFields: PopulateOption[] = []
-  ): Promise<T[] | null> {
+    selectedFields: K[] = [],
+    populateFields: PopulateOptionStrict<P> = [] // ✅ Strictly typed
+  ): Promise<T[]> {
     return await this.model
       .find(filter)
       .populate(
-        populateFields.map((e) => {
-          return {
-            path: e.path,
-            select: e.select,
-          };
-        })
+        populateFields.map((e) => ({
+          path: e.path,
+          select: e.select?.join(" "),
+        })) as mongoose.PopulateOptions[] // ✅
       )
       .select(selectedFields.join(" "))
       .exec();

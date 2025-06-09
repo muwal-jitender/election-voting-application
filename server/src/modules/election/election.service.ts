@@ -115,7 +115,7 @@ export class ElectionService {
 
   async getElectionResults() {
     logger.info("📊 Fetching election results");
-    return await this.electionRepository.findAll2(
+    return await this.electionRepository.findAll(
       {},
       ["id", "thumbnail", "title"],
       [
