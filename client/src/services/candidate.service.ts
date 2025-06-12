@@ -2,17 +2,15 @@ import { IAddCandidateModel, ICandidateModel, ICandidateService } from "types";
 import { API_PATH, resolveApiPath } from "utils/api-path.utils";
 
 import { AxiosRequestConfig } from "axios";
+import { toFormData } from "utils/form-data.util";
 import { apiRequest } from "./api-request";
 
 export const candidateService: ICandidateService = {
   /** Create Election */
   create: async (payload: IAddCandidateModel, electionId: string) => {
     // ✅ Create FormData for file upload
-    const formData = new FormData();
-    formData.append("fullName", payload.fullName);
-    formData.append("motto", payload.motto);
-    formData.append("electionId", electionId);
-    formData.append("image", payload.image as File);
+    //const formData = new FormData();
+    const formData = toFormData({ ...payload, electionId });
 
     // ✅ Configure request headers
     const config: AxiosRequestConfig = {
