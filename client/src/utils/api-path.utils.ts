@@ -3,9 +3,7 @@ const AUTH_CONTROLLER = "/auth";
 const CANDIDATE_CONTROLLER = "/candidates";
 const ELECTION_CONTROLLER = "/elections";
 
-export const API_PATH = {
-  // Voter
-  VOTER: `${VOTER_CONTROLLER}`,
+export const AUTH_API = {
   AUTH_REGISTER: `${AUTH_CONTROLLER}/register`,
   AUTH_LOGIN: `${AUTH_CONTROLLER}/login`,
   AUTH_LOGOUT: `${AUTH_CONTROLLER}/logout`,
@@ -14,12 +12,19 @@ export const API_PATH = {
   AUTH_2FA_VERIFY: `${AUTH_CONTROLLER}/2fa/verify`,
   AUTH_2FA_LOGIN: `${AUTH_CONTROLLER}/2fa/verify-login`,
   AUTH_2FA_DISABLE: `${AUTH_CONTROLLER}/2fa/disable`,
-
-  LOGIN_USER_DETAIL: `${VOTER_CONTROLLER}/me`,
+} as const;
+export const CANDIDATE_API = {
   // Candidate
   CANDIDATE: `${CANDIDATE_CONTROLLER}`,
   CANDIDATE_ID: `${CANDIDATE_CONTROLLER}/:id`,
   CANDIDATE_VOTE: `${CANDIDATE_CONTROLLER}/:id/elections/:electionId`,
+} as const;
+
+export const VOTER_API = {
+  VOTER: `${VOTER_CONTROLLER}`,
+  LOGIN_USER_DETAIL: `${VOTER_CONTROLLER}/me`,
+} as const;
+export const ELECTION_API = {
   // Election
   ELECTION: `${ELECTION_CONTROLLER}`,
   ELECTION_RESULTS: `${ELECTION_CONTROLLER}/elections-result`,
@@ -29,7 +34,7 @@ export const API_PATH = {
   ELECTION_GET_DETAILS_BY_ID: `${ELECTION_CONTROLLER}/:id/details`,
   ELECTION_GET_VOTERS_BY_ID: `${ELECTION_CONTROLLER}/:id/voters`,
   ELECTION_CHECK_IF_VOTER_ALREADY_VOTED: `${ELECTION_CONTROLLER}/:id/voted`,
-};
+} as const;
 
 /** Utility function to replace ":id" */
 export const resolveApiPath = (

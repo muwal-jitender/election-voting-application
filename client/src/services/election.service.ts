@@ -7,19 +7,17 @@ import {
   IElectionService,
   IVoterVotedResponse,
 } from "types";
-import { API_PATH, resolveApiPath } from "utils/api-path.utils";
+import { ELECTION_API, resolveApiPath } from "utils/api-path.utils";
 
 import { AxiosRequestConfig } from "axios";
+import { toFormData } from "utils/form-data.util";
 import { apiRequest } from "./api-request";
 
 export const electionService: IElectionService = {
   /** Create Election */
   create: async (payload: IAddElection) => {
     // ✅ Create FormData for file upload
-    const formData = new FormData();
-    formData.append("title", payload.title);
-    formData.append("description", payload.description);
-    formData.append("thumbnail", payload.thumbnail);
+    const formData = toFormData(payload);
 
     // ✅ Configure request headers
     const config: AxiosRequestConfig = {
@@ -29,7 +27,7 @@ export const electionService: IElectionService = {
     };
     // ✅ Call the API
     return await apiRequest<IElectionModel>(
-      API_PATH.ELECTION,
+      ELECTION_API.ELECTION,
       "POST",
       formData,
       config,
@@ -39,10 +37,7 @@ export const electionService: IElectionService = {
   /** Update Election */
   update: async (id: string, payload: IEditElection) => {
     // ✅ Create FormData for file upload
-    const formData = new FormData();
-    formData.append("title", payload.title);
-    formData.append("description", payload.description);
-    formData.append("thumbnail", payload.thumbnail as File);
+    const formData = toFormData(payload);
 
     // ✅ Configure request headers
     const config: AxiosRequestConfig = {
@@ -52,7 +47,7 @@ export const electionService: IElectionService = {
     };
     // ✅ Call the API
     return await apiRequest<IElectionModel>(
-      resolveApiPath(API_PATH.ELECTION_ID, { id: id }),
+      resolveApiPath(ELECTION_API.ELECTION_ID, { id: id }),
       "PATCH",
       formData,
       config,
@@ -60,30 +55,30 @@ export const electionService: IElectionService = {
   },
   /** Get All Elections */
   getAll: async () => {
-    return await apiRequest<IElectionDetail[]>(API_PATH.ELECTION, "GET");
+    return await apiRequest<IElectionDetail[]>(ELECTION_API.ELECTION, "GET");
   },
   getResults: async () => {
     return await apiRequest<IElectionDetail[]>(
-      API_PATH.ELECTION_RESULTS,
+      ELECTION_API.ELECTION_RESULTS,
       "GET",
     );
   },
   /** Get All Candidates by Elections id */
   getCandidatesByElectionId: async (id: string) => {
     return await apiRequest<ICandidateModel[]>(
-      resolveApiPath(API_PATH.ELECTION_GET_CANDIDATES_BY_ID, { id: id }),
+      resolveApiPath(ELECTION_API.ELECTION_GET_CANDIDATES_BY_ID, { id: id }),
       "GET",
     );
   },
   delete: async (id: string) => {
     return await apiRequest<IElectionModel>(
-      resolveApiPath(API_PATH.ELECTION_ID, { id: id }),
+      resolveApiPath(ELECTION_API.ELECTION_ID, { id: id }),
       "DELETE",
     );
   },
   checkIfVoterAlreadyVoted: async (id: string) => {
     return await apiRequest<IVoterVotedResponse>(
-      resolveApiPath(API_PATH.ELECTION_CHECK_IF_VOTER_ALREADY_VOTED, {
+      resolveApiPath(ELECTION_API.ELECTION_CHECK_IF_VOTER_ALREADY_VOTED, {
         id: id,
       }),
       "GET",
@@ -91,7 +86,7 @@ export const electionService: IElectionService = {
   },
   getFullDetail: async (id: string) => {
     return await apiRequest<IElectionDetail>(
-      resolveApiPath(API_PATH.ELECTION_GET_DETAILS_BY_ID, { id: id }),
+      resolveApiPath(ELECTION_API.ELECTION_GET_DETAILS_BY_ID, { id: id }),
       "GET",
     );
   },
