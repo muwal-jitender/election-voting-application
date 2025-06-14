@@ -4,14 +4,14 @@ const CANDIDATE_CONTROLLER = "/candidates";
 const ELECTION_CONTROLLER = "/elections";
 
 export const AUTH_API = {
-  AUTH_REGISTER: `${AUTH_CONTROLLER}/register`,
-  AUTH_LOGIN: `${AUTH_CONTROLLER}/login`,
-  AUTH_LOGOUT: `${AUTH_CONTROLLER}/logout`,
-  AUTH_REFRESH_TOKEN: `${AUTH_CONTROLLER}/refresh-token`,
-  AUTH_2FA_SETUP: `${AUTH_CONTROLLER}/2fa/setup`,
-  AUTH_2FA_VERIFY: `${AUTH_CONTROLLER}/2fa/verify`,
-  AUTH_2FA_LOGIN: `${AUTH_CONTROLLER}/2fa/verify-login`,
-  AUTH_2FA_DISABLE: `${AUTH_CONTROLLER}/2fa/disable`,
+  REGISTER: `${AUTH_CONTROLLER}/register`,
+  LOGIN: `${AUTH_CONTROLLER}/login`,
+  LOGOUT: `${AUTH_CONTROLLER}/logout`,
+  REFRESH_TOKEN: `${AUTH_CONTROLLER}/refresh-token`,
+  TWO_FA_SETUP: `${AUTH_CONTROLLER}/2fa/setup`,
+  TWO_FA_VERIFY: `${AUTH_CONTROLLER}/2fa/verify`,
+  TWO_FA_LOGIN: `${AUTH_CONTROLLER}/2fa/verify-login`,
+  TWO_FA_DISABLE: `${AUTH_CONTROLLER}/2fa/disable`,
 } as const;
 export const CANDIDATE_API = {
   // Candidate
@@ -36,13 +36,27 @@ export const ELECTION_API = {
   ELECTION_CHECK_IF_VOTER_ALREADY_VOTED: `${ELECTION_CONTROLLER}/:id/voted`,
 } as const;
 
-/** Utility function to replace ":id" */
+/**
+ * Replaces parameter placeholders in an API path string with actual values.
+ *
+ * This utility is used to resolve dynamic route parameters (e.g., ":id", ":userId")
+ * by replacing them with the corresponding values provided in the `params` object.
+ *
+ * @example
+ * const path = resolveApiPath("/users/:userId/posts/:postId", { userId: 123, postId: 456 });
+ * // Returns: "/users/123/posts/456"
+ *
+ * @param {string} path - The API path containing placeholders (e.g., "/resource/:id").
+ * @param {Record<string, string | number>} params - An object where each key matches a placeholder name in the path, and the value is what should replace it.
+ *
+ * @returns {string} The resolved path with all placeholders replaced by their corresponding values.
+ */
 export const resolveApiPath = (
   path: string,
   params: Record<string, string | number>,
-) => {
+): string => {
   return Object.entries(params).reduce(
-    (acc, [key, value]) => acc.replace(`:${key}`, String(params[key])),
+    (acc, [key, value]) => acc.replace(`:${key}`, String(value)),
     path,
   );
 };
